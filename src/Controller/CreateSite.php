@@ -59,6 +59,8 @@ final class CreateSite extends AbstractController
 
             $this->siteRepository->save($site);
 
+            $this->addFlash('success', 'Site created successfully');
+
             return ['form' => $form->createView()];
         }
 

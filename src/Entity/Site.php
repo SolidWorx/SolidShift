@@ -31,8 +31,8 @@ class Site
     private Ulid $id;
 
     #[ORM\Column(length: 45)]
-    #[Assert\NotBlank()]
-    #[Assert\Length(min: 3, max: 45)]
+    #[Assert\NotBlank(message: 'Please enter a name for the site')]
+    #[Assert\Length(min: 3, max: 45, minMessage: 'The site name must be at least {{ limit }} characters long', maxMessage: 'The site name must be less than {{ limit }} characters long')]
     private string $name = '';
 
     #[ORM\Column(length: 75)]
@@ -60,11 +60,11 @@ class Site
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
-        $this->name = $name;
+        $this->name = (string) $name;
 
-        $this->slug = (new AsciiSlugger())->slug($name)->lower()->toString();
+        $this->slug = (new AsciiSlugger())->slug($this->name)->lower()->toString();
 
         return $this;
     }

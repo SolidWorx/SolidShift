@@ -29,6 +29,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -67,6 +68,14 @@ final class CreateSiteTest extends KernelTestCase
 
         $container = new ServiceLocator([
             'form.factory' => fn () => $this->formFactory,
+            'request_stack' => static function () {
+                $stack = new RequestStack();
+                $request = new Request();
+                $sessionFactory = self::getContainer()->get('session.factory');
+                $request->setSession($sessionFactory->createSession());
+                $stack->push($request);
+                return $stack;
+            },
             'security.token_storage' => function () {
                 $tokenStorage = $this->createMock(TokenStorageInterface::class);
                 $token = $this->createMock(TokenInterface::class);
