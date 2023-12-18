@@ -11,7 +11,9 @@
 
 namespace App\Security;
 
+use App\Controller\ChooseSite;
 use App\Controller\CreateSite;
+use App\Controller\Security;
 use App\Entity\User;
 use App\Repository\UserSiteAccessRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -32,23 +34,21 @@ final class AppAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
-
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly UrlGeneratorInterface    $urlGenerator,
         private readonly UserSiteAccessRepository $siteAccessRepository,
     ) {
     }
 
     public function authenticate(Request $request): Passport
     {
-        $username = $request->request->getString('username', '');
+        $username = $request->request->getString('username');
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
 
         return new Passport(
             new UserBadge($username),
-            new PasswordCredentials($request->request->getString('password', '')),
+            new PasswordCredentials($request->request->getString('password')),
             [
                 new CsrfTokenBadge('authenticate', $request->request->getString('_csrf_token')),
                 new RememberMeBadge(),
@@ -70,16 +70,17 @@ final class AppAuthenticator extends AbstractLoginFormAuthenticator
 
         $sites = $this->siteAccessRepository->findBy(['user' => $user]);
 
+        $route = ChooseSite::ROUTE_NAME;
+
         if (count($sites) === 0) {
-            return new RedirectResponse($this->urlGenerator->generate(CreateSite::ROUTE_NAME));
+            $route = CreateSite::ROUTE_NAME;
         }
 
-        // @TODO: Redirect to site if there is only one, otherwise redirect to site selector
-        return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+        return new RedirectResponse($this->urlGenerator->generate($route));
     }
 
     protected function getLoginUrl(Request $request): string
     {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        return $this->urlGenerator->generate(Security::LOGIN_ROUTE_NAME);
     }
 }

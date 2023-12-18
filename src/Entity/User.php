@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: User::TABLE_NAME)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface

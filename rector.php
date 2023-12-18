@@ -15,6 +15,7 @@ use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Doctrine\Set\DoctrineSetList;
+use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
@@ -71,6 +72,11 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__ . '/src/Security/Voter/UserSiteAccessVoter.php',
-        ]
+        ],
+        AnnotationToAttributeRector::class => [
+            __DIR__ . '/src/Entity/Site.php',
+            __DIR__ . '/src/Entity/User.php',
+            __DIR__ . '/src/Entity/UserSiteAccess.php',
+        ],
     ]);
 };

@@ -1,0 +1,8 @@
+{% extends "layouts/empty.html.twig" %}
+
+{% block title %}Create Site{% endblock title %}
+
+{% block body %}
+    {% set site = {id: null} %}
+    {% include 'site/_partial/site_list.html.twig' with {site: {id: null}, action: 'choose'} %}
+{% endblock %}

@@ -18,6 +18,9 @@ use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * @codeCoverageIgnore
+ */
 #[ORM\Entity(repositoryClass: UserSiteAccessRepository::class)]
 class UserSiteAccess
 {

@@ -14,7 +14,6 @@ namespace App\Tests\Controller;
 use App\Controller\CreateSite;
 use App\Entity\Site;
 use App\Entity\User;
-use App\Entity\UserSiteAccess;
 use App\Enum\UserRole;
 use App\Repository\SiteRepository;
 use App\Repository\UserRepository;
@@ -41,9 +40,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 #[CoversClass(CreateSite::class)]
 #[
-    UsesClass(Site::class),
-    UsesClass(User::class),
-    UsesClass(UserSiteAccess::class),
     UsesClass(UserRepository::class),
     UsesClass(SiteRepository::class),
 ]

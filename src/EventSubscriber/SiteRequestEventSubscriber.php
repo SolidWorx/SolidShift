@@ -22,6 +22,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Uid\Ulid;
 use function is_array;
 
+/**
+ * @see \App\Tests\EventSubscriber\SiteRequestEventSubscriberTest
+ */
 final readonly class SiteRequestEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(

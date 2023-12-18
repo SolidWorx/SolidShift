@@ -30,12 +30,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use function assert;
 
 #[CoversClass(SiteRequestEventSubscriber::class)]
-#[
-    UsesClass(User::class),
-    UsesClass(UserSiteAccess::class),
-    UsesClass(Site::class),
-    UsesClass(SiteRepository::class)
-]
+#[UsesClass(SiteRepository::class)]
 final class SiteRequestEventSubscriberTest extends KernelTestCase
 {
     public function testGetSubscribedEvents(): void

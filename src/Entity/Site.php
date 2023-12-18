@@ -21,6 +21,9 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @codeCoverageIgnore
+ */
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\Table(name: Site::TABLE_NAME)]
 class Site implements Stringable
