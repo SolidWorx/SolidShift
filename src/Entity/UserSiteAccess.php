@@ -17,11 +17,11 @@ class UserSiteAccess
 
     #[ORM\ManyToOne(inversedBy: 'sites')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\ManyToOne(inversedBy: 'userAccess')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Site $site = null;
+    private Site $site;
 
     #[ORM\Column(length: 15, enumType: UserRole::class)]
     private UserRole $role;
@@ -43,7 +43,11 @@ class UserSiteAccess
 
     public function setUser(?User $user): static
     {
-        $this->user = $user;
+        if (null === $user) {
+            unset($this->user);
+        } else {
+            $this->user = $user;
+        }
 
         return $this;
     }
@@ -55,7 +59,11 @@ class UserSiteAccess
 
     public function setSite(?Site $site): static
     {
-        $this->site = $site;
+        if (null === $site) {
+            unset($this->site);
+        } else {
+            $this->site = $site;
+        }
 
         return $this;
     }

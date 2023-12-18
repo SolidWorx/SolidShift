@@ -20,22 +20,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]
-    private ?Ulid $id = null;
+    private Ulid $id;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\Email(mode: Assert\Email::VALIDATION_MODE_STRICT)]
     #[Assert\NotBlank()]
-    private ?string $username = null;
+    private string $username = '';
 
+    /** @var list<string> */
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string|null The hashed password
-     */
     #[ORM\Column]
-    private ?string $password = null;
+    private string $password = '';
 
+    /** @var Collection<int, UserSiteAccess>  */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
     private Collection $siteAccess;
 
@@ -69,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return $this->username;
     }
 
     /**
@@ -84,6 +83,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    /**
+     * @param list<string> $roles
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;

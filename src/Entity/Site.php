@@ -23,8 +23,9 @@ class Site
     #[ORM\Column(length: 45)]
     #[Assert\NotBlank()]
     #[Assert\Length(min: 3, max: 45)]
-    private ?string $name = null;
+    private string $name = '';
 
+    /** @var Collection<int, UserSiteAccess>  */
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
     private Collection $userAccess;
 
