@@ -23,7 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method UserSiteAccess[]    findAll()
  * @method UserSiteAccess[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserSiteAccessRepository extends ServiceEntityRepository
+final class UserSiteAccessRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

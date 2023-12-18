@@ -23,7 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Site[]    findAll()
  * @method Site[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SiteRepository extends ServiceEntityRepository
+final class SiteRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

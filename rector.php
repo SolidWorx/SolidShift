@@ -30,12 +30,22 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         // General
         SetList::CODE_QUALITY,
+        SetList::CODING_STYLE,
+        SetList::DEAD_CODE,
+        SetList::EARLY_RETURN,
+        SetList::INSTANCEOF,
+        SetList::PHP_82,
+        SetList::STRICT_BOOLEANS,
+        SetList::TYPE_DECLARATION,
+        SetList::PRIVATIZATION,
 
         // PHP
         LevelSetList::UP_TO_PHP_82,
 
         // PHPUnit
+        PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
 
         // Doctrine

@@ -58,6 +58,7 @@
     "twig/twig": "^2.12 || ^3.0"
   },
   "require-dev": {
+    "dama/doctrine-test-bundle": "^8.0",
     "ergebnis/composer-normalize": "^2.41",
     "ergebnis/phpunit-slow-test-detector": "^2.7",
     "phpstan/extension-installer": "^1.3",
