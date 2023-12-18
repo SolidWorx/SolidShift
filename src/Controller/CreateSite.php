@@ -20,6 +20,7 @@ use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -42,10 +43,10 @@ final class CreateSite extends AbstractController
     }
 
     /**
-     * @return array{form: FormView}
+     * @return array{form: FormView}|Response
      */
     #[Template(self::TEMPLATE_NAME)]
-    public function __invoke(Request $request): array
+    public function __invoke(Request $request): array|Response
     {
         $form = $this->createForm(SiteType::class);
 
@@ -55,13 +56,13 @@ final class CreateSite extends AbstractController
             $site = $form->getData();
             assert($site instanceof Site);
 
-            $site->addUserAccess(new UserSiteAccess($this->getUser(), UserRole::ROLE_ADMIN));
+            $site->addUserAccess(new UserSiteAccess(user: $this->getUser(), role: UserRole::ROLE_ADMIN));
 
             $this->siteRepository->save($site);
 
             $this->addFlash('success', 'Site created successfully');
 
-            return ['form' => $form->createView()];
+            return $this->redirectToRoute(Dashboard::ROUTE_NAME, ['site' => $site->getId()->toBase58()]);
         }
 
         return ['form' => $form->createView()];

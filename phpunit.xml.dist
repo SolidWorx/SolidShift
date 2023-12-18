@@ -41,7 +41,7 @@
         </testsuite>
     </testsuites>
 
-    <coverage includeUncoveredFiles="true"/>
+    <coverage includeUncoveredFiles="true" />
 
     <extensions>
         <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />

@@ -14,11 +14,13 @@ namespace App\Tests\Controller;
 use App\Controller\CreateSite;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Entity\UserSiteAccess;
 use App\Enum\UserRole;
 use App\Repository\SiteRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
@@ -28,14 +30,23 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 #[CoversClass(CreateSite::class)]
+#[
+    UsesClass(Site::class),
+    UsesClass(User::class),
+    UsesClass(UserSiteAccess::class),
+    UsesClass(UserRepository::class),
+    UsesClass(SiteRepository::class),
+]
 final class CreateSiteTest extends KernelTestCase
 {
     private SiteRepository $siteRepository;
@@ -92,6 +103,11 @@ final class CreateSiteTest extends KernelTestCase
 
                 return $tokenStorage;
             },
+            'router' => static function () {
+                $router = self::getContainer()->get('router');
+                assert($router instanceof RouterInterface);
+                return $router;
+            },
         ]);
 
         $this->formView = new FormView();
@@ -147,11 +163,6 @@ final class CreateSiteTest extends KernelTestCase
             ->method('getData')
             ->willReturn($site);
 
-        $form
-            ->expects(self::once())
-            ->method('createView')
-            ->willReturn($this->formView);
-
         $this->formFactory
             ->expects(self::once())
             ->method('create')
@@ -160,7 +171,8 @@ final class CreateSiteTest extends KernelTestCase
         $response = ($this->createSite)($request);
         $all = $this->siteRepository->findAll();
 
-        self::assertSame(['form' => $this->formView], $response);
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('/' . $site->getId()->toBase58() . '/dashboard', $response->getTargetUrl());
         self::assertCount(1, $all);
         self::assertSame([$site], $all);
         self::assertSame('Test Site', $site->getName());

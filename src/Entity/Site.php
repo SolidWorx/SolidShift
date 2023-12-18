@@ -15,6 +15,7 @@ use App\Repository\SiteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Ulid;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\Table(name: Site::TABLE_NAME)]
-class Site
+class Site implements Stringable
 {
     final public const TABLE_NAME = '`sites`';
 
@@ -44,8 +45,10 @@ class Site
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $userAccess;
 
-    public function __construct()
+    public function __construct(?string $name = null)
     {
+        $this->setName($name);
+
         $this->id = new Ulid();
         $this->userAccess = new ArrayCollection();
     }
@@ -100,5 +103,10 @@ class Site
     public function getSlug(): string
     {
         return $this->slug;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

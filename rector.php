@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
@@ -65,5 +66,11 @@ return static function (RectorConfig $rectorConfig): void {
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
         SymfonySetList::CONFIGS,
+    ]);
+
+    $rectorConfig->skip([
+        RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__ . '/src/Security/Voter/UserSiteAccessVoter.php',
+        ]
     ]);
 };

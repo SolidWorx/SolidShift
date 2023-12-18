@@ -36,7 +36,7 @@ class UserSiteAccess
     #[ORM\Column(length: 15, enumType: UserRole::class)]
     private UserRole $role;
 
-    public function __construct(?UserInterface $user = null, ?UserRole $role = null)
+    public function __construct(?UserInterface $user = null, ?Site $site = null, ?UserRole $role = null)
     {
         if ($user instanceof User) {
             $this->setUser($user);
@@ -44,6 +44,10 @@ class UserSiteAccess
 
         if ($role instanceof UserRole) {
             $this->setRole($role);
+        }
+
+        if ($site instanceof Site) {
+            $this->setSite($site);
         }
 
         $this->id = new Ulid();
