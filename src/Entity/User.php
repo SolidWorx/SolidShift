@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -16,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: User::TABLE_NAME)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const TABLE_NAME = '`users`';
+    final public const TABLE_NAME = '`users`';
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]
@@ -27,14 +36,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank()]
     private string $username = '';
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column]
     private string $password = '';
 
-    /** @var Collection<int, UserSiteAccess>  */
+    /**
+     * @var Collection<int, UserSiteAccess>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
     private Collection $siteAccess;
 
@@ -127,7 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addSite(UserSiteAccess $site): static
     {
-        if (!$this->siteAccess->contains($site)) {
+        if (! $this->siteAccess->contains($site)) {
             $this->siteAccess->add($site);
             $site->setUser($this);
         }

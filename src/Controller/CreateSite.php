@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Controller;
 
 use App\Entity\Site;
@@ -17,8 +26,9 @@ final class CreateSite extends AbstractController
 {
     public const ROUTE_NAME = 'app_create_site';
 
-    public function __construct(private readonly SiteRepository $siteRepository)
-    {
+    public function __construct(
+        private readonly SiteRepository $siteRepository
+    ) {
     }
 
     public function __invoke(Request $request): Response

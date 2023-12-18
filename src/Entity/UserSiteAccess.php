@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Entity;
 
 use App\Enum\UserRole;
@@ -43,7 +52,7 @@ class UserSiteAccess
 
     public function setUser(?User $user): static
     {
-        if (null === $user) {
+        if (! $user instanceof User) {
             unset($this->user);
         } else {
             $this->user = $user;
@@ -59,7 +68,7 @@ class UserSiteAccess
 
     public function setSite(?Site $site): static
     {
-        if (null === $site) {
+        if (! $site instanceof Site) {
             unset($this->site);
         } else {
             $this->site = $site;

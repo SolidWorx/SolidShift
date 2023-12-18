@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Entity;
 
 use App\Repository\SiteRepository;
@@ -14,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: Site::TABLE_NAME)]
 class Site
 {
-    public const TABLE_NAME = '`sites`';
+    final public const TABLE_NAME = '`sites`';
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]
@@ -25,7 +34,9 @@ class Site
     #[Assert\Length(min: 3, max: 45)]
     private string $name = '';
 
-    /** @var Collection<int, UserSiteAccess>  */
+    /**
+     * @var Collection<int, UserSiteAccess>
+     */
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
     private Collection $userAccess;
 
@@ -62,7 +73,7 @@ class Site
 
     public function addUserAccess(UserSiteAccess $userAccess): static
     {
-        if (!$this->userAccess->contains($userAccess)) {
+        if (! $this->userAccess->contains($userAccess)) {
             $this->userAccess->add($userAccess);
             $userAccess->setSite($this);
         }
