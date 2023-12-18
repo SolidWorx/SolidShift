@@ -114,6 +114,7 @@ final class CreateSiteTest extends KernelTestCase
     {
         $request = new Request();
         $site = new Site();
+        $site->setName('Test Site');
 
         $form = $this->createMock(FormInterface::class);
 
@@ -153,6 +154,8 @@ final class CreateSiteTest extends KernelTestCase
         self::assertSame(['form' => $this->formView], $response);
         self::assertCount(1, $all);
         self::assertSame([$site], $all);
+        self::assertSame('Test Site', $site->getName());
+        self::assertSame('test-site', $site->getSlug());
 
         foreach ($all as $dbSite) {
             self::assertCount(1, $dbSite->getUserAccess());
