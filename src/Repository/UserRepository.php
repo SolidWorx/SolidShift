@@ -48,4 +48,12 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    public function save(User $user): void
+    {
+        $em = $this->getEntityManager();
+
+        $em->persist($user);
+        $em->flush();
+    }
 }

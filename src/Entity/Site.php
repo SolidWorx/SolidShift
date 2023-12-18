@@ -41,7 +41,7 @@ class Site
     /**
      * @var Collection<int, UserSiteAccess>
      */
-    #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $userAccess;
 
     public function __construct()
@@ -95,5 +95,10 @@ class Site
         }
 
         return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
     }
 }

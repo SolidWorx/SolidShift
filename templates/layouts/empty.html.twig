@@ -1,0 +1,37 @@
+{% set locale = app.request.locale|split('_')[0] %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="{{ locale }}">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>{{ block('page_title') is defined  ? block('page_title') : (block('title') is defined ? block('title')) }}</title>
+
+    <meta name="msapplication-TileColor" content="#0054a6"/>
+    <meta name="theme-color" content="#0054a6"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="HandheldFriendly" content="True"/>
+    <meta name="MobileOptimized" content="320"/>
+
+
+    {#<link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}" />
+    <link rel="shortcut icon" type="x-icon" href="{{ asset('/favicon.ico') }}"/>#}
+
+    {%- block stylesheets -%}
+        {{ encore_entry_link_tags('app') }}
+    {%- endblock -%}
+</head>
+<body class="d-flex flex-column">
+<div class="page page-center">
+    <div class="container container-tight py-4">
+        {% block body %}{% endblock %}
+    </div>
+</div>
+
+{%- block scripts -%}
+    {{ encore_entry_script_tags('app') }}
+{%- endblock scripts -%}
+</body>

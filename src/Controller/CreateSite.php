@@ -27,10 +27,12 @@ use Symfony\Component\Routing\Attribute\Route;
  * @see \App\Tests\Controller\CreateSiteTest
  */
 #[AsController()]
-#[Route('/site/create', name: CreateSite::ROUTE_NAME)]
+#[Route(path: CreateSite::ROUTE_PATH, name: CreateSite::ROUTE_NAME)]
 final class CreateSite extends AbstractController
 {
     public const ROUTE_NAME = 'app_create_site';
+
+    public const ROUTE_PATH = '/site/create';
 
     public const TEMPLATE_NAME = 'site/create.html.twig';
 
