@@ -12,6 +12,8 @@
 namespace App\Controller;
 
 use App\Entity\Site;
+use App\Entity\UserSiteAccess;
+use App\Enum\UserRole;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -50,6 +52,8 @@ final class CreateSite extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $site = $form->getData();
             assert($site instanceof Site);
+
+            $site->addUserAccess(new UserSiteAccess($this->getUser(), UserRole::ROLE_ADMIN));
 
             $this->siteRepository->save($site);
 

@@ -15,6 +15,7 @@ use App\Enum\UserRole;
 use App\Repository\UserSiteAccessRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: UserSiteAccessRepository::class)]
@@ -35,8 +36,16 @@ class UserSiteAccess
     #[ORM\Column(length: 15, enumType: UserRole::class)]
     private UserRole $role;
 
-    public function __construct()
+    public function __construct(?UserInterface $user = null, ?UserRole $role = null)
     {
+        if ($user instanceof User) {
+            $this->setUser($user);
+        }
+
+        if ($role instanceof UserRole) {
+            $this->setRole($role);
+        }
+
         $this->id = new Ulid();
     }
 

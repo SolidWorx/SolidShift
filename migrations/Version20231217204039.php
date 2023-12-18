@@ -23,7 +23,7 @@ final class Version20231217204039 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Create users, sites and user_site_access tables';
     }
 
     public function up(Schema $schema): void

@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -33,6 +34,9 @@ class Site
     #[Assert\NotBlank()]
     #[Assert\Length(min: 3, max: 45)]
     private string $name = '';
+
+    #[ORM\Column(length: 75)]
+    private string $slug = '';
 
     /**
      * @var Collection<int, UserSiteAccess>
@@ -59,6 +63,8 @@ class Site
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        $this->slug = (new AsciiSlugger())->slug($name)->lower()->toString();
 
         return $this;
     }
