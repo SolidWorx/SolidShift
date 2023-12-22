@@ -11,6 +11,7 @@
 
 namespace App\Twig\Extension;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,12 +22,15 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use function file_get_contents;
 
 final class UiExtension extends AbstractExtension
 {
     public function __construct(
         private readonly RouterInterface      $router,
         private readonly FormFactoryInterface $formFactory,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
     ) {
     }
 
@@ -37,6 +41,7 @@ final class UiExtension extends AbstractExtension
     {
         return [
             new TwigFunction('deleteBtn', $this->deleteBtn(...), ['is_safe' => ['html'], 'needs_environment' => true]),
+            new TwigFunction('icon', $this->icon(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -55,5 +60,16 @@ final class UiExtension extends AbstractExtension
         return $twig->render('ui/button/delete.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    public function icon(string $name): string
+    {
+        static $icons = [];
+
+        if (! isset($icons[$name])) {
+            $icons[$name] = file_get_contents($this->projectDir . '/src/Resources/icons/' . $name . '.svg');
+        }
+
+        return $icons[$name];
     }
 }

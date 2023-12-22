@@ -37,9 +37,13 @@ final class UiExtensionTest extends TestCase
      */
     public function testGetFunctions(): void
     {
-        $extension = new UiExtension($this->createMock(RouterInterface::class), $this->createMock(FormFactoryInterface::class));
+        $extension = new UiExtension(
+            $this->createMock(RouterInterface::class),
+            $this->createMock(FormFactoryInterface::class),
+            '',
+        );
 
-        self::assertCount(1, $extension->getFunctions());
+        self::assertCount(2, $extension->getFunctions());
 
         foreach ($extension->getFunctions() as $function) {
             self::assertInstanceOf(TwigFunction::class, $function);
@@ -106,7 +110,7 @@ final class UiExtensionTest extends TestCase
             ->method('createView')
             ->willReturn($formView);
 
-        $extension = new UiExtension($router, $formFactory);
+        $extension = new UiExtension($router, $formFactory, '');
 
         $string = $extension->deleteBtn(new Environment(new ArrayLoader(['ui/button/delete.html.twig' => '<button>{{ form.vars.attr.label }}</button>'])), 'test', ['id' => 'test'], 'test');
 
