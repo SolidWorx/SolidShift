@@ -11,13 +11,13 @@
 
 namespace App\Controller;
 
+use App\Attribute\Route;
 use App\Entity\User;
 use Exception;
 use LogicException;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class Security extends AbstractController

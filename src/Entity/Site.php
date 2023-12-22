@@ -14,6 +14,7 @@ namespace App\Entity;
 use App\Repository\SiteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -48,12 +49,20 @@ class Site implements Stringable
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserSiteAccess::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $userAccess;
 
+    /**
+     * @var Collection<int, Location>
+     */
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: Location::class, orphanRemoval: true)]
+    #[ORM\OrderBy(['name' => Criteria::ASC])]
+    private Collection $locations;
+
     public function __construct(?string $name = null)
     {
         $this->setName($name);
 
         $this->id = new Ulid();
         $this->userAccess = new ArrayCollection();
+        $this->locations = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -111,5 +120,33 @@ class Site implements Stringable
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return Collection<int, Location>
+     */
+    public function getLocations(): Collection
+    {
+        return $this->locations;
+    }
+
+    public function addLocation(Location $location): static
+    {
+        if (! $this->locations->contains($location)) {
+            $this->locations->add($location);
+            $location->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocation(Location $location): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->locations->removeElement($location) && $location->getSite() === $this) {
+            $location->setSite(null);
+        }
+
+        return $this;
     }
 }

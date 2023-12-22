@@ -11,11 +11,11 @@
 
 namespace App\Tests\Controller;
 
+use App\Attribute\Route;
 use App\Controller\ChooseSite;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Attribute\Template;
-use Symfony\Component\Routing\Attribute\Route;
 
 #[CoversClass(ChooseSite::class)]
 final class ChooseSiteTest extends TestCase

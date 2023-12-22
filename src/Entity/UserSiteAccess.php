@@ -28,7 +28,7 @@ class UserSiteAccess
     #[ORM\Column(type: UlidType::NAME)]
     private Ulid $id;
 
-    #[ORM\ManyToOne(inversedBy: 'sites')]
+    #[ORM\ManyToOne(inversedBy: 'siteAccess')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 

@@ -11,11 +11,15 @@
 
 namespace App\Tests\EventSubscriber;
 
+use App\Doctrine\Filter\SiteFilter;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\UserSiteAccess;
 use App\EventSubscriber\SiteRequestEventSubscriber;
 use App\Repository\SiteRepository;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\FilterCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -30,7 +34,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use function assert;
 
 #[CoversClass(SiteRequestEventSubscriber::class)]
-#[UsesClass(SiteRepository::class)]
+#[
+    UsesClass(SiteRepository::class),
+    UsesClass(SiteFilter::class),
+]
 final class SiteRequestEventSubscriberTest extends KernelTestCase
 {
     public function testGetSubscribedEvents(): void
@@ -64,7 +71,8 @@ final class SiteRequestEventSubscriberTest extends KernelTestCase
 
         (new SiteRequestEventSubscriber(
             new SiteRepository($this->createMock(ManagerRegistry::class)),
-            $security
+            $security,
+            $this->createMock(ManagerRegistry::class),
         ))->onKernelRequest($requestEvent);
 
         self::assertNull($request->attributes->get('site'));
@@ -88,24 +96,49 @@ final class SiteRequestEventSubscriberTest extends KernelTestCase
             'site' => $siteId,
         ]);
 
+        $security = $this->createMock(Security::class);
+        $registry = $this->createMock(ManagerRegistry::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $configuration = new Configuration();
+        $configuration->addFilter('site', SiteFilter::class);
         $requestEvent = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             $request,
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $security = $this->createMock(Security::class);
-
         $security
             ->expects(self::never())
             ->method('getUser');
 
+        $entityManager
+            ->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn($configuration)
+        ;
+
+        $registry
+            ->expects(self::once())
+            ->method('getManager')
+            ->willReturn($entityManager)
+        ;
+
+        $filterCollection = new FilterCollection($entityManager);
+        $entityManager
+            ->expects(self::exactly(2))
+            ->method('getFilters')
+            ->willReturn($filterCollection);
+
         (new SiteRequestEventSubscriber(
             $siteRepository,
-            $security
+            $security,
+            $registry,
         ))->onKernelRequest($requestEvent);
 
         self::assertSame($site, $request->attributes->get('site'));
+        self::assertTrue($filterCollection->isEnabled('site'));
+        self::assertTrue($filterCollection->getFilter('site')->hasParameter('site'));
     }
 
     /**
@@ -139,7 +172,38 @@ final class SiteRequestEventSubscriberTest extends KernelTestCase
 
         (new SiteRequestEventSubscriber(
             $siteRepository,
-            $security
+            $security,
+            $this->createMock(ManagerRegistry::class),
+        ))->onKernelRequest($requestEvent);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testOnKernelRequestWithNonExistentSiteId(): void
+    {
+        $siteRepository = self::getContainer()->get(SiteRepository::class);
+
+        $request = new Request();
+        $site = new Site();
+
+        $request->attributes->set('_route_params', [
+            'site' => $site->getId()->toBase58(),
+        ]);
+
+        $requestEvent = new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Invalid site ID');
+
+        (new SiteRequestEventSubscriber(
+            $siteRepository,
+            $this->createMock(Security::class),
+            $this->createMock(ManagerRegistry::class),
         ))->onKernelRequest($requestEvent);
     }
 
@@ -157,6 +221,12 @@ final class SiteRequestEventSubscriberTest extends KernelTestCase
             'site' => 'test-site',
         ]);
 
+        $registry = $this->createMock(ManagerRegistry::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $configuration = new Configuration();
+        $configuration->addFilter('site', SiteFilter::class);
+
         $requestEvent = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             $request,
@@ -173,9 +243,28 @@ final class SiteRequestEventSubscriberTest extends KernelTestCase
             ->method('getUser')
             ->willReturn($user);
 
+        $entityManager
+            ->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn($configuration)
+        ;
+
+        $registry
+            ->expects(self::once())
+            ->method('getManager')
+            ->willReturn($entityManager)
+        ;
+
+        $filterCollection = new FilterCollection($entityManager);
+        $entityManager
+            ->expects(self::exactly(2))
+            ->method('getFilters')
+            ->willReturn($filterCollection);
+
         (new SiteRequestEventSubscriber(
             $siteRepository,
-            $security
+            $security,
+            $registry,
         ))->onKernelRequest($requestEvent);
 
         self::assertSame($site, $request->attributes->get('site'));

@@ -1,0 +1,53 @@
+{% extends 'layouts/base.html.twig' %}
+
+{%- block title -%}
+    {% if location is defined %}
+        Edit {{ location.name }}
+    {% else %}
+        Create Location
+    {% endif %}
+{%- endblock title -%}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <div class="row row-cards">
+            <div class="col-6 offset-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">{{- block('title') -}}</h3>
+                        <div class="mb-3">
+                            {% if location is not defined %}
+                                <div class="alert alert-indigo" role="alert">
+                                    <div class="d-flex">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path><path d="M12 9h.01"></path><path d="M11 12h1v4h1"></path></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="alert-title">Create a new location by giving it a unique name.</h4>
+                                            <div class="text-secondary">
+                                                A location is any place where a person can be scheduled to be on duty.<br />
+                                                This could be a physical location, like an office or an area in the building, <br />
+                                                or it can be a team or department within the organization.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+                                    <button type="submit" class="btn-primary btn">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

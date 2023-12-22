@@ -11,9 +11,9 @@
 
 namespace App\Controller;
 
+use App\Attribute\Route;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @see \App\Tests\Controller\ChooseSiteTest

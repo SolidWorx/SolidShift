@@ -9,19 +9,19 @@
  * with this source code in the file LICENSE.
  */
 
-namespace App\Controller;
+namespace App\Controller\Site;
 
+use App\Attribute\Route;
 use App\Entity\Site;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController()]
-#[Route('/{site}/dashboard', name: Dashboard::ROUTE_NAME)]
+#[Route('/dashboard', name: Dashboard::ROUTE_NAME, siteAware: true)]
 final class Dashboard extends AbstractController
 {
-    public const ROUTE_NAME = 'app_dashboard';
+    public const ROUTE_NAME = 'dashboard';
 
     /**
      * @return array<string, mixed>

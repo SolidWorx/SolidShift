@@ -11,6 +11,8 @@
 
 namespace App\Controller;
 
+use App\Attribute\Route;
+use App\Controller\Site\Dashboard;
 use App\Entity\Site;
 use App\Entity\UserSiteAccess;
 use App\Enum\UserRole;
@@ -22,7 +24,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @see \App\Tests\Controller\CreateSiteTest

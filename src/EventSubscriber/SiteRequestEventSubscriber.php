@@ -11,11 +11,15 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Site;
 use App\Entity\User;
 use App\Repository\SiteRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -29,7 +33,8 @@ final readonly class SiteRequestEventSubscriber implements EventSubscriberInterf
 {
     public function __construct(
         private SiteRepository $siteRepository,
-        private Security $security
+        private Security $security,
+        private ManagerRegistry $registry,
     ) {
     }
 
@@ -60,7 +65,7 @@ final readonly class SiteRequestEventSubscriber implements EventSubscriberInterf
 
             foreach ($user->getSiteAccess() as $siteAccess) {
                 if ($siteAccess->getSite()?->getSlug() === $routeParams['site']) {
-                    $request->attributes->set('site', $siteAccess->getSite());
+                    $this->setSiteParameter($request, $siteAccess->getSite());
                     return;
                 }
             }
@@ -68,6 +73,25 @@ final readonly class SiteRequestEventSubscriber implements EventSubscriberInterf
             throw new BadRequestHttpException('Invalid site ID', $invalidArgumentException, $invalidArgumentException->getCode());
         }
 
-        $request->attributes->set('site', $this->siteRepository->find($siteId));
+        $site = $this->siteRepository->find($siteId);
+
+        if (! $site instanceof Site) {
+            throw new BadRequestHttpException('Invalid site ID');
+        }
+
+        $this->setSiteParameter($request, $site);
+    }
+
+    private function setSiteParameter(Request $request, Site $site): void
+    {
+        $request->attributes->set('site', $site);
+
+        $em = $this->registry->getManager();
+        assert($em instanceof EntityManagerInterface);
+
+        $em
+            ->getFilters()
+            ->enable('site')
+            ->setParameter('site', $site->getId()->toBinary());
     }
 }

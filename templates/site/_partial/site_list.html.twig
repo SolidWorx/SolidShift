@@ -12,7 +12,7 @@
         {% for userSite in app.user.siteAccess|filter((s) => not s.site.id.equals(site.id)) %}
             <div class="list-group-item">
                 <div class="row align-items-center">
-                    <a href="{{ path('app_dashboard', {'site': userSite.site.id.toBase58()}) }}" class="text-body d-block">
+                    <a href="{{ url('dashboard', {'site': userSite.site.id.toBase58()}) }}" class="text-body d-block">
                         {{ userSite.site }}
                     </a>
                 </div>

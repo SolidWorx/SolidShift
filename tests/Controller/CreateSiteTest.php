@@ -11,12 +11,15 @@
 
 namespace App\Tests\Controller;
 
+use App\Attribute\Route;
 use App\Controller\CreateSite;
+use App\Doctrine\Filter\SiteFilter;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Enum\UserRole;
 use App\Repository\SiteRepository;
 use App\Repository\UserRepository;
+use App\Router\Router;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,7 +36,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -42,6 +44,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 #[
     UsesClass(UserRepository::class),
     UsesClass(SiteRepository::class),
+    UsesClass(SiteFilter::class),
+    UsesClass(Router::class),
 ]
 final class CreateSiteTest extends KernelTestCase
 {
@@ -168,7 +172,7 @@ final class CreateSiteTest extends KernelTestCase
         $all = $this->siteRepository->findAll();
 
         self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/' . $site->getId()->toBase58() . '/dashboard', $response->getTargetUrl());
+        self::assertSame('/s/' . $site->getId()->toBase58() . '/dashboard', $response->getTargetUrl());
         self::assertCount(1, $all);
         self::assertSame([$site], $all);
         self::assertSame('Test Site', $site->getName());
