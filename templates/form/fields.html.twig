@@ -1,0 +1,30 @@
+{%- block phonenumber_widget -%}
+    <div {{ stimulus_controller('telinput') }}>
+        <input class="form-control" {{ stimulus_target('telinput', 'input')}} />
+
+        {% set attr = attr|merge(stimulus_target('telinput', 'output')) -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' d-none')|trim}) -%}
+
+        {{- block('form_widget_simple') -}}
+    </div>
+{%- endblock phonenumber_widget -%}
+
+{%- block user_invite_widget -%}
+    {{ form_errors(form) }}
+
+    {{ form_row(form.email) }}
+    <div class="hr-text">or</div>
+    {{ form_row(form.phone) }}
+    <div class="hr-text"></div>
+    {{ form_row(form.role) }}
+{%- endblock user_invite_widget -%}
+
+{%- block email_widget -%}
+    <div class="input-group {{ group_class|default('') }}">
+        <span class="input-group-text">
+            {{ icon('mail') }}
+        </span>
+        {{- block('form_widget_simple') -}}
+    </div>
+
+{%- endblock email_widget -%}

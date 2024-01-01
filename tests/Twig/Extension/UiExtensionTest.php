@@ -43,7 +43,7 @@ final class UiExtensionTest extends TestCase
             '',
         );
 
-        self::assertCount(2, $extension->getFunctions());
+        self::assertCount(3, $extension->getFunctions());
 
         foreach ($extension->getFunctions() as $function) {
             self::assertInstanceOf(TwigFunction::class, $function);

@@ -1,0 +1,132 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Invites List{% endblock %}
+
+{% block page_header %}
+    {% if invites is not empty %}
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Invites
+                        </h2>
+                    </div>
+
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <a href="{{ url('user.invite') }}" class="btn btn-primary d-none d-sm-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M12 5l0 14" />
+                                    <path d="M5 12l14 0" />
+                                </svg>
+                                Invite new user
+                            </a>
+                            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-create-location" aria-label="Invite new user">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M12 5l0 14" />
+                                    <path d="M5 12l14 0" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock page_header %}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <ul class="nav nav-bordered mb-4">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('user.list') }}">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ path('user.invite.list') }}">Invites</a>
+            </li>
+        </ul>
+
+        {% if invites is empty %}
+            <div class="empty">
+                <div class="empty-img">
+                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
+                </div>
+                <p class="empty-title">No invites found</p>
+                <p class="empty-subtitle text-secondary">
+                    Invite users to {{ site.name }} to give them access to the system.<br />
+                    Once invited, they will receive an email with a link to register their account.<br /><br />
+
+                    {#You can also invite users by sending them the link below.
+                    <br />
+                    <pre>https://site.com/join/abc-def-ghi</pre>#}
+                </p>
+                <div class="empty-action">
+                    <a href="{{ url('user.invite') }}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Invite new user
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th class="w-1"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for invite in invites %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex py-1 align-items-center">
+                                        <div class="flex-fill">
+                                            <div class="font-weight-medium">{{ invite.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if invite.phone is not empty %}
+                                        <a href="tel:{{ invite.phone }}">{{ invite.phone|format_phone }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-secondary">
+                                    {{ invite.role.value|title }}
+                                </td>
+                                <td>
+                                    <div class="btn-list flex-nowrap">
+                                        <a href="{{ path('user.invite.resend', {invite: invite.id}) }}" class="btn btn-sm btn-action btn-ghost-light" title="Re-send invitation" data-bs-toggle="tooltip">
+                                            {{ icon('send') }}
+                                        </a>
+                                        {% embed 'ui/modal/confirm.html.twig' with {url: 'user.invite.delete', parameters: {invite: invite.id}} %}
+                                            {% block title %}
+                                                Are you sure you want to delete the invite for {{ invite.email|default(invite.phone) }}?
+                                            {% endblock %}
+
+                                            {% block content %}
+                                                Deleting the user will remove all their access from {{ site.name }}.
+                                            {% endblock content %}
+                                        {% endembed %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock body %}

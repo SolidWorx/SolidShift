@@ -12,10 +12,12 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Validator\PhoneNumber;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
@@ -26,6 +28,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: User::TABLE_NAME)]
+#[UniqueEntity(fields: ['username'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['phone'], message: 'There is already an account with this phone number')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     final public const TABLE_NAME = '`users`';
@@ -51,13 +55,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, UserSiteAccess>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSiteAccess::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSiteAccess::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $siteAccess;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 15, nullable: true)]
+    #[PhoneNumber()]
+    private ?string $phone = null;
+
+    /**
+     * @var Collection<int, UserInvite>|UserInvite[]
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserInvite::class)]
+    private Collection $invites;
 
     public function __construct()
     {
         $this->id = new Ulid();
         $this->siteAccess = new ArrayCollection();
+        $this->invites = new ArrayCollection();
     }
 
     public function getId(): ?Ulid
@@ -156,6 +177,75 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // set the owning side to null (unless already changed)
         if ($this->siteAccess->removeElement($site) && $site->getUser() === $this) {
             $site->setUser(null);
+        }
+
+        return $this;
+    }
+
+    public function getFullName(): string
+    {
+        return trim(sprintf('%s %s', $this->firstName, $this->lastName));
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(?string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserInvite>
+     */
+    public function getInvites(): Collection
+    {
+        return $this->invites;
+    }
+
+    public function addInvite(UserInvite $invite): static
+    {
+        if (! $this->invites->contains($invite)) {
+            $this->invites->add($invite);
+            $invite->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvite(UserInvite $invite): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->invites->removeElement($invite) && $invite->getUser() === $this) {
+            $invite->setUser(null);
         }
 
         return $this;

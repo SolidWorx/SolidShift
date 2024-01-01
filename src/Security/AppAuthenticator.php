@@ -14,6 +14,7 @@ namespace App\Security;
 use App\Controller\ChooseSite;
 use App\Controller\CreateSite;
 use App\Controller\Security;
+use App\Controller\Site\Dashboard;
 use App\Entity\User;
 use App\Repository\UserSiteAccessRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -69,14 +70,19 @@ final class AppAuthenticator extends AbstractLoginFormAuthenticator
         assert($user instanceof User);
 
         $sites = $this->siteAccessRepository->findBy(['user' => $user]);
+        $totalSites = count($sites);
 
         $route = ChooseSite::ROUTE_NAME;
+        $parameters = [];
 
-        if (count($sites) === 0) {
+        if ($totalSites === 0) {
             $route = CreateSite::ROUTE_NAME;
+        } elseif ($totalSites === 1) {
+            $parameters = ['site' => $sites[0]->getSite()->getId()];
+            $route = Dashboard::ROUTE_NAME;
         }
 
-        return new RedirectResponse($this->urlGenerator->generate($route));
+        return new RedirectResponse($this->urlGenerator->generate($route, $parameters));
     }
 
     protected function getLoginUrl(Request $request): string

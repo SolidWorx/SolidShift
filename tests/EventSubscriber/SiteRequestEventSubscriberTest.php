@@ -12,6 +12,7 @@
 namespace App\Tests\EventSubscriber;
 
 use App\Doctrine\Filter\SiteFilter;
+use App\Doctrine\Listener\UserPasswordListener;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\UserSiteAccess;
@@ -37,6 +38,7 @@ use function assert;
 #[
     UsesClass(SiteRepository::class),
     UsesClass(SiteFilter::class),
+    UsesClass(UserPasswordListener::class),
 ]
 final class SiteRequestEventSubscriberTest extends KernelTestCase
 {

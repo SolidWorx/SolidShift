@@ -77,7 +77,7 @@ class UserSiteAccess
         return $this;
     }
 
-    public function getSite(): ?Site
+    public function getSite(): Site
     {
         return $this->site;
     }

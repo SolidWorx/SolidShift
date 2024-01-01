@@ -56,6 +56,12 @@ class Site implements Stringable
     #[ORM\OrderBy(['name' => Criteria::ASC])]
     private Collection $locations;
 
+    /**
+     * @var Collection<int, UserInvite>|UserInvite[]
+     */
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserInvite::class, orphanRemoval: true)]
+    private Collection $invites;
+
     public function __construct(?string $name = null)
     {
         $this->setName($name);
@@ -63,6 +69,7 @@ class Site implements Stringable
         $this->id = new Ulid();
         $this->userAccess = new ArrayCollection();
         $this->locations = new ArrayCollection();
+        $this->invites = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -70,7 +77,7 @@ class Site implements Stringable
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -145,6 +152,34 @@ class Site implements Stringable
         // set the owning side to null (unless already changed)
         if ($this->locations->removeElement($location) && $location->getSite() === $this) {
             $location->setSite(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserInvite>
+     */
+    public function getInvites(): Collection
+    {
+        return $this->invites;
+    }
+
+    public function addInvite(UserInvite $invite): static
+    {
+        if (! $this->invites->contains($invite)) {
+            $this->invites->add($invite);
+            $invite->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvite(UserInvite $invite): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->invites->removeElement($invite) && $invite->getSite() === $this) {
+            $invite->setSite(null);
         }
 
         return $this;

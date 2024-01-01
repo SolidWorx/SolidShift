@@ -14,6 +14,7 @@ namespace App\Tests\Controller;
 use App\Attribute\Route;
 use App\Controller\CreateSite;
 use App\Doctrine\Filter\SiteFilter;
+use App\Doctrine\Listener\UserPasswordListener;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Enum\UserRole;
@@ -46,6 +47,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
     UsesClass(SiteRepository::class),
     UsesClass(SiteFilter::class),
     UsesClass(Router::class),
+    UsesClass(UserPasswordListener::class),
 ]
 final class CreateSiteTest extends KernelTestCase
 {

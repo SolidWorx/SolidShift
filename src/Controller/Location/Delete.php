@@ -13,7 +13,6 @@ namespace App\Controller\Location;
 
 use App\Attribute\Route;
 use App\Entity\Location;
-use App\Entity\Site;
 use App\Enum\UserRole;
 use App\Repository\LocationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +30,7 @@ final class Delete extends AbstractController
     ) {
     }
 
-    public function __invoke(Site $site, Location $location): Response
+    public function __invoke(Location $location): Response
     {
         $this->locationRepository->delete($location);
 

@@ -18,66 +18,34 @@
 
         <div>
             <a href="{{ url('location.edit', {location: location.id}) }}" class="btn btn-sm btn-action btn-ghost-light" data-bs-toggle="tooltip" title="Edit Location" data-bs-placement="top">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                    <path d="M13.5 6.5l4 4" />
-                </svg>
+                {{ icon('pencil') }}
             </a>
 
-            <a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Location" data-bs-toggle="modal" data-bs-target="#modal-delete-location-{{ location.id }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M4 7l16 0" />
-                    <path d="M10 11l0 6" />
-                    <path d="M14 11l0 6" />
-                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                </svg>
+            <a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Location" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ location.id }}">
+                {{ icon('trash') }}
             </a>
         </div>
     </div>
 
-    <div class="modal modal-blur fade" id="modal-delete-location-{{ location.id }}" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete Location?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    {% embed 'ui/modal/confirm.html.twig' with {url: 'location.delete', parameters: {location: location.id}, id: location.id} %}
+        {% block trigger %}{% endblock trigger %}
+        {% block title %}
+            Are you sure you want to delete the location {{ location.name }}?
+        {% endblock %}
+
+        {% block content %}
+            {% if location.children|length > 0 %}
+                <div class="text-secondary">
+                    <b>Note:</b> Deleting this location will also delete the following child locations:
+                    <ul>
+                        {% for child in location.children %}
+                            <li>{{ child.name }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <div class="alert alert-danger" role="alert">
-                            <div class="d-flex">
-                                <div>
-                                    {{ icon('alert') }}
-                                </div>
-                                <div>
-                                    <h4 class="alert-title">Are you sure you want to delete the location {{ location.name }}?</h4>
-                                    {% if location.children|length > 0 %}
-                                        <div class="text-secondary">
-                                            <b>Note:</b> Deleting this location will also delete the following child locations:
-                                            <ul>
-                                                {% for child in location.children %}
-                                                    <li>{{ child.name }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-                        Cancel
-                    </a>
-                    {{ deleteBtn('location.delete', {location: location.id}) }}
-                </div>
-            </div>
-        </div>
-    </div>
+            {% endif %}
+        {% endblock content %}
+    {% endembed %}
 
     {% for child in location.children(false) %}
         {{ _self.printTree(child, level + 1) }}

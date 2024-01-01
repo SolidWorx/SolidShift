@@ -11,19 +11,30 @@
 
 namespace App\Twig\Extension;
 
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumber;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
+use function assert;
 use function file_get_contents;
 
+/**
+ * @see \App\Tests\Twig\Extension\UiExtensionTest
+ */
 final class UiExtension extends AbstractExtension
 {
     public function __construct(
@@ -42,6 +53,17 @@ final class UiExtension extends AbstractExtension
         return [
             new TwigFunction('deleteBtn', $this->deleteBtn(...), ['is_safe' => ['html'], 'needs_environment' => true]),
             new TwigFunction('icon', $this->icon(...), ['is_safe' => ['html']]),
+            new TwigFunction('uuid', static fn (): UuidV4 => Uuid::v4()),
+        ];
+    }
+
+    /**
+     * @return list<TwigFilter>
+     */
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('format_phone', $this->formatPhone(...)),
         ];
     }
 
@@ -71,5 +93,17 @@ final class UiExtension extends AbstractExtension
         }
 
         return $icons[$name];
+    }
+
+    /**
+     * @throws NumberParseException
+     */
+    public function formatPhone(string $number): string
+    {
+        $phoneUtil = PhoneNumberUtil::getInstance();
+        $phone = $phoneUtil->parse($number);
+        assert($phone instanceof PhoneNumber);
+
+        return $phoneUtil->format($phone, PhoneNumberFormat::NATIONAL);
     }
 }

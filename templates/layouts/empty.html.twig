@@ -16,7 +16,6 @@
     <meta name="HandheldFriendly" content="True"/>
     <meta name="MobileOptimized" content="320"/>
 
-
     {#<link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}" />
     <link rel="shortcut icon" type="x-icon" href="{{ asset('/favicon.ico') }}"/>#}
 
@@ -27,6 +26,15 @@
 <body class="d-flex flex-column">
 <div class="page page-center">
     <div class="container container-tight py-4">
+        {% for label, messages in app.flashes %}
+            <div class="container-xl mt-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible">
+                        {{ message|trans }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
         {% block body %}{% endblock %}
     </div>
 </div>

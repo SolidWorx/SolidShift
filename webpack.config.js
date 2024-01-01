@@ -50,16 +50,16 @@ Encore
     // })
 
     // enables and configure @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
+    /*.configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
         config.corejs = '3.23';
-    })
+    })*/
 
     // enables Sass/SCSS support
     .enableSassLoader()
 
     // uncomment if you use TypeScript
-    //.enableTypeScriptLoader()
+    .enableTypeScriptLoader()
 
     // uncomment if you use React
     //.enableReactPreset()

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -61,6 +62,10 @@ final readonly class Router implements RouterInterface, WarmableInterface
         assert($generator instanceof CompiledUrlGenerator);
 
         return Closure::bind(static function (CompiledUrlGenerator $generator) use ($name, $parameters, $referenceType, $site): string {
+            if (! array_key_exists($name, $generator->compiledRoutes)) {
+                throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
+            }
+
             [$variables] = $generator->compiledRoutes[$name];
             if (! in_array('site', $variables, true)) {
                 return $generator->generate($name, $parameters, $referenceType);

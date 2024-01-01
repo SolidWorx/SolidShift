@@ -1,0 +1,134 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}User List{% endblock %}
+
+{% block page_header %}
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Users
+                    </h2>
+                </div>
+
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        <a href="{{ url('user.invite') }}" class="btn btn-primary d-none d-sm-inline-block">
+                            {{ icon('plus') }}
+                            Invite new user
+                        </a>
+                        <a href="#" class="btn btn-cyan d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#site-invite-link" aria-label="Get Invite Link">
+                            {{ icon('link') }}
+                            Get Invite Link
+                        </a>
+                        <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-create-location" aria-label="Invite new user">
+                            {{ icon('plus') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page_header %}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <ul class="nav nav-bordered mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ path('user.list') }}">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('user.invite.list') }}">Invites</a>
+            </li>
+        </ul>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th class="w-1"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for userAccess in users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex py-1 align-items-center">
+                                        <span class="avatar me-2">
+                                            {% if userAccess.user.firstName is not empty %}
+                                                {{ userAccess.user.firstName|first|title }}
+                                            {%- endif -%}
+                                            {%- if userAccess.user.lastName is not empty -%}
+                                                {{ userAccess.user.lastName|first|title }}
+                                            {% endif %}
+                                        </span>
+                                    <div class="flex-fill">
+                                        <div class="font-weight-medium">{{ userAccess.user.fullName }}</div>
+                                        <div class="text-secondary">
+                                            <a href="mailto:{{ userAccess.user.username }}" class="text-reset">{{ userAccess.user.username }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if userAccess.user.phone is not empty %}
+                                    <a href="tel:{{ userAccess.user.phone }}">{{ userAccess.user.phone|format_phone }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="text-secondary">
+                                {{ userAccess.role.value|title }}
+                            </td>
+                            <td>
+                                {% if userAccess.user is not same as(app.user) %}
+                                    {% embed 'ui/modal/confirm.html.twig' with {url: 'user.remove', parameters: {user: userAccess.user.id}} %}
+                                        {% block title %}
+                                            Are you sure you want to delete the user {{ userAccess.user.fullName }}?
+                                        {% endblock %}
+
+                                        {% block content %}
+                                            Deleting the user will remove all their access from {{ site.name }}.
+                                        {% endblock content %}
+                                    {% endembed %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block page_end %}
+    <div class="modal modal-blur fade" id="site-invite-link" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ site.name }} Invite link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Send the below link to any user that you want to invite to {{ site.name }}.<br />
+
+                    {#<pre>{{ url('site.join', {site: site.id}) }}</pre>#}
+
+                    <div class="clipboard-container" data-controller="clipboard">
+                        <pre data-clipboard-target="source">{{ url('site.join', {site: site.id}) }}</pre>
+                        <a class="copy-btn" href="#" data-action="clipboard#copy">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-copy" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h3m9 -9v-5a2 2 0 0 0 -2 -2h-2" /><path d="M13 17v-1a1 1 0 0 1 1 -1h1m3 0h1a1 1 0 0 1 1 1v1m0 3v1a1 1 0 0 1 -1 1h-1m-3 0h-1a1 1 0 0 1 -1 -1v-1" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page_end %}
