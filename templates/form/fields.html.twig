@@ -28,3 +28,121 @@
     </div>
 
 {%- endblock email_widget -%}
+
+{%- block _schedule_scheduleType_widget -%}
+    <div class="form-selectgroup-boxes row mb-3">
+
+        {% for child in form.children %}
+            <div class="col-lg-6">
+                <label class="form-selectgroup-item">
+
+                    {% set inputAttr = stimulus_action('schedule', 'isRecurring').toArray %}
+                    {% set inputAttr = inputAttr|merge(stimulus_target('schedule', 'scheduleType'~(child.vars.value|title)).toArray) %}
+
+                    {{ form_widget(child, {'attr_class': 'form-selectgroup-input', 'attr': inputAttr}) }}
+                    <span class="form-selectgroup-label d-flex align-items-center p-3">
+                        <span class="me-3">
+                          <span class="form-selectgroup-check"></span>
+                        </span>
+                        <span class="form-selectgroup-label-content">
+                          <span class="form-selectgroup-title strong mb-1">
+                              {{- form_label(child, null, {widget: ''}) -}}
+                          </span>
+                          <span class="d-block text-secondary">
+                              {{ child.vars.label.helpMessage }}
+                          </span>
+                        </span>
+                      </span>
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+{%- endblock _schedule_scheduleType_widget -%}
+
+{%- block _schedule_scheduleType_entry_widget -%}
+    {%- set attr_class = attr_class|default(attr.class|default('')) -%}
+    {%- set row_class = '' -%}
+
+    {%- set attr = attr|merge({class: attr_class|trim}) -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+{%- endblock _schedule_scheduleType_entry_widget %}
+
+{%- block schedule_widget -%}
+    <div {{ stimulus_controller('schedule') }}>
+        {{ form_widget(form.scheduleType) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.location) }}
+
+        <div {{ stimulus_target('schedule', 'startDate') }}>
+            {{ form_row(form.startDate) }}
+        </div>
+
+        {{ form_row(form.startTime) }}
+        {{ form_row(form.endTime) }}
+
+        <div class="d-none" {{ stimulus_target('schedule', 'recurringOptions') }}>
+            <div class="hr-text">Recurring Options</div>
+            {{ form_row(form.recurringOptions.type, {'attr': {'data-schedule-target' : 'recurringType'}}) }}
+
+            <div class="d-none" {{ stimulus_target('schedule', 'recurringWeekly') }}>
+                {{ form_row(form.recurringOptions.days) }}
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {% set neverInput = form.recurringOptions.endType.children|filter((v) => v.vars.value is same as('never'))|first %}
+                    {% set inputAttr = neverInput.vars.attr|merge(stimulus_target('schedule', 'scheduleEnd'~(neverInput.vars.value|title)).toArray) %}
+                    {{ form_row(neverInput, {'attr': inputAttr}) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {% set afterInput = form.recurringOptions.endType.children|filter((v) => v.vars.value is same as('after'))|first %}
+                    {% set inputAttr = afterInput.vars.attr|merge(stimulus_target('schedule', 'scheduleEnd'~(afterInput.vars.value|title)).toArray) %}
+                    {{ form_row(afterInput, {'attr': inputAttr}) }}
+                </div>
+                <div class="col d-none" {{ stimulus_target('schedule', 'recurringEndOccurrence') }}>
+                    {{ form_widget(form.recurringOptions.endOccurrence) }}
+                    {{ form_errors(form.recurringOptions.endOccurrence) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {% set onInput = form.recurringOptions.endType.children|filter((v) => v.vars.value is same as('on'))|first %}
+                    {% set inputAttr = onInput.vars.attr|merge(stimulus_target('schedule', 'scheduleEnd'~(onInput.vars.value|title)).toArray) %}
+                    {{ form_row(onInput, {'attr': inputAttr}) }}
+                </div>
+                <div class="col d-none" {{ stimulus_target('schedule', 'recurringEndDate') }}>
+                    {{ form_widget(form.recurringOptions.endDate) }}
+                    {{ form_errors(form.recurringOptions.endDate) }}
+                </div>
+            </div>
+
+            {{ form_errors(form.recurringOptions.endType) }}
+
+            {% do form.recurringOptions.endType.setRendered(true) %}
+        </div>
+
+        {{ block('form_widget') }}
+    </div>
+{%- endblock schedule_widget -%}
+
+{%- block number_widget -%}
+    <div class="input-group mb-3" {{ stimulus_controller('numberinput') }}>
+        <button class="btn btn-outline-secondary" type="button" {{ stimulus_action('numberinput', 'decrement') }}>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-minus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 12l14 0" /></svg>
+        </button>
+
+        {%- set type = type|default('text') -%}
+        {%- set attr = attr|default({})|merge(stimulus_target('numberinput', 'input').toArray) -%}
+        {{ block('form_widget_simple') }}
+
+        <button class="btn btn-outline-secondary" type="button" {{ stimulus_action('numberinput', 'increment') }}>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+        </button>
+    </div>
+{%- endblock number_widget -%}

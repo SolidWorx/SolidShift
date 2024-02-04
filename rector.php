@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
@@ -21,8 +20,67 @@ use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonySetList;
+use Rector\ValueObject\PhpVersion;
 
-return static function (RectorConfig $rectorConfig): void {
+return RectorConfig::configure()
+    ->withPaths([__DIR__ . '/src'])
+    ->withImportNames(removeUnusedImports: true)
+    ->withPhpVersion(PhpVersion::PHP_82)
+    ->withSkip([
+        RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__ . '/src/Security/Voter/UserSiteAccessVoter.php',
+        ],
+        AnnotationToAttributeRector::class => [
+            __DIR__ . '/src/Entity/Site.php',
+            __DIR__ . '/src/Entity/User.php',
+            __DIR__ . '/src/Entity/UserSiteAccess.php',
+        ],
+        ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__ . '/src/Entity/*.php',
+        ],
+    ])
+    ->withSets([
+        // General
+        SetList::CODE_QUALITY,
+        SetList::CODING_STYLE,
+        SetList::DEAD_CODE,
+        SetList::EARLY_RETURN,
+        SetList::INSTANCEOF,
+        SetList::PHP_82,
+        SetList::STRICT_BOOLEANS,
+        SetList::TYPE_DECLARATION,
+        SetList::PRIVATIZATION,
+
+        // PHP
+        LevelSetList::UP_TO_PHP_82,
+
+        // PHPUnit
+        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+
+        // Doctrine
+        DoctrineSetList::DOCTRINE_ORM_25,
+        DoctrineSetList::DOCTRINE_ORM_29,
+        DoctrineSetList::DOCTRINE_ORM_213,
+        DoctrineSetList::DOCTRINE_ORM_214,
+        DoctrineSetList::DOCTRINE_COMMON_20,
+        DoctrineSetList::DOCTRINE_DBAL_30,
+        DoctrineSetList::DOCTRINE_DBAL_40,
+        DoctrineSetList::DOCTRINE_DBAL_40,
+        DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        DoctrineSetList::DOCTRINE_BUNDLE_210,
+
+        // Symfony
+        SymfonySetList::SYMFONY_CODE_QUALITY,
+        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
+        SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
+        SymfonySetList::CONFIGS,
+    ])
+;
+
+/*return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__ . '/src']);
 
     $rectorConfig->importNames();
@@ -83,4 +141,4 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/Entity/*.php',
         ],
     ]);
-};
+};*/

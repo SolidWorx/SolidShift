@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Type Traversable\\<mixed, App\\\\Entity\\\\Schedule\\> in generic type AppendIterator\\<int, App\\\\Entity\\\\Schedule, Traversable\\<mixed, App\\\\Entity\\\\Schedule\\>\\> in PHPDoc tag @var for variable \\$append is not subtype of template type TIterator of Iterator\\<int, App\\\\Entity\\\\Schedule\\> of class AppendIterator\\.$#"
+			count: 1
+			path: src/Repository/ScheduleRepository.php

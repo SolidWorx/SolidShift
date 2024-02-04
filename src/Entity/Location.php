@@ -12,6 +12,8 @@
 namespace App\Entity;
 
 use App\Repository\LocationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -39,13 +41,20 @@ class Location implements Stringable
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
+    /**
+     * @var Collection<int, Schedule>
+     */
+    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Schedule::class, orphanRemoval: true)]
+    private Collection $schedules;
+
     public function __construct(
         ?string $name = null,
         #[ORM\ManyToOne(targetEntity: self::class)]
         private ?self $parent = null,
-        ?Site $site = null
+        ?Site $site = null,
     ) {
         $this->name = (string) $name;
+        $this->schedules = new ArrayCollection();
         $this->id = new Ulid();
 
         if ($site instanceof Site) {
@@ -132,6 +141,34 @@ class Location implements Stringable
             unset($this->site);
         } else {
             $this->site = $site;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Schedule>
+     */
+    public function getSchedules(): Collection
+    {
+        return $this->schedules;
+    }
+
+    public function addSchedule(Schedule $schedule): static
+    {
+        if (! $this->schedules->contains($schedule)) {
+            $this->schedules->add($schedule);
+            $schedule->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSchedule(Schedule $schedule): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->schedules->removeElement($schedule) && $schedule->getLocation() === $this) {
+            $schedule->setLocation(null);
         }
 
         return $this;

@@ -164,7 +164,7 @@
             <div class="collapse navbar-collapse" id="sidebar-menu">
                 <ul class="navbar-nav pt-lg-3">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('dashboard', {'site': site.id.toBase58()}) }}">
+                        <a class="nav-link" href="{{ url('dashboard') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 {{ icon('home') }}
                             </span>
@@ -174,7 +174,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('location.list', {'site': site.id.toBase58()}) }}">
+                        <a class="nav-link" href="{{ url('location.list') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 {{ icon('building') }}
                             </span>
@@ -184,7 +184,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('user.list', {'site': site.id.toBase58()}) }}">
+                        <a class="nav-link" href="{{ url('schedule.list') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                {{ icon('calendar') }}
+                            </span>
+                            <span class="nav-link-title">
+                                Schedules
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('user.list') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 {{ icon('users') }}
                             </span>

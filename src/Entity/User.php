@@ -69,16 +69,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $phone = null;
 
     /**
-     * @var Collection<int, UserInvite>|UserInvite[]
+     * @var Collection<int, UserInvite>
      */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserInvite::class)]
     private Collection $invites;
+
+    /**
+     * @var Collection<int, Shift>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Shift::class, orphanRemoval: true)]
+    private Collection $shifts;
 
     public function __construct()
     {
         $this->id = new Ulid();
         $this->siteAccess = new ArrayCollection();
         $this->invites = new ArrayCollection();
+        $this->shifts = new ArrayCollection();
     }
 
     public function getId(): ?Ulid
@@ -246,6 +253,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // set the owning side to null (unless already changed)
         if ($this->invites->removeElement($invite) && $invite->getUser() === $this) {
             $invite->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shift>
+     */
+    public function getShifts(): Collection
+    {
+        return $this->shifts;
+    }
+
+    public function addShift(Shift $shift): static
+    {
+        if (! $this->shifts->contains($shift)) {
+            $this->shifts->add($shift);
+            $shift->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShift(Shift $shift): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->shifts->removeElement($shift) && $shift->getUser() === $this) {
+            $shift->setUser(null);
         }
 
         return $this;

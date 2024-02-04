@@ -57,10 +57,16 @@ class Site implements Stringable
     private Collection $locations;
 
     /**
-     * @var Collection<int, UserInvite>|UserInvite[]
+     * @var Collection<int, UserInvite>
      */
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: UserInvite::class, orphanRemoval: true)]
     private Collection $invites;
+
+    /**
+     * @var Collection<int, Schedule>
+     */
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: Schedule::class, orphanRemoval: true)]
+    private Collection $schedules;
 
     public function __construct(?string $name = null)
     {
@@ -70,6 +76,7 @@ class Site implements Stringable
         $this->userAccess = new ArrayCollection();
         $this->locations = new ArrayCollection();
         $this->invites = new ArrayCollection();
+        $this->schedules = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -180,6 +187,41 @@ class Site implements Stringable
         // set the owning side to null (unless already changed)
         if ($this->invites->removeElement($invite) && $invite->getSite() === $this) {
             $invite->setSite(null);
+        }
+
+        return $this;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Schedule>
+     */
+    public function getSchedules(): Collection
+    {
+        return $this->schedules;
+    }
+
+    public function addSchedule(Schedule $schedule): static
+    {
+        if (!$this->schedules->contains($schedule)) {
+            $this->schedules->add($schedule);
+            $schedule->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSchedule(Schedule $schedule): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->schedules->removeElement($schedule) && $schedule->getSite() === $this) {
+            $schedule->setSite(null);
         }
 
         return $this;

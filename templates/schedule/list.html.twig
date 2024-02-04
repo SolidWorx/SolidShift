@@ -1,0 +1,102 @@
+{% extends 'layouts/base.html.twig' %}
+
+{%- block title -%}
+    {% if app.request.query.get('type') is same as('recurring') %}
+        Recurring Schedules
+    {% else %}
+        Single Schedules
+    {% endif %}
+{%- endblock title -%}
+
+{% block page_header %}
+    {% if schedules is not empty %}
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Schedules
+                        </h2>
+                    </div>
+
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <a href="{{ url('schedule.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                                {{ icon('plus') }}
+                                Create new Schedule
+                            </a>
+                            <a href="{{ url('schedule.create') }}" class="btn btn-primary d-sm-none btn-icon" aria-label="Create new Schedule">
+                                {{ icon('plus') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock page_header %}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <ul class="nav nav-bordered mb-4">
+            <li class="nav-item">
+                <a class="nav-link{% if app.request.query.get('type') is same as(null) or app.request.query.get('type') is same as('single') %} active{% endif %}" aria-current="page" href="{{ path('schedule.list') }}">Single Schedule</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link{% if app.request.query.get('type') is same as('recurring') %} active{% endif %}" href="{{ path('schedule.list', {'type': 'recurring'}) }}">Recurring Schedules</a>
+            </li>
+        </ul>
+
+        <div class="container-xl d-flex flex-column justify-content-center">
+            {% if schedules is empty %}
+                <div class="empty">
+                    <div class="empty-img">
+                        <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
+                    </div>
+                    <p class="empty-title">No schedules found</p>
+                    <p class="empty-subtitle text-secondary">
+                        Schedules are used to assign people to locations and times. <br />
+                        A schedule can be a one-time event or a recurring event.<br />
+                    </p>
+                    <div class="empty-action">
+                        <a href="{{ url('schedule.create') }}" class="btn btn-primary">
+                            {{ icon('plus') }}
+                            Add your first schedule
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{- block('title') -}}</h3>
+                    </div>
+                    <div class="list-group list-group-flush list-group-hoverable">
+                        {% for schedule in schedules %}
+                            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="col text-truncate">
+                                        {{ schedule.name }}
+                                        <div class="d-block text-secondary text-truncate mt-n1">
+                                            {{ schedule }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <a href="{{ url('schedule.edit', {schedule: schedule.id}) }}" class="btn btn-sm btn-action btn-ghost-light" data-bs-toggle="tooltip" title="Edit Schedule" data-bs-placement="top">
+                                        {{ icon('pencil') }}
+                                    </a>
+
+                                    {#<a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Location" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ schedule.id }}">
+                                    {{ icon('trash') }}
+                                </a>#}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock body %}

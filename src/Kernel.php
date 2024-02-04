@@ -11,10 +11,9 @@
 
 namespace App;
 
-use App\DependencyInjection\CompilerPass\RoutingAttributeAnnotationPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use function date_default_timezone_set;
 
 final class Kernel extends BaseKernel
 {
@@ -22,8 +21,12 @@ final class Kernel extends BaseKernel
 
     use MicroKernelTrait;
 
-    protected function build(ContainerBuilder $container): void
+    public function boot(): void
     {
-        $container->addCompilerPass(new RoutingAttributeAnnotationPass());
+        date_default_timezone_set('UTC');
+        mb_internal_encoding('UTF-8');
+        ini_set('intl.default_locale', 'en_US');
+
+        parent::boot();
     }
 }
