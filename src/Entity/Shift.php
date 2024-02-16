@@ -54,10 +54,14 @@ class Shift
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $endTime = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private DateTimeImmutable $created;
+
     public function __construct()
     {
         $this->id = new Ulid();
         $this->users = new ArrayCollection();
+        $this->created = new DateTimeImmutable();
     }
 
     public function getId(): Ulid
@@ -159,5 +163,10 @@ class Shift
         $this->users->removeElement($user);
 
         return $this;
+    }
+
+    public function getCreated(): DateTimeImmutable
+    {
+        return $this->created;
     }
 }
