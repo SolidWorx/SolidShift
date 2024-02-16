@@ -32,7 +32,7 @@ class UserSiteAccess
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    #[ORM\ManyToOne(inversedBy: 'userAccess')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'userAccess')]
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
