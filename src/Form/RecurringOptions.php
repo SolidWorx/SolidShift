@@ -15,6 +15,7 @@ use App\Entity\RecurringOptions as RecurringOptionsEntity;
 use App\Enum\ScheduleEndType;
 use App\Enum\ScheduleRecurringType;
 use Carbon\CarbonImmutable;
+use Carbon\WeekDay;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -28,16 +29,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class RecurringOptions extends AbstractType
 {
-    private const RECURRING_DAYS = [
-        'Monday' => 'monday',
-        'Tuesday' => 'tuesday',
-        'Wednesday' => 'wednesday',
-        'Thursday' => 'thursday',
-        'Friday' => 'friday',
-        'Saturday' => 'saturday',
-        'Sunday' => 'sunday',
-    ];
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -46,8 +37,8 @@ final class RecurringOptions extends AbstractType
                 'class' => ScheduleRecurringType::class,
                 'required' => false,
             ])
-            ->add('days', ChoiceType::class, [
-                'choices' => self::RECURRING_DAYS,
+            ->add('days', EnumType::class, [
+                'class' => WeekDay::class,
                 'multiple' => true,
                 'expanded' => true,
                 'help' => 'Select the days of the week the shift should recur on',

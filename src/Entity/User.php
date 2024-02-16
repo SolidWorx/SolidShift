@@ -77,7 +77,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Shift>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Shift::class, orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: Shift::class, mappedBy: 'users')]
     private Collection $shifts;
 
     public function __construct()
@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->shifts = new ArrayCollection();
     }
 
-    public function getId(): ?Ulid
+    public function getId(): Ulid
     {
         return $this->id;
     }
@@ -266,11 +266,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->shifts;
     }
 
+    public function addSiteAccess(UserSiteAccess $siteAccess): static
+    {
+        if (!$this->siteAccess->contains($siteAccess)) {
+            $this->siteAccess->add($siteAccess);
+            $siteAccess->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSiteAccess(UserSiteAccess $siteAccess): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->siteAccess->removeElement($siteAccess) && $siteAccess->getUser() === $this) {
+            $siteAccess->setUser(null);
+        }
+
+        return $this;
+    }
+
     public function addShift(Shift $shift): static
     {
-        if (! $this->shifts->contains($shift)) {
+        if (!$this->shifts->contains($shift)) {
             $this->shifts->add($shift);
-            $shift->setUser($this);
+            $shift->addUser($this);
         }
 
         return $this;
@@ -278,9 +298,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeShift(Shift $shift): static
     {
-        // set the owning side to null (unless already changed)
-        if ($this->shifts->removeElement($shift) && $shift->getUser() === $this) {
-            $shift->setUser(null);
+        if ($this->shifts->removeElement($shift)) {
+            $shift->removeUser($this);
         }
 
         return $this;

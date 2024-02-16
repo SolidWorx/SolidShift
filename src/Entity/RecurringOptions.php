@@ -16,6 +16,8 @@ use App\Enum\ScheduleRecurringType;
 use App\Repository\RecurringOptionsRepository;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Carbon\Unit;
+use Carbon\WeekDay;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
@@ -42,9 +44,9 @@ class RecurringOptions implements Stringable
     private ScheduleRecurringType $type;
 
     /**
-     * @var list<string>
+     * @var list<int>
      */
-    #[ORM\Column]
+    #[ORM\Column(type: Types::JSON)]
     private array $days = [];
 
     #[ORM\Column(length: 15, enumType: ScheduleEndType::class)]
@@ -62,7 +64,7 @@ class RecurringOptions implements Stringable
     private Schedule $schedule;
 
     /**
-     * @param list<string> $days
+     * @param list<int> $days
      */
     public function __construct(
         ?ScheduleRecurringType $type = null,
@@ -107,15 +109,15 @@ class RecurringOptions implements Stringable
     }
 
     /**
-     * @return list<string>
+     * @return list<WeekDay>
      */
     public function getDays(): array
     {
-        return $this->days;
+        return array_map(WeekDay::from(...), $this->days);
     }
 
     /**
-     * @param list<string> $days
+     * @param list<int> $days
      */
     public function setDays(array $days): static
     {
@@ -224,7 +226,7 @@ class RecurringOptions implements Stringable
         }
 
         if ($this->type->isWeekly()) {
-            $string = sprintf('Every %s %s', Arr::join(array_map(ucfirst(...), $this->days), ', ', ' and '), $time);
+            $string = sprintf('Every %s %s', Arr::join(array_map(static fn (WeekDay $day) => $day->name, $this->getDays()), ', ', ' and '), $time);
         } else {
             $string = sprintf('Every day %s', $time);
         }
@@ -235,12 +237,12 @@ class RecurringOptions implements Stringable
             $totalOccurrence = 0;
             $start = CarbonImmutable::instance($this->schedule->getStartDate());
 
-            $dates = $start->range(null, '1 day');
+            $dates = $start->range(null, Unit::Day->interval());
             $endDate = null;
 
             foreach ($dates->getIterator() as $date) {
                 /** @var CarbonImmutable $date */
-                if (in_array(strtolower($date->format('l')), $this->days, true)) {
+                if (in_array($date->dayOfWeek, $this->days, true)) {
                     $totalOccurrence++;
 
                     if ($totalOccurrence === $this->endOccurrence) {
@@ -256,18 +258,5 @@ class RecurringOptions implements Stringable
         }
 
         return $string;
-    }
-
-    public function isValidForDay(?CarbonInterface $date): bool
-    {
-        if (null === $date) {
-            return false;
-        }
-
-        if ($this->type->isDaily()) {
-            return true;
-        }
-
-        return in_array(strtolower($date->format('l')), $this->days, true);
     }
 }

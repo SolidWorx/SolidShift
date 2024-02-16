@@ -1,0 +1,31 @@
+<div{{ attributes.defaults({
+    'data-live-id': scheduleDate.hash ~ shifts|length,
+}) }} {{ attributes }}>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#{{ scheduleDate.hash }}">
+        {{ icon('plus') }} Add Users
+    </a>
+
+    <div class="tags-list">
+        {% for shift in shifts %}
+            {% for user in shift.users %}
+                <span class="tag">
+                    {{ user.fullName }}
+                    <a href="#" class="btn-close" data-action="live#action" data-action-name="prevent|removeUser(user={{ user.id }}, shift={{ shift.id }})"></a>
+                </span>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <twig:Ui:Modal id="{{ scheduleDate.hash }}" title="Assign users to shift" data-live-id="{{ scheduleDate.hash ~ shifts|length }}">
+        {{ form_start(form, {
+            attr: {
+                'data-action': 'live#action',
+                'data-action-name': 'prevent|save',
+            }
+        }) }}
+
+        {{ form_row(form.users) }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        {{ form_end(form) }}
+    </twig:Ui:Modal>
+</div>

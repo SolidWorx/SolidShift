@@ -1,6 +1,8 @@
 {
   "devDependencies": {
     "@hotwired/stimulus": "^3.2.2",
+    "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
+    "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "@symfony/webpack-encore": "^4.0.0",
     "@types/bootstrap": "^5.2.10",
     "@types/intl-tel-input": "^18.1.4",
@@ -26,6 +28,7 @@
   "dependencies": {
     "@symfony/stimulus-bridge": "^3.2.2",
     "@tabler/core": "^1.0.0-beta20",
-    "intl-tel-input": "^18.3.3"
+    "intl-tel-input": "^18.3.3",
+    "tom-select": "^2.3.1"
   }
 }

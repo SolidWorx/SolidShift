@@ -12,6 +12,7 @@
 namespace App\Tests\Schedule;
 
 use ArrayIterator;
+use Carbon\WeekDay;
 use const STR_PAD_LEFT;
 use App\Entity\RecurringOptions;
 use App\Entity\Schedule;
@@ -58,9 +59,9 @@ final class ScheduleListTest extends TestCase
             array_map(
                 static fn (ScheduleDate $date): array => [
                     'startDate' => $date->getStartDate()->format('Y-m-d'),
-                    'endDate' => $date->getEndDate()?->format('Y-m-d'),
-                    'startTime' => $date->getStartTime()?->format('H:i'),
-                    'endTime' => $date->getEndTime()?->format('H:i'),
+                    'endDate' => $date->endDate?->format('Y-m-d'),
+                    'startTime' => $date->startTime?->format('H:i'),
+                    'endTime' => $date->endTime?->format('H:i'),
                 ],
                 iterator_to_array($scheduleList->getScheduledDates())
             )
@@ -200,7 +201,7 @@ final class ScheduleListTest extends TestCase
                     'startTime' => null,
                     'endTime' => null,
                 ],
-                range(2, 18)
+                range(2, 13)
             ),
         ];
         // </editor-fold>
@@ -259,7 +260,7 @@ final class ScheduleListTest extends TestCase
                 recurringOptions: new RecurringOptions(
                     type: ScheduleRecurringType::WEEKLY,
                     endType: ScheduleEndType::NEVER,
-                    days: ['monday'],
+                    days: [WeekDay::Monday->value],
                 ),
             )],
             [
@@ -271,6 +272,12 @@ final class ScheduleListTest extends TestCase
                 ],
                 [
                     'startDate' => '2021-04-12',
+                    'endDate' => null,
+                    'startTime' => null,
+                    'endTime' => null,
+                ],
+                [
+                    'startDate' => '2021-04-19',
                     'endDate' => null,
                     'startTime' => null,
                     'endTime' => null,
@@ -287,7 +294,7 @@ final class ScheduleListTest extends TestCase
                 recurringOptions: new RecurringOptions(
                     type: ScheduleRecurringType::WEEKLY,
                     endType: ScheduleEndType::AFTER,
-                    days: ['monday', 'wednesday'],
+                    days: [WeekDay::Monday->value, WeekDay::Wednesday->value],
                     endOccurrence: 5,
                 ),
             )],
@@ -316,6 +323,12 @@ final class ScheduleListTest extends TestCase
                     'startTime' => null,
                     'endTime' => null,
                 ],
+                [
+                    'startDate' => '2021-04-19',
+                    'endDate' => null,
+                    'startTime' => null,
+                    'endTime' => null,
+                ],
             ],
         ];
         // </editor-fold>
@@ -329,7 +342,7 @@ final class ScheduleListTest extends TestCase
                     type: ScheduleRecurringType::WEEKLY,
                     endType: ScheduleEndType::ON,
                     endDate: new DateTimeImmutable('2021-04-11'),
-                    days: ['monday'],
+                    days: [WeekDay::Monday->value],
                 ),
             )],
             [
@@ -351,7 +364,7 @@ final class ScheduleListTest extends TestCase
                 recurringOptions: new RecurringOptions(
                     type: ScheduleRecurringType::WEEKLY,
                     endType: ScheduleEndType::AFTER,
-                    days: ['sunday'],
+                    days: [WeekDay::Sunday->value],
                     endOccurrence: 2,
                 ),
             )],

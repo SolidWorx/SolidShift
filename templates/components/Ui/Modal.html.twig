@@ -1,0 +1,36 @@
+<div{{ attributes.defaults({
+    class: 'modal modal-blur fade',
+    tabindex: '-1',
+    'aria-hidden': 'true',
+    id: id|default(null) ? id : false,
+}) }} {{ stimulus_controller('modal') }}>
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            {% if title is defined %}
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            <div class="modal-body text-center py-4">
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
+        {#<div class="modal-content">
+            #}{#<div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                    Cancel
+                                </a>
+                            </div>
+                            <div class="col">
+                                {{ deleteBtn(url, parameters|default({}), deleteBtnLabel|default('Delete'), 'btn-danger w-100') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>#}{#
+        </div>#}
+    </div>
+</div>

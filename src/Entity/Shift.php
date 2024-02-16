@@ -14,6 +14,8 @@ namespace App\Entity;
 use App\Repository\ShiftRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -26,13 +28,15 @@ class Shift
     #[ORM\Column(type: UlidType::NAME)]
     private Ulid $id;
 
-    #[ORM\ManyToOne(inversedBy: 'shifts')]
-    #[ORM\JoinColumn(nullable: false)]
-    private User $user;
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'shifts')]
+    private Collection $users;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private Schedule $schedule;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Schedule $schedule;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -44,8 +48,8 @@ class Shift
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $endDate = null;
 
-    #[ORM\Column(type: Types::TIME_IMMUTABLE)]
-    private DateTimeImmutable $startTime;
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $startTime = null;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $endTime = null;
@@ -53,6 +57,7 @@ class Shift
     public function __construct()
     {
         $this->id = new Ulid();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -60,28 +65,12 @@ class Shift
         return $this->id;
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        if (! $user instanceof User) {
-            unset($this->user);
-        } else {
-            $this->user = $user;
-        }
-
-        return $this;
-    }
-
     public function getSchedule(): ?Schedule
     {
         return $this->schedule;
     }
 
-    public function setSchedule(Schedule $schedule): static
+    public function setSchedule(?Schedule $schedule): static
     {
         $this->schedule = $schedule;
 
@@ -105,7 +94,7 @@ class Shift
         return $this->endDate;
     }
 
-    public function setEndDate(DateTimeImmutable $endDate): static
+    public function setEndDate(?DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
 
@@ -117,7 +106,7 @@ class Shift
         return $this->startTime;
     }
 
-    public function setStartTime(DateTimeImmutable $startTime): static
+    public function setStartTime(?DateTimeImmutable $startTime): static
     {
         $this->startTime = $startTime;
 
@@ -144,6 +133,30 @@ class Shift
     public function setLocation(Location $location): static
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->users->removeElement($user);
 
         return $this;
     }

@@ -13,13 +13,16 @@ namespace App\Repository;
 
 use App\Entity\Schedule;
 use App\Enum\ScheduleType;
+use App\Filter\ScheduleFilter;
 use App\Model\ScheduleDate;
 use App\Schedule\ScheduleList;
 use AppendIterator;
 use Carbon\CarbonImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Iterator;
 use IteratorIterator;
+use Psr\Clock\ClockInterface;
 use Traversable;
 use function date_default_timezone_get;
 
@@ -33,8 +36,10 @@ use function date_default_timezone_get;
  */
 final class ScheduleRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly ClockInterface $clock
+    ) {
         parent::__construct($registry, Schedule::class);
     }
 
@@ -64,21 +69,27 @@ final class ScheduleRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s');
 
+        $today = CarbonImmutable::instance($this->clock->now())->startOfDay();
+
         $qb->where('s.scheduleType = :type')
             ->andWhere(
-            $qb->expr()->orX(
-                $qb->expr()->isNull('s.endDate'),
-                $qb->expr()->gte('s.endDate', ':today')
+                $qb->expr()->orX(
+                    $qb->expr()->isNull('s.endDate'),
+                    $qb->expr()->gte('s.endDate', ':today')
+                )
             )
-        )
             ->setParameter('type', ScheduleType::RECURRING)
-            ->setParameter('today', CarbonImmutable::now(date_default_timezone_get())->startOfDay())
+            ->setParameter('today', $today)
             ->orderBy('s.startDate', 'ASC');
 
-        /** @var Traversable<Schedule> $return */
-        $return = $qb->getQuery()->toIterable();
+        foreach ($qb->getQuery()->toIterable() as $schedule) {
+            /** @var Schedule $schedule */
+            if (ScheduleFilter::isScheduleCompleted($schedule, $today)) {
+                continue;
+            }
 
-        return $return;
+            yield $schedule;
+        }
     }
 
     /**
@@ -113,7 +124,7 @@ final class ScheduleRepository extends ServiceEntityRepository
      */
     public function getScheduleListForActiveSchedules(): ScheduleList
     {
-        /** @var AppendIterator<int, Schedule, Traversable<Schedule>> $append */
+        /** @var AppendIterator<int, Schedule, Iterator<Schedule>> $append */
         $append = new AppendIterator();
         $append->append(new IteratorIterator($this->findActiveSingleSchedules()));
         $append->append(new IteratorIterator($this->findActiveRecurringSchedules()));
