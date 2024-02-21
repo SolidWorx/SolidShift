@@ -55,11 +55,11 @@ class UserInvite
     private UserRole $role;
 
     public function __construct(
-        ?User    $user = null,
-        ?Site    $site = null,
+        ?User $user = null,
+        ?Site $site = null,
         UserRole $role = UserRole::ROLE_USER,
-        ?string   $email = null,
-        ?string   $phone = null,
+        ?string $email = null,
+        ?string $phone = null,
     ) {
         $this->user = $user;
         $this->email = $email;

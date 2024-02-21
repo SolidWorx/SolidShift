@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Components;
 
 use App\Entity\Shift;
@@ -19,8 +28,6 @@ use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
-use function array_map;
-use function collect;
 
 #[AsLiveComponent]
 final class ShiftUsers extends AbstractController
@@ -33,8 +40,9 @@ final class ShiftUsers extends AbstractController
     #[LiveProp(writable: true)]
     private ?ScheduleDate $scheduleDate = null;
 
-    public function __construct(private readonly ShiftRepository $shiftRepository)
-    {
+    public function __construct(
+        private readonly ShiftRepository $shiftRepository
+    ) {
     }
 
     public function mount(ScheduleDate $shiftDate): void
@@ -47,19 +55,16 @@ final class ShiftUsers extends AbstractController
         return $this->scheduleDate;
     }
 
-    public function setScheduleDate(?ScheduleDate $scheduleDate): ShiftUsers
+    public function setScheduleDate(?ScheduleDate $scheduleDate): self
     {
         $this->scheduleDate = $scheduleDate;
         return $this;
     }
 
-    /**
-     * @return array<int, Shift>
-     */
-    #[ExposeInTemplate('shifts')]
-    public function getShifts(): array
+    #[ExposeInTemplate()]
+    public function getShift(): ?Shift
     {
-        return $this->shiftRepository->findBy([
+        return $this->shiftRepository->findOneBy([
             'schedule' => $this->scheduleDate?->schedule,
             'startDate' => $this->scheduleDate?->startDate,
             'startTime' => $this->scheduleDate?->startTime,
@@ -79,12 +84,7 @@ final class ShiftUsers extends AbstractController
                 UserAutocompleteType::class,
                 [
                     'extra_options' => [
-                        'exclude_users' => collect(
-                            array_map(
-                                static fn (Shift $shift) => $shift->getUsers()->map(static fn (User $user) => $user->getId()->toBase32())->toArray(),
-                                $this->getShifts(),
-                            )
-                        )->flatten()->toArray(),
+                        'exclude_users' => $this->getShift()?->getUsers()->map(static fn (User $user) => $user->getId()->toBase32())->toArray(),
                     ],
                 ]
             )
@@ -99,22 +99,25 @@ final class ShiftUsers extends AbstractController
         // and the component is automatically re-rendered with the errors
         $this->submitForm();
 
-        if (!$this->scheduleDate instanceof ScheduleDate) {
+        if (! $this->scheduleDate instanceof ScheduleDate) {
             throw new \LogicException('No schedule date set');
         }
 
         /** @var array{users: Collection<int, User>} $data */
         $data = $this->getForm()->getData();
 
-        $shift = new Shift();
-        $shift
-            ->setStartDate($this->scheduleDate->getStartDate())
-            ->setEndDate($this->scheduleDate->endDate)
-            ->setStartTime($this->scheduleDate->startTime)
-            ->setEndTime($this->scheduleDate->endTime)
-            ->setLocation($this->scheduleDate->getSchedule()->getLocation())
-            ->setSchedule($this->scheduleDate->schedule)
-        ;
+        $shift = $this->getShift();
+
+        if (! $shift instanceof Shift) {
+            $shift = (new Shift())
+                ->setStartDate($this->scheduleDate->getStartDate())
+                ->setEndDate($this->scheduleDate->endDate)
+                ->setStartTime($this->scheduleDate->startTime)
+                ->setEndTime($this->scheduleDate->endTime)
+                ->setLocation($this->scheduleDate->getSchedule()->getLocation())
+                ->setSchedule($this->scheduleDate->schedule)
+            ;
+        }
 
         foreach ($data['users'] ?? [] as $user) {
             $user->addShift($shift);
@@ -123,7 +126,7 @@ final class ShiftUsers extends AbstractController
         $entityManager->persist($shift);
         $entityManager->flush();
 
-        $this->dispatchBrowserEvent('modal:close:'.$this->scheduleDate->getHash());
+        $this->dispatchBrowserEvent('modal:close:' . $this->scheduleDate->getHash());
         $this->resetForm();
     }
 

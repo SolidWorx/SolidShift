@@ -15,7 +15,6 @@ use App\Enum\ScheduleEndType;
 use App\Enum\ScheduleRecurringType;
 use App\Repository\RecurringOptionsRepository;
 use Carbon\CarbonImmutable;
-use Carbon\CarbonInterface;
 use Carbon\Unit;
 use Carbon\WeekDay;
 use DateTimeImmutable;
@@ -30,7 +29,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use function in_array;
 use function sprintf;
-use function strtolower;
 
 #[ORM\Entity(repositoryClass: RecurringOptionsRepository::class)]
 #[Assert\Callback(callback: 'validateDays')]
@@ -178,7 +176,7 @@ class RecurringOptions implements Stringable
 
     public function validateDays(ExecutionContextInterface $context): void
     {
-        if (!isset($this->type)) {
+        if (! isset($this->type)) {
             $context->buildViolation('You must select a recurrence type')
                 ->atPath('type')
                 ->addViolation();
@@ -191,7 +189,7 @@ class RecurringOptions implements Stringable
                 ->addViolation();
         }
 
-        if (!isset($this->endType)) {
+        if (! isset($this->endType)) {
             $context->buildViolation('You must select an end type')
                 ->atPath('endType')
                 ->addViolation();

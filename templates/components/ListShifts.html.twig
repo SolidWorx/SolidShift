@@ -1,0 +1,70 @@
+<div{{ attributes }}>
+    <div class="card">
+        <div class="card-header">
+            <button
+                class="btn btn-icon{{ displayTimeline ? ' btn-primary' }}"
+                type="button"
+                data-model="display"
+                data-value="{{ constant('App\\Components\\ListShifts::DISPLAY_TIMELINE') }}"
+                data-action="live#update"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Show Timeline view"
+            >
+                {{ icon('timeline-event') }}
+            </button>
+            <button
+                class="btn btn-icon{{ displayCalendar ? ' btn-primary' }} mx-2"
+                type="button"
+                data-model="display"
+                data-value="{{ constant('App\\Components\\ListShifts::DISPLAY_CALENDAR') }}"
+                data-action="live#update"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Show Calendar view"
+            >
+                {{ icon('calendar') }}
+            </button>
+
+            {% if display is same as(constant('App\\Components\\ListShifts::DISPLAY_CALENDAR')) %}
+                <div class="card-actions row">
+                    <div class="col px-0">
+                        <div class="dropdown">
+                            <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
+                                Show Days
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                {% for day in weekDays %}
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input m-0 me-2" type="checkbox" data-model="hiddenDays.{{ day.name }}"> {{ day.name }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col me-2 ms-0 ps-0">
+                        <div class="dropdown">
+                            <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Week Starts On
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                {% for day in weekDays %}
+                                    <label class="dropdown-item">
+                                        <input name="weekStartsOn" class="form-check-input m-0 me-2" type="radio" data-model="weekStartsOn" value="{{ day.value }}"> {{ day.name }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-body" data-skip-morph>
+            {% if display is same as(constant('App\\Components\\ListShifts::DISPLAY_TIMELINE')) %}
+                <twig:UpcomingShifts />
+            {% elseif display is same as(constant('App\\Components\\ListShifts::DISPLAY_CALENDAR')) %}
+                <twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" />
+            {% endif %}
+        </div>
+    </div>
+</div>

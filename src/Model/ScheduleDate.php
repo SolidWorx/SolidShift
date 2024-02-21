@@ -13,7 +13,6 @@ namespace App\Model;
 
 use App\Entity\Schedule;
 use Carbon\CarbonImmutable;
-use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
 use Stringable;
@@ -62,7 +61,7 @@ final class ScheduleDate implements Stringable
             if ($this->endTime instanceof DateTimeInterface) {
                 $string .= ' ' . $this->endTime->format('H:i');
             }
-        } else if ($this->endTime instanceof DateTimeInterface) {
+        } elseif ($this->endTime instanceof DateTimeInterface) {
             $string .= ' - ' . $this->endTime->format('H:i');
         }
 
@@ -78,16 +77,16 @@ final class ScheduleDate implements Stringable
         return $this->hash = Ulid::fromBinary(hash('md5', $this->schedule?->getId() . $this, true));
     }
 
-    public function setHash(string $hash): ScheduleDate
+    public function setHash(string $hash): self
     {
         $this->hash = $hash;
 
         return $this;
     }
 
-    public function getStartDate(): DateTimeImmutable
+    public function getStartDate(): CarbonImmutable
     {
-        if (!$this->startDate instanceof DateTimeImmutable) {
+        if (! $this->startDate instanceof CarbonImmutable) {
             throw new LogicException('Start date is not set');
         }
 
@@ -96,7 +95,7 @@ final class ScheduleDate implements Stringable
 
     public function getSchedule(): Schedule
     {
-        if (!$this->schedule instanceof Schedule) {
+        if (! $this->schedule instanceof Schedule) {
             throw new LogicException('Schedule is not set');
         }
 

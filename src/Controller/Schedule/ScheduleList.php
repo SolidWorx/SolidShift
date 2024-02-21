@@ -43,4 +43,3 @@ final class ScheduleList extends AbstractController
         ];
     }
 }
-

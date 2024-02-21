@@ -36,7 +36,7 @@ final class AppAuthenticator extends AbstractLoginFormAuthenticator
     use TargetPathTrait;
 
     public function __construct(
-        private readonly UrlGeneratorInterface    $urlGenerator,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly UserSiteAccessRepository $siteAccessRepository,
     ) {
     }

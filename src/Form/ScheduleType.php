@@ -15,6 +15,7 @@ use App\Entity\Location;
 use App\Entity\Schedule;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use Carbon\CarbonImmutable;
+use Psr\Clock\ClockInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -28,8 +29,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class ScheduleType extends AbstractType
 {
+    public function __construct(
+        private readonly ClockInterface $clock
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $minStartDate = $options['edit'] === false ? [
+            'min' => CarbonImmutable::instance($this->clock->now())->addDay()->format('Y-m-d'),
+        ] : [];
+
         $builder
             ->add('name')
             ->add(
@@ -46,9 +56,7 @@ final class ScheduleType extends AbstractType
                 DateType::class,
                 [
                     'label' => 'Shift Date',
-                    'attr' => [
-                        'min' => CarbonImmutable::now()->addDay()->format('Y-m-d'),
-                    ],
+                    'attr' => $minStartDate,
                     'input' => 'datetime_immutable',
                 ]
             )
@@ -61,6 +69,8 @@ final class ScheduleType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Schedule::class);
+        $resolver->setDefault('edit', false);
+        $resolver->setAllowedTypes('edit', 'bool');
     }
 
     public function getBlockPrefix(): string

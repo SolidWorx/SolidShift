@@ -44,7 +44,7 @@ final class Create extends AbstractController
             site: $site,
         );
 
-        $form = $this->createForm(ScheduleType::class, $schedule)->handleRequest($request);
+        $form = $this->createForm(ScheduleType::class, $schedule, ['edit' => false])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->scheduleRepository->save($schedule);

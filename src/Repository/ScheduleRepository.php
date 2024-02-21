@@ -18,11 +18,15 @@ use App\Model\ScheduleDate;
 use App\Schedule\ScheduleList;
 use AppendIterator;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
+use DateInvalidTimeZoneException;
+use DateMalformedStringException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Iterator;
 use IteratorIterator;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\MockClock;
 use Traversable;
 use function date_default_timezone_get;
 
@@ -129,6 +133,33 @@ final class ScheduleRepository extends ServiceEntityRepository
         $append->append(new IteratorIterator($this->findActiveSingleSchedules()));
         $append->append(new IteratorIterator($this->findActiveRecurringSchedules()));
 
-        return new ScheduleList($append);
+        return new ScheduleList($append, $this->clock);
+    }
+
+    /**
+     * @return ScheduleList<ScheduleDate>
+     * @throws DateInvalidTimeZoneException|DateMalformedStringException
+     */
+    public function getScheduleListForPeriod(CarbonInterface $start, CarbonInterface $end): ScheduleList
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        $qb->where(
+            $qb->expr()->orX(
+                $qb->expr()->andX(
+                    $qb->expr()->gte('s.startDate', ':start'),
+                    $qb->expr()->lte('s.startDate', ':end')
+                ),
+                $qb->expr()->lte('s.startDate', ':start'),
+            )
+        )
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('s.startDate', 'ASC');
+
+        /** @var iterable<Schedule> $schedules */
+        $schedules = $qb->getQuery()->toIterable();
+
+        return new ScheduleList($schedules, new MockClock($start));
     }
 }

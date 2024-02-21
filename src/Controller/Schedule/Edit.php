@@ -38,7 +38,7 @@ final class Edit extends AbstractController
     #[Template('schedule/create.html.twig')]
     public function __invoke(Request $request, Site $site, Schedule $schedule): array|Response
     {
-        $form = $this->createForm(ScheduleType::class, $schedule)->handleRequest($request);
+        $form = $this->createForm(ScheduleType::class, $schedule, ['edit' => true])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->scheduleRepository->save($schedule);

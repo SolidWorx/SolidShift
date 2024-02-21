@@ -38,7 +38,7 @@ class Schedule implements Stringable
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotBlank()]
-    #[Assert\GreaterThan('today')]
+    // #[Assert\GreaterThan('today')]
     private DateTimeImmutable $startDate;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]

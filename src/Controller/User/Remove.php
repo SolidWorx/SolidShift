@@ -26,7 +26,7 @@ final class Remove extends AbstractController
     public const ROUTE_NAME = 'user.remove';
 
     public function __construct(
-        private readonly Security       $security,
+        private readonly Security $security,
         private readonly UserRepository $userRepository,
     ) {
     }

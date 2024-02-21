@@ -35,7 +35,7 @@ final readonly class Router implements RouterInterface, WarmableInterface
 {
     public function __construct(
         private RouterInterface $inner,
-        private RequestStack    $requestStack,
+        private RequestStack $requestStack,
     ) {
     }
 

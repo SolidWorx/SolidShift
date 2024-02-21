@@ -17,25 +17,16 @@
             </div>
         </div>
     {% else %}
-        <div class="card">
-            {# <div class="card-header">
-                {{ form_start(form) }}
-            #}{# {{ form_widget(this.filters.location, {'attr': {'data-model': 'query'}}) }} #}{#
-            {{ form_row(form.location, {'attr': {'data-model': 'query'}}) }}
-            {{ form_end(form) }}
+        <div class="container mt-3">
 
-        </div> #}
-            <div class="card-body">
-                <div class="container mt-3">
+            {#<div class="row g-2 align-items-center mb-4">
+                <div class="col">
+                    <h2 class="page-title">
+                        Event Timeline
+                    </h2>
+                </div>
 
-                    <div class="row g-2 align-items-center mb-4">
-                        <div class="col">
-                            <h2 class="page-title">
-                                Upcoming Shifts
-                            </h2>
-                        </div>
-
-                        {#<div class="col-auto ms-auto d-print-none">
+                #}{#<div class="col-auto ms-auto d-print-none">
                             <div class="btn-list">
                                 <a href="{{ url('schedule.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                                     {{ icon('plus') }}
@@ -45,49 +36,79 @@
                                     {{ icon('plus') }}
                                 </a>
                             </div>
-                        </div>#}
-                    </div>
+                        </div>#}{#
+            </div>#}
 
-                    {% for location, dates in computed.shiftDates %}
-                        <div class="list-group mb-4">
-                            <div class="d-flex w-100 justify-content-between align-items-center list-group-item">
-                                <span class="badge badge-light rounded-pill">
-                                    {{ location|date('d') }}
-                                    <br />
-                                    {{ location|date('M') }}
-                                </span>
-                                <div class="border-2 flex-grow-1 border-left border-indigo border-start ps-3 ms-3">
-                                    {% for shiftDate in dates %}
-                                        <div class="row">
-                                            <div class="col-3">
-                                                <h3 class="mb-1">{{ shiftDate.schedule.name }}</h3>
-                                                <p class="mb-1">
-                                                    {{ shiftDate.schedule.location }}
-                                                </p>
-                                                {% if shiftDate.timeRange is not empty %}
-                                                    <span class="tag">
+            {% set currentDate = null %}
+
+            {% for location, dates in computed.shiftDates %}
+
+                {% if currentDate != dates|first|date('Y-m') %}
+                    <h2 class="mb-3 page-title">
+                        {{ dates|first|date('F Y') }}
+                    </h2>
+                    {% set currentDate = dates|first|date('Y-m') %}
+                {% endif %}
+
+                <div class="list-group mb-4">
+                    <div class="d-flex w-100 justify-content-between align-items-center list-group-item">
+                        <span class="badge badge-light rounded-pill">
+                            {#{{ location|date('d') }}
+                            <br />
+                            {{ location|date('M') }}#}
+
+                            {{ location|date('D') }}
+                            <br />
+                            {{ location|date('d') }}
+                        </span>
+                        <div class="border-2 flex-grow-1 border-left border-indigo border-start ps-3 ms-3">
+                            {% for shiftDate in dates %}
+                                <div class="row">
+                                    <div class="col-3">
+                                        <h3 class="mb-1">{{ shiftDate.schedule.name }}</h3>
+                                        <p class="mb-1">
+                                            {{ shiftDate.schedule.location }}
+                                        </p>
+                                        {% if shiftDate.timeRange is not empty %}
+                                            <span class="tag">
                                                         {{ shiftDate.timeRange }}
                                                     </span>
-                                                {% endif %}
-                                            </div>
-
-                                            <div class="col">
-                                                <twig:ShiftUsers :shiftDate="shiftDate" />
-                                            </div>
-                                        </div>
-
-                                        {% if not loop.last %}
-                                            <hr />
                                         {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
+                                    </div>
 
+                                    <div class="col">
+                                        <twig:ShiftUsers :shiftDate="shiftDate" />
+                                    </div>
+                                </div>
+
+                                {% if not loop.last %}
+                                    <hr />
+                                {% endif %}
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    </div>
+
                 </div>
-            </div>
+            {% endfor %}
         </div>
+        {#<div class="card">
+             <div class="card-header">
+                 <button class="btn btn-icon" type="button" data-action="live#action" data-action-name="fooBar">
+                    {{ icon('calendar') }}
+                 </button>
+                 {% if this.display is same as('calendar') %}
+                     DISPLAY THE CALENDAR!!!!
+                 {% endif %}
+                #}{#{{ form_start(form) }}
+                    {{ form_widget(this.filters.location, {'attr': {'data-model': 'query'}}) }}
+                    {{ form_row(form.location, {'attr': {'data-model': 'query'}}) }}
+                {{ form_end(form) }}#}{#
+
+            </div>
+            <div class="card-body">
+
+            </div>
+        </div>#}
 
         <style>
             .list-group-item .badge {

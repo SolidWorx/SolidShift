@@ -42,7 +42,7 @@ enum ScheduleEndType: string implements TranslatableInterface
 
     public function formLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::NEVER => 'Never',
             self::AFTER => 'After x occurrences',
             self::ON => 'On the following date',

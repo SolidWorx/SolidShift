@@ -12,12 +12,13 @@
 namespace App\Twig\Extension;
 
 use DirectoryIterator;
+use InvalidArgumentException;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +35,7 @@ use Twig\TwigFunction;
 use function assert;
 use function file_exists;
 use function file_get_contents;
-use function iterator_to_array;
+use function Symfony\Component\String\s;
 
 /**
  * @see \App\Tests\Twig\Extension\UiExtensionTest
@@ -42,11 +43,12 @@ use function iterator_to_array;
 final class UiExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly RouterInterface      $router,
+        private readonly RouterInterface $router,
         private readonly FormFactoryInterface $formFactory,
         #[Autowire('%kernel.project_dir%')]
-        private readonly string               $projectDir,
-    ) {}
+        private readonly string $projectDir,
+    ) {
+    }
 
     /**
      * @return list<TwigFunction>
@@ -56,7 +58,7 @@ final class UiExtension extends AbstractExtension
         return [
             new TwigFunction('deleteBtn', $this->deleteBtn(...), ['is_safe' => ['html'], 'needs_environment' => true]),
             new TwigFunction('icon', $this->icon(...), ['is_safe' => ['html']]),
-            new TwigFunction('uuid', static fn(): UuidV4 => Uuid::v4()),
+            new TwigFunction('uuid', static fn (): UuidV4 => Uuid::v4()),
         ];
     }
 
@@ -91,26 +93,31 @@ final class UiExtension extends AbstractExtension
     {
         static $icons = [];
 
-        if (!isset($icons[$name])) {
+        if (! isset($icons[$name])) {
             $iconsPath = $this->projectDir . '/src/Resources/icons/';
 
-            if (!file_exists($iconsPath . $name . '.svg')) {
-
+            if (! file_exists($iconsPath . $name . '.svg')) {
                 $allIcons = [];
 
                 foreach (new DirectoryIterator($iconsPath) as $fileInfo) {
                     /** @var DirectoryIterator $fileInfo */
-                    if ($fileInfo->isDot() || !$fileInfo->isFile()) {
+                    if ($fileInfo->isDot() || ! $fileInfo->isFile()) {
                         continue;
                     }
 
-                    $allIcons[] = $fileInfo->getFileInfo()->getBasename(".svg");
+                    $allIcons[] = $fileInfo->getFileInfo()->getBasename('.svg');
                 }
 
-                throw new \InvalidArgumentException(sprintf('Icon "%s" not found. Available icons: %s', $name, implode(', ', $allIcons)));
+                throw new InvalidArgumentException(sprintf('Icon "%s" not found. Available icons: %s', $name, implode(', ', $allIcons)));
             }
 
             $icons[$name] = file_get_contents($iconsPath . $name . '.svg');
+
+            if (false === $icons[$name]) {
+                throw new RuntimeException(sprintf('Failed to read icon "%s"', $name));
+            }
+
+            $icons[$name] = s($icons[$name])->collapseWhitespace();
         }
 
         return $icons[$name];

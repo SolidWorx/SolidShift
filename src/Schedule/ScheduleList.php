@@ -18,10 +18,10 @@ use Carbon\CarbonImmutable;
 use Carbon\Unit;
 use Carbon\WeekDay;
 use Countable;
+use DateTimeInterface;
 use Generator;
 use IteratorAggregate;
 use Psr\Clock\ClockInterface;
-use Traversable;
 use function array_slice;
 use function in_array;
 use function iterator_count;
@@ -36,27 +36,22 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
     private CarbonImmutable $today;
 
     /**
-     * @param Traversable<Schedule> $schedules
+     * @param iterable<Schedule> $schedules
      */
-    public function __construct(
-        private Traversable $schedules,
-        ?ClockInterface $clock = null
-    ) {
-        $this->today = $clock instanceof ClockInterface ? CarbonImmutable::instance($clock->now()) : CarbonImmutable::now()->startOfDay();
+    public function __construct(private iterable $schedules, ClockInterface $clock)
+    {
+        $this->today = CarbonImmutable::instance($clock->now())->startOfDay();
     }
 
     /**
      * @return Generator<ScheduleDate>
      */
-    public function getScheduledDates(int $numberOfWeeks = 2, int $totalDisplayDates = 12): Generator
+    public function getScheduledDates(int $numberOfWeeks = 2): Generator
     {
         $scheduleEnd = $this->today->copy()->addWeeks($numberOfWeeks)->endOfWeek();
 
         foreach ($this->schedules as $schedule) {
             foreach ($this->getScheduledDate($schedule, $scheduleEnd) as $scheduledDate) {
-                if ($totalDisplayDates-- <= 0) {
-                    break;
-                }
                 yield $scheduledDate;
             }
         }
@@ -74,10 +69,25 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
         }
 
         usort($schedules, static function (ScheduleDate $schedule1, ScheduleDate $schedule2): int {
-            return $schedule1->startDate <=> $schedule2->startDate;
+            $date1 = $schedule1->getStartDate();
+            $date2 = $schedule2->getStartDate();
+
+            if ($schedule1->startTime instanceof DateTimeInterface) {
+                $date1 = $date1->copy()->setTimeFromTimeString($schedule1->startTime->format('H:i:00'));
+            }
+
+            if ($schedule2->startTime instanceof DateTimeInterface) {
+                $date2 = $date2->copy()->setTimeFromTimeString($schedule2->startTime->format('H:i:00'));
+            }
+
+            return $date1 <=> $date2;
         });
 
-        return array_slice($schedules, 0, $totalDisplayDates);
+        if ($totalDisplayDates > 0) {
+            return array_slice($schedules, 0, $totalDisplayDates);
+        }
+
+        return $schedules;
     }
 
     /**
@@ -126,6 +136,18 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
                 startTime: $schedule->getStartTime(),
                 endTime: $schedule->getEndTime(),
             );
+        }
+    }
+
+    /**
+     * @return Generator<int, ScheduleDate>
+     */
+    public function getScheduledDatesBeforeDate(CarbonImmutable $endDate): \Generator
+    {
+        foreach ($this->schedules as $schedule) {
+            foreach ($this->getScheduledDate($schedule, $endDate) as $scheduledDate) {
+                yield $scheduledDate;
+            }
         }
     }
 

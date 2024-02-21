@@ -17,7 +17,6 @@ use App\Enum\ScheduleRecurringType;
 use Carbon\CarbonImmutable;
 use Carbon\WeekDay;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -46,7 +45,7 @@ final class RecurringOptions extends AbstractType
             ->add('endType', EnumType::class, [
                 'label' => 'End Recurrence',
                 'class' => ScheduleEndType::class,
-                'choice_label' => static fn(ScheduleEndType $type) => $type->formLabel(),
+                'choice_label' => static fn (ScheduleEndType $type) => $type->formLabel(),
                 'expanded' => true,
                 'required' => false,
             ])

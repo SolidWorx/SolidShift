@@ -11,8 +11,6 @@
 
 namespace App\Tests\Schedule;
 
-use ArrayIterator;
-use Carbon\WeekDay;
 use const STR_PAD_LEFT;
 use App\Entity\RecurringOptions;
 use App\Entity\Schedule;
@@ -21,8 +19,10 @@ use App\Enum\ScheduleRecurringType;
 use App\Enum\ScheduleType;
 use App\Model\ScheduleDate;
 use App\Schedule\ScheduleList;
+use ArrayIterator;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\WeekDay;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

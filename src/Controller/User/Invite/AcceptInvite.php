@@ -37,8 +37,8 @@ final class AcceptInvite extends AbstractController
     public const ROUTE_NAME = 'user.invite.accept';
 
     public function __construct(
-        private readonly UserInviteRepository                    $userInviteRepository,
-        private readonly UserRepository                          $userRepository,
+        private readonly UserInviteRepository $userInviteRepository,
+        private readonly UserRepository $userRepository,
         private readonly \Symfony\Bundle\SecurityBundle\Security $security,
     ) {
     }

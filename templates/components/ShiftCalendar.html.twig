@@ -1,0 +1,177 @@
+<div{{ attributes }}>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEnd" aria-labelledby="offcanvasEndLabel">
+        <div class="offcanvas-header">
+            <h2 class="offcanvas-title" id="offcanvasEndLabel">End offcanvas</h2>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda ea est, eum exercitationem fugiat illum itaque laboriosam magni necessitatibus, nemo nisi numquam quae reiciendis repellat sit soluta unde. Aut!
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary" type="button" data-bs-dismiss="offcanvas">
+                    Close offcanvas
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mb-2">
+        <div class="col px-0">
+            <a href="#" class="btn btn-icon" data-action="live#action" data-action-name="prevent|previous">
+                {{ icon('chevron-left') }}
+            </a>
+
+            <a href="#" class="btn" data-action="live#action" data-action-name="prevent|today">
+                {{ icon('history') }}
+                Today
+            </a>
+        </div>
+        <div class="col">
+            <h3 class="text-center">
+                {{ startDate|date('F Y') }}
+            </h3>
+        </div>
+        <div class="col text-right px-0" style="text-align: right">
+            {% if displayType.value is same as('month') %}
+                <button type="button" class="btn" data-action="live#update" data-model="displayType" data-value="week">
+                    {{ icon('calendar-week') }}
+                    Week View
+                </button>
+            {% else %}
+                <button type="button" class="btn" data-action="live#update" data-model="displayType" data-value="month">
+                    {{ icon('calendar-month') }}
+                    Month View
+                </button>
+            {% endif %}
+            <a href="#" class="btn btn-icon" data-action="live#action" data-action-name="prevent|next">
+                {{ icon('chevron-right') }}
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        {% for header in computed.calendar.headers %}
+            <div class="col p-0">
+                <div class="card rounded-0">
+                    <div class="card-body pt-1 px-2">
+                        <h3 class="card-title">
+                            {{ header.name }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% for week in computed.calendar.dates|batch(7) %}
+        <div class="row">
+            {% for day in week|filter(v => not computed.calendar.shouldSkipDate(v)) %}
+                {% set outsideCurentMonth = displayType.value is not same as('week') and (day < computed.calendar.firstDayOfMonth or day > computed.calendar.lastDayOfMonth) %}
+                <div class="col p-0 d-flex">
+                    <div class="card flex-fill rounded-0{{ outsideCurentMonth ? ' bg-gray-500' }} link-hover">
+                        <div class="card-body pt-1 px-2">
+                            <h3 class="card-title mb-0">
+                                <span{{ day.isToday ? ' class="badge badge-pill badge-outline bg-primary text-white"' }}>
+                                    {{ day|date('j') }}
+                                </span>
+                                {% if not outsideCurentMonth %}
+                                    <div class="float-right">
+                                        <small>
+                                            <a href="#" class="text-right hide-link" style="text-align: right !important;">
+                                                {{ icon('plus') }} Add Shift
+                                            </a>
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            </h3>
+
+                            {#<div class="tags-list">
+                                {% for shift in computed.shiftDates[day|date('Y-m-d')]|default([]) %}
+                                    <small class="">
+                                        <span class="tag text-nowrap overflow-hidden">
+                                            #}{# <span class="badge bg-blue text-blue-fg tag-status badge-empty"></span> #}{#
+                                            {% if shift.startTime is not empty %}
+                                                {{ shift.startTime|date('H:i') }}
+                                                {% if shift.endDate is not empty %}
+                                                    - {{ shift.endDate|date('H:i') }}
+                                                {% endif %}
+                                            {% endif %}
+                                            {{ shift.schedule.name }}
+                                            <br />
+                                            <small class="text-secondary text-truncate">
+                                                {{ shift.schedule.location }}
+                                            </small>
+                                        </span>
+                                    </small>
+                                {% endfor %}
+                            </div>#}
+
+                            {% if computed.shiftDates[day|date('Y-m-d')]|default([])|length is same as(0) %}
+                                <br /><br />
+                                <br /><br />
+                            {% endif %}
+
+                            <div class="list-group list-group-flush">
+                                {% for shift in computed.shiftDates[day|date('Y-m-d')]|default([]) %}
+                                    {% if displayType.isWeekly or hiddenDays|filter(v => v == true)|length == 1 or loop.index < 3 %}
+                                        <div class="list-group-item px-0 py-2">
+                                            <small>
+                                                <div class="col text-truncate">
+                                                    <span class="text-primary">
+                                                        {% if shift.startTime is not empty %}
+                                                            {{ shift.startTime|date('H:i') }}
+                                                        {% endif %}
+
+                                                        {{ shift.schedule.name }}
+                                                    </span>
+                                                    <div class="d-block text-secondary text-truncate">
+                                                        {{ shift.schedule.location }}
+
+                                                        {% set scheduledShift = this.shift(shift) %}
+
+                                                        {% if scheduledShift is not empty and scheduledShift.users|length > 0 %}
+                                                            -
+                                                            {% set userList = scheduledShift.users|join('<br />') %}
+
+                                                            <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="{{ userList|e('html_attr') }}" data-bs-html="true" data-bs-placement="right">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" style="width: 16px; height: 16px;" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
+                                                                {{ scheduledShift.users|length }}
+                                                            </span>
+
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if not displayType.isWeekly and computed.shiftDates[day|date('Y-m-d')]|default([])|length > 2 and hiddenDays|filter(v => v == true)|length != 1 %}
+                                    <small class="text-muted">
+                                        + {{ computed.shiftDates[day|date('Y-m-d')]|default([])|length - 2 }} more
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <style>
+        .hide-link {
+            display: none;
+        }
+
+        .link-hover:hover .hide-link {
+            display: block;
+        }
+
+        .float-right {
+            float: right;
+        }
+    </style>
+</div>

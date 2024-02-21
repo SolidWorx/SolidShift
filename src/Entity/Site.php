@@ -209,7 +209,7 @@ class Site implements Stringable
 
     public function addSchedule(Schedule $schedule): static
     {
-        if (!$this->schedules->contains($schedule)) {
+        if (! $this->schedules->contains($schedule)) {
             $this->schedules->add($schedule);
             $schedule->setSite($this);
         }

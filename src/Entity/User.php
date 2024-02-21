@@ -16,6 +16,7 @@ use App\Validator\PhoneNumber;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: User::TABLE_NAME)]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this email')]
 #[UniqueEntity(fields: ['phone'], message: 'There is already an account with this phone number')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringable
 {
     final public const TABLE_NAME = '`users`';
 
@@ -268,7 +269,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addSiteAccess(UserSiteAccess $siteAccess): static
     {
-        if (!$this->siteAccess->contains($siteAccess)) {
+        if (! $this->siteAccess->contains($siteAccess)) {
             $this->siteAccess->add($siteAccess);
             $siteAccess->setUser($this);
         }
@@ -288,7 +289,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addShift(Shift $shift): static
     {
-        if (!$this->shifts->contains($shift)) {
+        if (! $this->shifts->contains($shift)) {
             $this->shifts->add($shift);
             $shift->addUser($this);
         }
@@ -303,5 +304,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFullName();
     }
 }

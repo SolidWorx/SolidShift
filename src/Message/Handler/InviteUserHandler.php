@@ -23,10 +23,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class InviteUserHandler
 {
     public function __construct(
-        private UserRepository       $userRepository,
-        private SignatureHasher      $hasher,
+        private UserRepository $userRepository,
+        private SignatureHasher $hasher,
         private UserInviteRepository $userInviteRepository,
-        private MessageBusInterface  $messageBus,
+        private MessageBusInterface $messageBus,
     ) {
     }
 

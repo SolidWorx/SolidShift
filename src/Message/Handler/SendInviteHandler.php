@@ -29,9 +29,9 @@ use function sprintf;
 final readonly class SendInviteHandler
 {
     public function __construct(
-        private MailerInterface       $mailer,
+        private MailerInterface $mailer,
         private UrlGeneratorInterface $urlGenerator,
-        private NotifierInterface     $notifier,
+        private NotifierInterface $notifier,
     ) {
     }
 
