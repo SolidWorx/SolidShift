@@ -33,7 +33,6 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Traversable;
-use function assert;
 use function date_default_timezone_get;
 
 /**
@@ -180,12 +179,12 @@ final class ScheduleRepository extends ServiceEntityRepository
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request instanceof Request) {
+        if (! $request instanceof Request) {
             throw new RuntimeException('No request found');
         }
 
         $site = $request->attributes->get('site');
-        if (!$site instanceof Site) {
+        if (! $site instanceof Site) {
             throw new RuntimeException('No site found');
         }
         return $site;

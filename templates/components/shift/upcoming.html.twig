@@ -4,16 +4,15 @@
             <div class="empty-img">
                 <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
             </div>
-            <p class="empty-title">No shifts found</p>
-            {# <p class="empty-subtitle text-secondary">
-                Schedules are used to assign people to locations and times. <br />
-                A schedule can be a one-time event or a recurring event.<br />
-            </p> #}
+            <p class="empty-title">{{ 'No shifts found'|trans }}</p>
+             <p class="empty-subtitle text-secondary">
+                Create a <a href="{{ path('schedule.create', {'site': site}) }}">new schedule</a> to start assigning shifts
+            </p>
             <div class="empty-action">
-                {# <a href="{{ url('schedule.create') }}" class="btn btn-primary">
+                 <a href="{{ url('schedule.create', {'site': site}) }}" class="btn btn-primary">
                     {{ icon('plus') }}
-                    Add your first schedule
-                </a> #}
+                    {{ 'Add your first schedule'|trans }}
+                </a>
             </div>
         </div>
     {% else %}
@@ -43,11 +42,11 @@
 
             {% for location, dates in computed.shiftDates %}
 
-                {% if currentDate != dates|first|date('Y-m') %}
+                {% if currentDate != dates|first.startDate|date('Y-m') %}
                     <h2 class="mb-3 page-title">
-                        {{ dates|first|date('F Y') }}
+                        {{ dates|first.startDate|date('F Y') }}
                     </h2>
-                    {% set currentDate = dates|first|date('Y-m') %}
+                    {% set currentDate = dates|first.startDate|date('Y-m') %}
                 {% endif %}
 
                 <div class="list-group mb-4">

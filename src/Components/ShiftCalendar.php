@@ -24,15 +24,11 @@ use Carbon\WeekDay;
 use DateInvalidTimeZoneException;
 use DateMalformedStringException;
 use Psr\Clock\ClockInterface;
-use RuntimeException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
-use Symfony\UX\TwigComponent\Attribute\PreMount;
 use function assert;
 use function collect;
 

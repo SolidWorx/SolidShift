@@ -61,9 +61,11 @@
         </div>
         <div class="card-body" data-skip-morph>
             {% if display is same as(constant('App\\Components\\ListShifts::DISPLAY_TIMELINE')) %}
-                <twig:UpcomingShifts />
+                <twig:UpcomingShifts :site="site" />
             {% elseif display is same as(constant('App\\Components\\ListShifts::DISPLAY_CALENDAR')) %}
-                <twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" />
+                {#<twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" :site="site" />#}
+
+                <twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" :site="site" />
             {% endif %}
         </div>
     </div>

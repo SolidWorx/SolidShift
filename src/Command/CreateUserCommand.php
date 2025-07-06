@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of SolidShift project.
+ *
+ * (c) Pierre du Plessis <open-source@solidworx.co>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace App\Command;
 
 use App\Entity\User;
@@ -14,8 +23,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:create-user')]
 class CreateUserCommand extends Command
 {
-    public function __construct(private readonly UserRepository $userRepository)
-    {
+    public function __construct(
+        private readonly UserRepository $userRepository
+    ) {
         parent::__construct();
     }
 
@@ -24,7 +34,6 @@ class CreateUserCommand extends Command
         $this->addArgument('email', InputArgument::REQUIRED, 'Email address of the user to create');
         $this->addArgument('password', InputArgument::REQUIRED, 'Password of the user to create');
     }
-
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

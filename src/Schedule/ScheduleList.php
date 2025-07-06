@@ -38,8 +38,10 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
     /**
      * @param iterable<Schedule> $schedules
      */
-    public function __construct(private iterable $schedules, ClockInterface $clock)
-    {
+    public function __construct(
+        private iterable $schedules,
+        ClockInterface $clock
+    ) {
         $this->today = CarbonImmutable::instance($clock->now())->startOfDay();
     }
 
