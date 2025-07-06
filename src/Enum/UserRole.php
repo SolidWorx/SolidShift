@@ -11,11 +11,20 @@
 
 namespace App\Enum;
 
-enum UserRole: string
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use function Symfony\Component\String\u;
+
+enum UserRole: string implements TranslatableInterface
 {
     case ROLE_ADMIN = 'admin';
 
     case ROLE_MANAGER = 'manager';
 
     case ROLE_USER = 'user';
+
+    public function trans(TranslatorInterface $translator, string $locale = null): string
+    {
+        return $translator->trans(u($this->value)->title()->toString(), [], $locale);
+    }
 }

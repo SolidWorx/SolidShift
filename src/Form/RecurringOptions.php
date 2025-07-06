@@ -48,6 +48,7 @@ final class RecurringOptions extends AbstractType
                 'choice_label' => static fn (ScheduleEndType $type) => $type->formLabel(),
                 'expanded' => true,
                 'required' => false,
+                'help' => 'Select when the schedule should end',
             ])
             ->add(
                 'endDate',

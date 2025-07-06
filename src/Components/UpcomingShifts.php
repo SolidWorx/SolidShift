@@ -11,10 +11,12 @@
 
 namespace App\Components;
 
+use App\Entity\Site;
 use App\Model\ScheduleDate;
 use App\Repository\ScheduleRepository;
 use Illuminate\Support\Collection;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use function collect;
@@ -26,6 +28,9 @@ final class UpcomingShifts
 {
     use DefaultActionTrait;
     use ComponentToolsTrait;
+
+    #[LiveProp(writable: true)]
+    public ?Site $site = null;
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,
@@ -40,7 +45,7 @@ final class UpcomingShifts
         return collect(
             $this
                 ->scheduleRepository
-                ->getScheduleListForActiveSchedules()
+                ->getScheduleListForActiveSchedules($this->site)
                 ->getSortedScheduledDates(totalDisplayDates: -1)
         )
             ->groupBy(static fn (ScheduleDate $schedule) => (int) $schedule->startDate?->timestamp);

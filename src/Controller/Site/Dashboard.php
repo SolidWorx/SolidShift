@@ -12,9 +12,11 @@
 namespace App\Controller\Site;
 
 use App\Attribute\Route;
+use App\Controller\Shift\Upcoming;
 use App\Entity\Site;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 #[AsController()]
@@ -23,12 +25,9 @@ final class Dashboard extends AbstractController
 {
     public const ROUTE_NAME = 'dashboard';
 
-    /**
-     * @return array<string, mixed>
-     */
     #[Template('site/dashboard.html.twig')]
-    public function __invoke(Site $site): array
+    public function __invoke(Site $site): RedirectResponse
     {
-        return [];
+        return $this->redirectToRoute(Upcoming::ROUTE_NAME);
     }
 }

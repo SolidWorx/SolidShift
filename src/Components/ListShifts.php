@@ -11,6 +11,7 @@
 
 namespace App\Components;
 
+use App\Entity\Site;
 use Carbon\WeekDay;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -32,6 +33,9 @@ final class ListShifts
     #[ExposeInTemplate]
     #[LiveProp(writable: true, url: true)]
     private WeekDay $weekStartsOn = WeekDay::Monday;
+
+    #[LiveProp(writable: true)]
+    public ?Site $site = null;
 
     /**
      * @var array<string, bool>

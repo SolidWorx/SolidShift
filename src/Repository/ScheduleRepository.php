@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use App\Entity\Schedule;
+use App\Entity\Site;
 use App\Enum\ScheduleType;
 use App\Filter\ScheduleFilter;
 use App\Model\ScheduleDate;
@@ -26,8 +27,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Iterator;
 use IteratorIterator;
 use Psr\Clock\ClockInterface;
+use RuntimeException;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Traversable;
+use function assert;
 use function date_default_timezone_get;
 
 /**
@@ -42,6 +48,7 @@ final class ScheduleRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
+        private readonly RequestStack $requestStack,
         private readonly ClockInterface $clock
     ) {
         parent::__construct($registry, Schedule::class);
@@ -69,7 +76,7 @@ final class ScheduleRepository extends ServiceEntityRepository
     /**
      * @return Traversable<Schedule>
      */
-    public function findActiveRecurringSchedules(): Traversable
+    public function findActiveRecurringSchedules(?Site $site = null): Traversable
     {
         $qb = $this->createQueryBuilder('s');
 
@@ -82,6 +89,8 @@ final class ScheduleRepository extends ServiceEntityRepository
                     $qb->expr()->gte('s.endDate', ':today')
                 )
             )
+            ->andWhere('s.site = :site')
+            ->setParameter('site', ($site ?? $this->getSite())->getId(), UlidType::NAME)
             ->setParameter('type', ScheduleType::RECURRING)
             ->setParameter('today', $today)
             ->orderBy('s.startDate', 'ASC');
@@ -99,7 +108,7 @@ final class ScheduleRepository extends ServiceEntityRepository
     /**
      * @return Traversable<Schedule>
      */
-    public function findActiveSingleSchedules(): Traversable
+    public function findActiveSingleSchedules(?Site $site = null): Traversable
     {
         $qb = $this->createQueryBuilder('s');
 
@@ -113,6 +122,8 @@ final class ScheduleRepository extends ServiceEntityRepository
                     )
                 )
             )
+            ->andWhere('s.site = :site')
+            ->setParameter('site', $site ?? $this->getSite())
             ->setParameter('type', ScheduleType::SINGLE)
             ->setParameter('today', CarbonImmutable::now(date_default_timezone_get())->startOfDay())
             ->orderBy('s.startDate', 'ASC');
@@ -126,12 +137,12 @@ final class ScheduleRepository extends ServiceEntityRepository
     /**
      * @return ScheduleList<ScheduleDate>
      */
-    public function getScheduleListForActiveSchedules(): ScheduleList
+    public function getScheduleListForActiveSchedules(?Site $site = null): ScheduleList
     {
         /** @var AppendIterator<int, Schedule, Iterator<Schedule>> $append */
         $append = new AppendIterator();
-        $append->append(new IteratorIterator($this->findActiveSingleSchedules()));
-        $append->append(new IteratorIterator($this->findActiveRecurringSchedules()));
+        $append->append(new IteratorIterator($this->findActiveSingleSchedules($site)));
+        $append->append(new IteratorIterator($this->findActiveRecurringSchedules($site)));
 
         return new ScheduleList($append, $this->clock);
     }
@@ -140,7 +151,7 @@ final class ScheduleRepository extends ServiceEntityRepository
      * @return ScheduleList<ScheduleDate>
      * @throws DateInvalidTimeZoneException|DateMalformedStringException
      */
-    public function getScheduleListForPeriod(CarbonInterface $start, CarbonInterface $end): ScheduleList
+    public function getScheduleListForPeriod(CarbonInterface $start, CarbonInterface $end, ?Site $site = null): ScheduleList
     {
         $qb = $this->createQueryBuilder('s');
 
@@ -153,6 +164,8 @@ final class ScheduleRepository extends ServiceEntityRepository
                 $qb->expr()->lte('s.startDate', ':start'),
             )
         )
+            ->andWhere('s.site = :site')
+            ->setParameter('site', ($site ?? $this->getSite())->getId(), UlidType::NAME)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->orderBy('s.startDate', 'ASC');
@@ -161,5 +174,20 @@ final class ScheduleRepository extends ServiceEntityRepository
         $schedules = $qb->getQuery()->toIterable();
 
         return new ScheduleList($schedules, new MockClock($start));
+    }
+
+    private function getSite(): Site
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request instanceof Request) {
+            throw new RuntimeException('No request found');
+        }
+
+        $site = $request->attributes->get('site');
+        if (!$site instanceof Site) {
+            throw new RuntimeException('No site found');
+        }
+        return $site;
     }
 }

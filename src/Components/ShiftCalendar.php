@@ -15,6 +15,7 @@ use App\Calendar\Calendar;
 use App\Calendar\Config;
 use App\Calendar\Enum\DisplayType;
 use App\Entity\Shift;
+use App\Entity\Site;
 use App\Model\ScheduleDate;
 use App\Repository\ScheduleRepository;
 use App\Repository\ShiftRepository;
@@ -23,11 +24,15 @@ use Carbon\WeekDay;
 use DateInvalidTimeZoneException;
 use DateMalformedStringException;
 use Psr\Clock\ClockInterface;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
+use Symfony\UX\TwigComponent\Attribute\PreMount;
 use function assert;
 use function collect;
 
@@ -51,6 +56,9 @@ final class ShiftCalendar
 
     #[LiveProp(writable: true, updateFromParent: true)]
     public WeekDay $weekStartsOn = WeekDay::Monday;
+
+    #[LiveProp(writable: true)]
+    public ?Site $site = null;
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,
@@ -89,10 +97,10 @@ final class ShiftCalendar
     {
         $schedules = match ($this->displayType) {
             DisplayType::WEEK => $this->scheduleRepository
-                ->getScheduleListForPeriod($this->startDate->startOfWeek($this->weekStartsOn->value), $this->startDate->endOfWeek($this->weekStartsOn->value - 1))
+                ->getScheduleListForPeriod($this->startDate->startOfWeek($this->weekStartsOn->value), $this->startDate->endOfWeek($this->weekStartsOn->value - 1), $this->site)
                 ->getScheduledDatesBeforeDate($this->startDate->endOfWeek($this->weekStartsOn->value - 1)),
             DisplayType::MONTH => $this->scheduleRepository
-                ->getScheduleListForPeriod($this->startDate->startOfMonth(), $this->startDate->endOfMonth())
+                ->getScheduleListForPeriod($this->startDate->startOfMonth(), $this->startDate->endOfMonth(), $this->site)
                 ->getScheduledDatesBeforeDate($this->startDate->endOfMonth()),
         };
 
