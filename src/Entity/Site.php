@@ -68,6 +68,10 @@ class Site implements Stringable
     #[ORM\OneToMany(mappedBy: 'site', targetEntity: Schedule::class, orphanRemoval: true)]
     private Collection $schedules;
 
+    #[ORM\ManyToOne(inversedBy: 'sites')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Organisation $organisation;
+
     public function __construct(?string $name = null)
     {
         $this->setName($name);
@@ -222,6 +226,22 @@ class Site implements Stringable
         // set the owning side to null (unless already changed)
         if ($this->schedules->removeElement($schedule) && $schedule->getSite() === $this) {
             $schedule->setSite(null);
+        }
+
+        return $this;
+    }
+
+    public function getOrganisation(): ?Organisation
+    {
+        return $this->organisation;
+    }
+
+    public function setOrganisation(?Organisation $organisation): static
+    {
+        if (! $organisation instanceof Organisation) {
+            unset($this->organisation);
+        } else {
+            $this->organisation = $organisation;
         }
 
         return $this;

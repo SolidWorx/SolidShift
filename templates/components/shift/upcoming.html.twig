@@ -6,10 +6,10 @@
             </div>
             <p class="empty-title">{{ 'No shifts found'|trans }}</p>
              <p class="empty-subtitle text-secondary">
-                Create a <a href="{{ path('schedule.create', {'site': site}) }}">new schedule</a> to start assigning shifts
+                Create a <a href="{{ path('schedule.create') }}">new schedule</a> to start assigning shifts
             </p>
             <div class="empty-action">
-                 <a href="{{ url('schedule.create', {'site': site}) }}" class="btn btn-primary">
+                 <a href="{{ url('schedule.create') }}" class="btn btn-primary">
                     {{ icon('plus') }}
                     {{ 'Add your first schedule'|trans }}
                 </a>

@@ -12,6 +12,7 @@
 namespace App\Security;
 
 use App\Controller\ChooseSite;
+use App\Controller\CreateOrganisation;
 use App\Controller\CreateSite;
 use App\Controller\Security;
 use App\Controller\Site\Dashboard;
@@ -76,7 +77,7 @@ final class AppAuthenticator extends AbstractLoginFormAuthenticator
         $parameters = [];
 
         if ($totalSites === 0) {
-            $route = CreateSite::ROUTE_NAME;
+            $route = CreateOrganisation::ROUTE_NAME;
         } elseif ($totalSites === 1) {
             $parameters = ['site' => $sites[0]->getSite()->getId()];
             $route = Dashboard::ROUTE_NAME;

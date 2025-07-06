@@ -17,22 +17,6 @@
                         <h3 class="card-title">{{- block('title') -}}</h3>
                         <div class="mb-3">
 
-                            {#<div class="alert alert-indigo" role="alert">
-                                <div class="d-flex">
-                                    <div>
-                                        {{ icon('alert') }}
-                                    </div>
-                                    <div>
-                                        <h4 class="alert-title">Create a new schedule.</h4>
-                                        <div class="text-secondary">
-                                            A location is any place where a person can be scheduled to be on duty.<br />
-                                            This could be a physical location, like an office or an area in the building, <br />
-                                            or it can be a team or department within the organization.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>#}
-
                             {#{% if location is not defined %}
                                 <div class="alert alert-indigo" role="alert">
                                     <div class="d-flex">
@@ -50,17 +34,41 @@
                                     </div>
                                 </div>
                             {% endif %}#}
-                            {{ form_start(form) }}
-                            {{ form_widget(form) }}
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
-                                    <button type="submit" class="btn-primary btn">
-                                        {{ 'Save'|trans }}
-                                    </button>
+
+                            {% if totalLocations is same as(0) %}
+                                <div class="alert alert-indigo" role="alert">
+                                    <div class="d-flex">
+                                        <div>
+                                            {{ icon('alert') }}
+                                        </div>
+                                        <div>
+                                            <h4 class="alert-title">{{ 'No locations'|trans }}</h4>
+                                            <div class="text-secondary">
+                                                {{ 'In order to create a schedule, you must first define a location.'|trans }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            {{ form_end(form) }}
+                                <div class="text-center">
+                                    <a href="{{ url('location.create') }}" class="btn btn-primary">
+                                        {{ icon('plus') }}
+                                        {{ 'Add location'|trans }}
+                                    </a>
+                                </div>
+                            {% else %}
+                                {{ form_start(form) }}
+                                {{ form_widget(form) }}
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+                                        <button type="submit" class="btn-primary btn">
+                                            {{ 'Save'|trans }}
+                                        </button>
+                                    </div>
+                                </div>
+                                {{ form_end(form) }}
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>

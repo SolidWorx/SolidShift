@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "51d91d7923412c1621949a3c67da3a46",
+    "content-hash": "a7b6e05fe467533f6d12eb69357e5cf7",
     "packages": [
         {
             "name": "api-platform/core",
@@ -7814,11 +7814,17 @@
         },
         {
             "name": "symfony/ux-autocomplete",
-            "version": "2.x-dev",
+            "version": "v2.27.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-autocomplete.git",
+                "reference": "ab0be7ef7d59ea6925fd6fabccbd4d04cb5f5e06"
+            },
             "dist": {
-                "type": "path",
-                "url": "/Users/pierre/projects/oss/symfony/ux/src/Autocomplete",
-                "reference": "7a290f61cb61b77ab29189000a645e6fbafec24e"
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-autocomplete/zipball/ab0be7ef7d59ea6925fd6fabccbd4d04cb5f5e06",
+                "reference": "ab0be7ef7d59ea6925fd6fabccbd4d04cb5f5e06",
+                "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
@@ -7826,8 +7832,7 @@
                 "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/http-foundation": "^6.3|^7.0",
                 "symfony/http-kernel": "^6.3|^7.0",
-                "symfony/property-access": "^6.3|^7.0",
-                "symfony/string": "^6.3|^7.0"
+                "symfony/property-access": "^6.3|^7.0"
             },
             "conflict": {
                 "doctrine/orm": "2.9.0 || 2.9.1"
@@ -7845,18 +7850,17 @@
                 "symfony/phpunit-bridge": "^6.3|^7.0",
                 "symfony/process": "^6.3|^7.0",
                 "symfony/security-bundle": "^6.3|^7.0",
-                "symfony/security-csrf": "^6.3|^7.0",
                 "symfony/twig-bundle": "^6.3|^7.0",
                 "symfony/uid": "^6.3|^7.0",
                 "twig/twig": "^2.14.7|^3.0.4",
                 "zenstruck/browser": "^1.1",
-                "zenstruck/foundry": "^1.33"
+                "zenstruck/foundry": "1.37.*"
             },
             "type": "symfony-bundle",
             "extra": {
                 "thanks": {
-                    "name": "symfony/ux",
-                    "url": "https://github.com/symfony/ux"
+                    "url": "https://github.com/symfony/ux",
+                    "name": "symfony/ux"
                 }
             },
             "autoload": {
@@ -7864,11 +7868,7 @@
                     "Symfony\\UX\\Autocomplete\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Symfony\\UX\\Autocomplete\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -7883,9 +7883,24 @@
             "keywords": [
                 "symfony-ux"
             ],
-            "transport-options": {
-                "relative": false
-            }
+            "support": {
+                "source": "https://github.com/symfony/ux-autocomplete/tree/v2.27.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-06-21T10:08:18+00:00"
         },
         {
             "name": "symfony/ux-live-component",
@@ -13131,7 +13146,6 @@
         "illuminate/contracts": 20,
         "illuminate/macroable": 20,
         "illuminate/support": 20,
-        "symfony/ux-autocomplete": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,
@@ -13141,6 +13155,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

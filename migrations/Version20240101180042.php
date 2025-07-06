@@ -35,8 +35,6 @@ final class Version20240101180042 extends AbstractMigration
         $this->addSql('ALTER TABLE shift ADD CONSTRAINT FK_A50B3B45A76ED395 FOREIGN KEY (user_id) REFERENCES `users` (id)');
         $this->addSql('ALTER TABLE shift ADD CONSTRAINT FK_A50B3B45A40BC2D5 FOREIGN KEY (schedule_id) REFERENCES schedule (id)');
         $this->addSql('ALTER TABLE shift ADD CONSTRAINT FK_A50B3B4564D218E FOREIGN KEY (location_id) REFERENCES location (id)');
-        $this->addSql('DROP INDEX IDX_A2B00BEAE7927C74 ON user_invite');
-        $this->addSql('DROP INDEX IDX_A2B00BEA444F97DD ON user_invite');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_A2B00BEAD1B862B8 ON user_invite (hash)');
     }
 
@@ -50,7 +48,5 @@ final class Version20240101180042 extends AbstractMigration
         $this->addSql('DROP TABLE schedule');
         $this->addSql('DROP TABLE shift');
         $this->addSql('DROP INDEX UNIQ_A2B00BEAD1B862B8 ON user_invite');
-        $this->addSql('CREATE INDEX IDX_A2B00BEAE7927C74 ON user_invite (email)');
-        $this->addSql('CREATE INDEX IDX_A2B00BEA444F97DD ON user_invite (phone)');
     }
 }
