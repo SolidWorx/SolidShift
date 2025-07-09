@@ -5,10 +5,10 @@
 
     {% if shift is not empty %}
         <div class="tags-list">
-            {% for user in shift.users %}
+            {% for assignment in shift.assignments %}
                 <span class="tag">
-                    {{ user.fullName }}
-                    <a href="#" class="btn-close" data-action="live#action" data-action-name="prevent|removeUser(user={{ user.id }}, shift={{ shift.id }})"></a>
+                    {{ assignment.user }}
+                    <a href="#" class="btn-close" data-action="live#action" data-action-name="prevent|removeUser(assignment={{ assignment.id }}, shift={{ shift.id }})"></a>
                 </span>
             {% endfor %}
         </div>
@@ -23,6 +23,7 @@
         }) }}
 
         {{ form_row(form.users) }}
+        {{ form_row(form.location) }}
         <button type="submit" class="btn btn-primary">Save</button>
         {{ form_end(form) }}
     </twig:Ui:Modal>

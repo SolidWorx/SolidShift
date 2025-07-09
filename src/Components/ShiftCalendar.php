@@ -14,6 +14,7 @@ namespace App\Components;
 use App\Calendar\Calendar;
 use App\Calendar\Config;
 use App\Calendar\Enum\DisplayType;
+use App\Entity\Location;
 use App\Entity\Shift;
 use App\Entity\Site;
 use App\Model\ScheduleDate;
@@ -105,12 +106,13 @@ final class ShiftCalendar
             ->toArray();
     }
 
-    public function getShift(ScheduleDate $scheduleDate): ?Shift
+    public function getShift(ScheduleDate $scheduleDate, Location $location): ?Shift
     {
         return $this->shiftRepository->findOneBy([
             'schedule' => $scheduleDate->schedule,
             'startDate' => $scheduleDate->startDate,
             'startTime' => $scheduleDate->startTime,
+            'location' => $location,
             'endDate' => $scheduleDate->endDate,
             'endTime' => $scheduleDate->endTime,
         ]);

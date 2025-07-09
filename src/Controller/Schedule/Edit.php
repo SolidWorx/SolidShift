@@ -49,6 +49,7 @@ final class Edit extends AbstractController
         }
 
         return [
+            'totalLocations' => PHP_INT_MAX,
             'form' => $form->createView(),
         ];
     }

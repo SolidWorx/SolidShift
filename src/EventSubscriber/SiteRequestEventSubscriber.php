@@ -59,9 +59,9 @@ final readonly class SiteRequestEventSubscriber implements EventSubscriberInterf
 
         try {
             $siteId = Ulid::fromString($routeParams['site']);
-            if ($siteId->toBase58() !== $routeParams['site']) {
+            /*if ($siteId->toBase58() !== $routeParams['site']) {
                 throw new InvalidArgumentException('Invalid site ID');
-            }
+            }*/
         } catch (InvalidArgumentException $invalidArgumentException) {
             $user = $this->security->getUser();
             assert($user instanceof User);

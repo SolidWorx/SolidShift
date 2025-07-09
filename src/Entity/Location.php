@@ -44,7 +44,7 @@ class Location implements Stringable
     /**
      * @var Collection<int, Schedule>
      */
-    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Schedule::class, orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'locations', orphanRemoval: true)]
     private Collection $schedules;
 
     public function __construct(
@@ -158,7 +158,7 @@ class Location implements Stringable
     {
         if (! $this->schedules->contains($schedule)) {
             $this->schedules->add($schedule);
-            $schedule->setLocation($this);
+            $schedule->setLocations($this);
         }
 
         return $this;
@@ -167,8 +167,8 @@ class Location implements Stringable
     public function removeSchedule(Schedule $schedule): static
     {
         // set the owning side to null (unless already changed)
-        if ($this->schedules->removeElement($schedule) && $schedule->getLocation() === $this) {
-            $schedule->setLocation(null);
+        if ($this->schedules->removeElement($schedule) && $schedule->getLocations() === $this) {
+            $schedule->setLocations(null);
         }
 
         return $this;

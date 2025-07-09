@@ -16,6 +16,8 @@ use App\Repository\ScheduleRepository;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
@@ -56,21 +58,27 @@ class Schedule implements Stringable
     #[Assert\Valid]
     private ?RecurringOptions $recurringOptions = null;
 
-    #[ORM\ManyToOne(inversedBy: 'schedules')]
+    /**
+     * @var Collection<int, Location>
+     */
+    #[ORM\ManyToMany(targetEntity: Location::class, inversedBy: 'schedules', orphanRemoval: true)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
     #[Assert\Valid]
     #[Assert\NotBlank]
-    private Location $location;
+    private Collection $locations;
 
     #[ORM\ManyToOne(inversedBy: 'schedules')]
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
+    /**
+     * @param Collection<int, Location>|null $locations
+     */
     public function __construct(
         string $name = '',
         ?ScheduleType $scheduleType = null,
-        ?Location $location = null,
+        ?Collection $locations = null,
         ?Site $site = null,
         ?DateTimeImmutable $startDate = null,
         ?DateTimeImmutable $endDate = null,
@@ -82,9 +90,7 @@ class Schedule implements Stringable
             $this->scheduleType = $scheduleType;
         }
 
-        if ($location instanceof Location) {
-            $this->location = $location;
-        }
+        $this->locations = $locations ?? new ArrayCollection();
 
         if ($site instanceof Site) {
             $this->site = $site;
@@ -189,18 +195,26 @@ class Schedule implements Stringable
         return $this;
     }
 
-    public function getLocation(): Location
+    /**
+     * @return Collection<int, Location>
+     */
+    public function getLocations(): Collection
     {
-        return $this->location;
+        return $this->locations;
     }
 
-    public function setLocation(?Location $location): static
+    public function addLocation(Location $location): static
     {
-        if (! $location instanceof Location) {
-            unset($this->location);
-        } else {
-            $this->location = $location;
+        if (! $this->locations->contains($location)) {
+            $this->locations->add($location);
         }
+
+        return $this;
+    }
+
+    public function removeLocation(Location $location): static
+    {
+        $this->locations->removeElement($location);
 
         return $this;
     }

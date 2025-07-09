@@ -13,7 +13,6 @@ namespace App\Security;
 
 use App\Controller\ChooseSite;
 use App\Controller\CreateOrganisation;
-use App\Controller\CreateSite;
 use App\Controller\Security;
 use App\Controller\Site\Dashboard;
 use App\Entity\User;

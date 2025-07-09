@@ -50,7 +50,7 @@ final class ScheduleType extends AbstractType
                     'expanded' => true,
                 ]
             )
-            ->add('location', EntityType::class, ['class' => Location::class])
+            ->add('locations', EntityType::class, ['class' => Location::class, 'multiple' => true, 'autocomplete' => true])
             ->add(
                 'startDate',
                 DateType::class,

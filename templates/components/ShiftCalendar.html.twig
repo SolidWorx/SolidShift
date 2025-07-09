@@ -57,7 +57,7 @@
                                 <span{{ day.isToday ? ' class="badge badge-pill badge-outline bg-primary text-white"' }}>
                                     {{ day|date('j') }}
                                 </span>
-                                {#{% if not outsideCurentMonth %}
+                                {# {% if not outsideCurentMonth %}
                                     <div class="float-right">
                                         <small>
                                             <a href="#" class="text-right hide-link" style="text-align: right !important;">
@@ -65,29 +65,29 @@
                                             </a>
                                         </small>
                                     </div>
-                                {% endif %}#}
+                                {% endif %} #}
                             </h3>
 
-                            {#<div class="tags-list">
+                            {# <div class="tags-list">
                                 {% for shift in computed.shiftDates[day|date('Y-m-d')]|default([]) %}
                                     <small class="">
                                         <span class="tag text-nowrap overflow-hidden">
-                                            #}{# <span class="badge bg-blue text-blue-fg tag-status badge-empty"></span> #}{#
-                                            {% if shift.startTime is not empty %}
-                                                {{ shift.startTime|date('H:i') }}
-                                                {% if shift.endDate is not empty %}
-                                                    - {{ shift.endDate|date('H:i') }}
-                                                {% endif %}
-                                            {% endif %}
-                                            {{ shift.schedule.name }}
-                                            <br />
-                                            <small class="text-secondary text-truncate">
-                                                {{ shift.schedule.location }}
-                                            </small>
-                                        </span>
-                                    </small>
-                                {% endfor %}
-                            </div>#}
+                            #}{# <span class="badge bg-blue text-blue-fg tag-status badge-empty"></span> #}{#
+                            {% if shift.startTime is not empty %}
+                                {{ shift.startTime|date('H:i') }}
+                                {% if shift.endDate is not empty %}
+                                    - {{ shift.endDate|date('H:i') }}
+                                {% endif %}
+                            {% endif %}
+                            {{ shift.schedule.name }}
+                            <br />
+                            <small class="text-secondary text-truncate">
+                                {{ shift.schedule.location }}
+                            </small>
+                        </span>
+                    </small>
+                {% endfor %}
+            </div> #}
 
                             {% if computed.shiftDates[day|date('Y-m-d')]|default([])|length is same as(0) %}
                                 <br /><br />
@@ -107,22 +107,25 @@
 
                                                         {{ shift.schedule.name }}
                                                     </span>
-                                                    <div class="d-block text-secondary text-truncate">
-                                                        {{ shift.schedule.location }}
 
-                                                        {% set scheduledShift = this.shift(shift) %}
+                                                    {% for location in shift.schedule.locations %}
+                                                        {% set scheduledShift = this.shift(shift, location) %}
 
-                                                        {% if scheduledShift is not empty and scheduledShift.users|length > 0 %}
-                                                            -
-                                                            {% set userList = scheduledShift.users|join('<br />') %}
+                                                        {% if scheduledShift is not empty and scheduledShift.assignments|length > 0 %}
+                                                            <div class="d-block text-secondary text-truncate">
+                                                                {{ location }}
+                                                                -
+                                                                {% set userList = scheduledShift.assignments|map(a => a.user)|join('<br>') %}
 
-                                                            <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="{{ userList|e('html_attr') }}" data-bs-html="true" data-bs-placement="right">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" style="width: 16px; height: 16px;" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
-                                                                {{ scheduledShift.users|length }}
-                                                            </span>
-
+                                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="{{ userList|e('html_attr') }}" data-bs-html="true" data-bs-placement="right">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" style="width: 16px; height: 16px;" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
+                                                                            d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"
+                                                                        /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
+                                                                    {{ scheduledShift.assignments|length }}
+                                                                </span>
+                                                            </div>
                                                         {% endif %}
-                                                    </div>
+                                                    {% endfor %}
                                                 </div>
                                             </small>
                                         </div>

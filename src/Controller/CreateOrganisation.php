@@ -41,7 +41,8 @@ final class CreateOrganisation extends AbstractController
 
     public function __construct(
         private readonly OrganisationRepository $organisationRepository
-    ) {}
+    ) {
+    }
 
     /**
      * @return array{form: FormView}|Response

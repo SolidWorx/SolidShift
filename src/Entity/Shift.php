@@ -28,12 +28,6 @@ class Shift
     #[ORM\Column(type: UlidType::NAME)]
     private Ulid $id;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'shifts')]
-    private Collection $users;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
     private ?Schedule $schedule;
@@ -57,11 +51,17 @@ class Shift
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $created;
 
+    /**
+     * @var Collection<int, ShiftAssignment>
+     */
+    #[ORM\OneToMany(mappedBy: 'shift', targetEntity: ShiftAssignment::class, orphanRemoval: true)]
+    private Collection $assignments;
+
     public function __construct()
     {
         $this->id = new Ulid();
-        $this->users = new ArrayCollection();
         $this->created = new DateTimeImmutable();
+        $this->assignments = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -141,32 +141,36 @@ class Shift
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
+    public function getCreated(): DateTimeImmutable
     {
-        return $this->users;
+        return $this->created;
     }
 
-    public function addUser(User $user): static
+    /**
+     * @return Collection<int, ShiftAssignment>
+     */
+    public function getAssignments(): Collection
     {
-        if (! $this->users->contains($user)) {
-            $this->users->add($user);
+        return $this->assignments;
+    }
+
+    public function addAssignment(ShiftAssignment $assignment): static
+    {
+        if (! $this->assignments->contains($assignment)) {
+            $this->assignments->add($assignment);
+            $assignment->setShift($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeAssignment(ShiftAssignment $assignment): static
     {
-        $this->users->removeElement($user);
+        // set the owning side to null (unless already changed)
+        if ($this->assignments->removeElement($assignment) && $assignment->getShift() === $this) {
+            $assignment->setShift(null);
+        }
 
         return $this;
-    }
-
-    public function getCreated(): DateTimeImmutable
-    {
-        return $this->created;
     }
 }
