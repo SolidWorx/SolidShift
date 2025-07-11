@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/shift/upcoming', name: self::ROUTE_NAME, siteAware: true)]
 final class Upcoming extends AbstractController
 {
-    public const ROUTE_NAME = 'shifts.upcoming';
+    public const string ROUTE_NAME = 'shifts.upcoming';
 
     public function __invoke(Request $request): Response
     {

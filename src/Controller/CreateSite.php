@@ -32,11 +32,11 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 #[Route(path: CreateSite::ROUTE_PATH, name: CreateSite::ROUTE_NAME)]
 final class CreateSite extends AbstractController
 {
-    public const ROUTE_NAME = 'app_create_site';
+    public const string ROUTE_NAME = 'app_create_site';
 
-    public const ROUTE_PATH = '/site/create';
+    public const string ROUTE_PATH = '/site/create';
 
-    public const TEMPLATE_NAME = 'site/create.html.twig';
+    public const string TEMPLATE_NAME = 'site/create.html.twig';
 
     public function __construct(
         private readonly SiteRepository $siteRepository

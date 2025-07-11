@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route(path: '/join/{site}', name: Join::ROUTE_NAME)]
 final class Join extends AbstractController
 {
-    public const ROUTE_NAME = 'site.join';
+    public const string ROUTE_NAME = 'site.join';
 
     public function __construct(
         private readonly UserRepository $userRepository

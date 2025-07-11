@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/schedule/create', name: Create::ROUTE_NAME, siteAware: true)]
 final class Create extends AbstractController
 {
-    public const ROUTE_NAME = 'schedule.create';
+    public const string ROUTE_NAME = 'schedule.create';
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,

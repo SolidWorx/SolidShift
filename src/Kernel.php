@@ -11,16 +11,18 @@
 
 namespace App;
 
+use Override;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use function date_default_timezone_set;
 
 final class Kernel extends BaseKernel
 {
-    public const APP_VERSION = '0.1.0';
+    public const string APP_VERSION = '0.1.0';
 
     use MicroKernelTrait;
 
+    #[Override]
     public function boot(): void
     {
         date_default_timezone_set('UTC');

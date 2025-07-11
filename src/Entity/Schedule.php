@@ -78,7 +78,7 @@ class Schedule implements Stringable
     public function __construct(
         string $name = '',
         ?ScheduleType $scheduleType = null,
-        ?Collection $locations = null,
+        ?Collection $locations = new ArrayCollection(),
         ?Site $site = null,
         ?DateTimeImmutable $startDate = null,
         ?DateTimeImmutable $endDate = null,
@@ -90,7 +90,7 @@ class Schedule implements Stringable
             $this->scheduleType = $scheduleType;
         }
 
-        $this->locations = $locations ?? new ArrayCollection();
+        $this->locations = $locations;
 
         if ($site instanceof Site) {
             $this->site = $site;

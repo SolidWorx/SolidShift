@@ -45,7 +45,7 @@ final class RecurringOptions extends AbstractType
             ->add('endType', EnumType::class, [
                 'label' => 'End Recurrence',
                 'class' => ScheduleEndType::class,
-                'choice_label' => static fn (ScheduleEndType $type) => $type->formLabel(),
+                'choice_label' => static fn (ScheduleEndType $type): string => $type->formLabel(),
                 'expanded' => true,
                 'required' => false,
                 'help' => 'Select when the schedule should end',

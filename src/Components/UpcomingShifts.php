@@ -48,6 +48,6 @@ final class UpcomingShifts
                 ->getScheduleListForActiveSchedules($this->site)
                 ->getSortedScheduledDates(totalDisplayDates: -1)
         )
-            ->groupBy(static fn (ScheduleDate $schedule) => (int) $schedule->startDate?->timestamp);
+            ->groupBy(static fn (ScheduleDate $schedule): int => (int) $schedule->startDate?->timestamp);
     }
 }

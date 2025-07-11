@@ -187,6 +187,7 @@ final class ScheduleRepository extends ServiceEntityRepository
         if (! $site instanceof Site) {
             throw new RuntimeException('No site found');
         }
+
         return $site;
     }
 }

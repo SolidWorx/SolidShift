@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[Route('/resend/invitation/{invite}', name: ResendInvitation::ROUTE_NAME, siteAware: true)]
 final class ResendInvitation extends AbstractController
 {
-    public const ROUTE_NAME = 'user.invite.resend';
+    public const string ROUTE_NAME = 'user.invite.resend';
 
     public function __construct(
         private readonly MessageBusInterface $messageBus

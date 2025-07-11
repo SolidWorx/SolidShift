@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class UserList extends AbstractController
 {
-    public const ROUTE_NAME = 'user.list';
+    public const string ROUTE_NAME = 'user.list';
 
     /**
      * @return array{users: Collection<int, UserSiteAccess>}

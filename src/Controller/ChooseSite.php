@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/site/choose', name: ChooseSite::ROUTE_NAME)]
 final class ChooseSite extends AbstractController
 {
-    public const ROUTE_NAME = 'app_choose_site';
+    public const string ROUTE_NAME = 'app_choose_site';
 
     /**
      * @return array<string, mixed>

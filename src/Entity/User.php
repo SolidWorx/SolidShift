@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['phone'], message: 'There is already an account with this phone number')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringable
 {
-    final public const TABLE_NAME = '`users`';
+    final public const string TABLE_NAME = '`users`';
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/invite/delete/{invite}', name: Delete::ROUTE_NAME, methods: ['POST', 'DELETE'], siteAware: true)]
 final class Delete extends AbstractController
 {
-    public const ROUTE_NAME = 'user.invite.delete';
+    public const string ROUTE_NAME = 'user.invite.delete';
 
     public function __construct(
         private readonly UserInviteRepository $userInviteRepository

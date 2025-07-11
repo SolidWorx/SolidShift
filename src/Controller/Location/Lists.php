@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(UserRole::ROLE_ADMIN->name)]
 final class Lists extends AbstractController
 {
-    public const ROUTE_NAME = 'location.list';
+    public const string ROUTE_NAME = 'location.list';
 
     /**
      * @return array{form: FormView, locations: Collection<int, Location>}

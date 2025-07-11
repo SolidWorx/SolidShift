@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(UserRole::ROLE_ADMIN->name)]
 final class Create extends AbstractController
 {
-    public const ROUTE_NAME = 'location.create';
+    public const string ROUTE_NAME = 'location.create';
 
     public function __construct(
         private readonly LocationRepository $locationRepository

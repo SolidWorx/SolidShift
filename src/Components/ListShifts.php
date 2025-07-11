@@ -23,9 +23,9 @@ final class ListShifts
 {
     use DefaultActionTrait;
 
-    public const DISPLAY_TIMELINE = 'timeline';
+    public const string DISPLAY_TIMELINE = 'timeline';
 
-    public const DISPLAY_CALENDAR = 'calendar';
+    public const string DISPLAY_CALENDAR = 'calendar';
 
     #[LiveProp(writable: true, url: true)]
     private string $display = self::DISPLAY_TIMELINE;

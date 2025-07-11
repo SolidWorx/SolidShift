@@ -22,9 +22,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class Security extends AbstractController
 {
-    public const LOGIN_ROUTE_NAME = 'app_login';
+    public const string LOGIN_ROUTE_NAME = 'app_login';
 
-    public const LOGOUT_ROUTE_NAME = 'app_logout';
+    public const string LOGOUT_ROUTE_NAME = 'app_logout';
 
     /**
      * @return Response|array{last_username: string, error: Exception|null}

@@ -12,7 +12,10 @@
 namespace App\Form;
 
 use App\Entity\User;
+use Closure;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -33,24 +36,22 @@ class UserAutocompleteType extends AbstractType
         $resolver->setDefaults([
             'class' => User::class,
             'searchable_fields' => ['firstName', 'lastName'],
-            'query_builder' => function (Options $options) {
-                return static function (EntityRepository $em) use ($options) {
-                    $qb = $em->createQueryBuilder('u');
+            'query_builder' => fn (Options $options): Closure => static function (EntityRepository $em) use ($options): QueryBuilder {
+                $qb = $em->createQueryBuilder('u');
 
-                    $excludeUsers = $options['extra_options']['exclude_users'] ?? [];
-                    if ([] !== $excludeUsers) {
-                        $qb->andWhere($qb->expr()->notIn('u.id', ':users'))
-                            ->setParameter(
-                                'users',
-                                array_map(
-                                    static fn (string $id) => Ulid::fromBase32($id)->toBinary(),
-                                    $excludeUsers,
-                                )
-                            );
-                    }
+                $excludeUsers = $options['extra_options']['exclude_users'] ?? [];
+                if ([] !== $excludeUsers) {
+                    $qb->andWhere($qb->expr()->notIn('u.id', ':users'))
+                        ->setParameter(
+                            'users',
+                            array_map(
+                                static fn (string $id): string => Ulid::fromBase32($id)->toBinary(),
+                                $excludeUsers,
+                            )
+                        );
+                }
 
-                    return $qb;
-                };
+                return $qb;
             },
             'label' => 'Search User',
             'choice_label' => 'fullName',
@@ -61,6 +62,7 @@ class UserAutocompleteType extends AbstractType
         ]);
     }
 
+    #[Override]
     public function getParent(): string
     {
         return BaseEntityAutocompleteType::class;

@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/user/invites/list', name: InvitesList::ROUTE_NAME, siteAware: true)]
 final class InvitesList extends AbstractController
 {
-    public const ROUTE_NAME = 'user.invite.list';
+    public const string ROUTE_NAME = 'user.invite.list';
 
     /**
      * @return array{invites: Collection<int, UserInvite>}

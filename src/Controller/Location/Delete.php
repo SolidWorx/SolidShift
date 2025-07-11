@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(UserRole::ROLE_ADMIN->name)]
 final class Delete extends AbstractController
 {
-    public const ROUTE_NAME = 'location.delete';
+    public const string ROUTE_NAME = 'location.delete';
 
     public function __construct(
         private readonly LocationRepository $locationRepository

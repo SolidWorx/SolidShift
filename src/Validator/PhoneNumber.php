@@ -17,9 +17,9 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final class PhoneNumber extends Constraint
 {
-    public const INVALID_MOBILE_NUMBER_ERROR = 'e8588c49-5db9-4da4-97c2-81806c7a3a0d';
+    public const string INVALID_MOBILE_NUMBER_ERROR = 'e8588c49-5db9-4da4-97c2-81806c7a3a0d';
 
-    public const INVALID_NUMBER_ERROR = '24ecc3b5-0595-4e38-93e0-fce4db3df626';
+    public const string INVALID_NUMBER_ERROR = '24ecc3b5-0595-4e38-93e0-fce4db3df626';
 
     public string $message = 'The value "{{ value }}" is not a valid phone number.';
 

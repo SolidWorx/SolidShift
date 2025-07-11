@@ -98,7 +98,7 @@ final readonly class Router implements RouterInterface, WarmableInterface
         return $this->inner->match($pathinfo);
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         if ($this->inner instanceof WarmableInterface) {
             return $this->inner->warmUp($cacheDir, $buildDir);

@@ -25,13 +25,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
+use Twig\Attribute\AsTwigFilter;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 use function assert;
 use function file_exists;
 use function file_get_contents;
@@ -40,42 +39,27 @@ use function Symfony\Component\String\s;
 /**
  * @see \App\Tests\Twig\Extension\UiExtensionTest
  */
-final class UiExtension extends AbstractExtension
+final readonly class UiExtension
 {
     public function __construct(
-        private readonly RouterInterface $router,
-        private readonly FormFactoryInterface $formFactory,
+        private RouterInterface $router,
+        private FormFactoryInterface $formFactory,
         #[Autowire('%kernel.project_dir%')]
-        private readonly string $projectDir,
+        private string $projectDir,
     ) {
     }
 
-    /**
-     * @return list<TwigFunction>
-     */
-    public function getFunctions(): array
+    #[AsTwigFunction('uuid')]
+    public function uuid(): UuidV4
     {
-        return [
-            new TwigFunction('deleteBtn', $this->deleteBtn(...), ['is_safe' => ['html'], 'needs_environment' => true]),
-            new TwigFunction('icon', $this->icon(...), ['is_safe' => ['html']]),
-            new TwigFunction('uuid', static fn (): UuidV4 => Uuid::v4()),
-        ];
-    }
-
-    /**
-     * @return list<TwigFilter>
-     */
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('format_phone', $this->formatPhone(...)),
-        ];
+        return Uuid::v4();
     }
 
     /**
      * @param array<string, mixed> $parameters
      * @throws SyntaxError | RuntimeError | LoaderError
      */
+    #[AsTwigFunction(name: 'deleteBtn', needsEnvironment: true, isSafe: ['html'])]
     public function deleteBtn(Environment $twig, string $url, array $parameters = [], string $label = 'Delete', string $class = 'btn-danger'): string
     {
         $form = $this->formFactory->createBuilder()
@@ -89,6 +73,7 @@ final class UiExtension extends AbstractExtension
         ]);
     }
 
+    #[AsTwigFunction('icon', isSafe: ['html'])]
     public function icon(string $name): string
     {
         static $icons = [];
@@ -101,7 +86,11 @@ final class UiExtension extends AbstractExtension
 
                 foreach (new DirectoryIterator($iconsPath) as $fileInfo) {
                     /** @var DirectoryIterator $fileInfo */
-                    if ($fileInfo->isDot() || ! $fileInfo->isFile()) {
+                    if ($fileInfo->isDot()) {
+                        continue;
+                    }
+
+                    if (! $fileInfo->isFile()) {
                         continue;
                     }
 
@@ -126,6 +115,7 @@ final class UiExtension extends AbstractExtension
     /**
      * @throws NumberParseException
      */
+    #[AsTwigFilter('format_phone')]
     public function formatPhone(string $number): string
     {
         $phoneUtil = PhoneNumberUtil::getInstance();

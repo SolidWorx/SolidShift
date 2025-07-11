@@ -17,7 +17,7 @@ use function array_values;
 
 final class Config
 {
-    public const DAYS_IN_WEEK = 7;
+    public const int DAYS_IN_WEEK = 7;
 
     private WeekDay $weekStartsOn = WeekDay::Monday;
 

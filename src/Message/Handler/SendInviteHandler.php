@@ -56,7 +56,7 @@ final readonly class SendInviteHandler
         }
 
         $this->mailer->send(
-            (new TemplatedEmail())
+            new TemplatedEmail()
                 ->from(new Address($userInvite->getSite()->getSlug() . '@solidshift.app', $userInvite->getSite()->getName()))
                 ->to($email)
                 ->subject('Invitation to join')
@@ -83,7 +83,7 @@ final readonly class SendInviteHandler
             return;
         }
 
-        $notification = (new Notification('', ['sms']))
+        $notification = new Notification('', ['sms'])
             ->content(
                 sprintf(
                     'You have been invited to join %s. Please click the following link to accept the invitation: %s',

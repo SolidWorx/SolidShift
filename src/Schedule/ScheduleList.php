@@ -144,7 +144,7 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
     /**
      * @return Generator<int, ScheduleDate>
      */
-    public function getScheduledDatesBeforeDate(CarbonImmutable $endDate): \Generator
+    public function getScheduledDatesBeforeDate(CarbonImmutable $endDate): Generator
     {
         foreach ($this->schedules as $schedule) {
             foreach ($this->getScheduledDate($schedule, $endDate) as $scheduledDate) {

@@ -23,7 +23,7 @@ use function iterator_to_array;
 #[Route('/schedules', name: self::ROUTE_NAME, methods: ['GET'], siteAware: true)]
 final class ScheduleList extends AbstractController
 {
-    public const ROUTE_NAME = 'schedule.list';
+    public const string ROUTE_NAME = 'schedule.list';
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository

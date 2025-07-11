@@ -12,6 +12,7 @@
 namespace App\Entity;
 
 use App\Repository\ShiftRepository;
+use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,7 +31,7 @@ class Shift
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Schedule $schedule;
+    private ?Schedule $schedule = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -60,7 +61,7 @@ class Shift
     public function __construct()
     {
         $this->id = new Ulid();
-        $this->created = new DateTimeImmutable();
+        $this->created = CarbonImmutable::now();
         $this->assignments = new ArrayCollection();
     }
 

@@ -20,7 +20,7 @@ use function hash_update;
 
 final readonly class SignatureHasher
 {
-    private const HASH_ALGORITHM = 'sha256';
+    private const string HASH_ALGORITHM = 'sha256';
 
     public function __construct(
         #[Autowire('%kernel.secret%')]

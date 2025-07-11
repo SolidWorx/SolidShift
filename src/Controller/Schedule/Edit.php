@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/schedule/edit/{schedule}', name: Edit::ROUTE_NAME, siteAware: true)]
 final class Edit extends AbstractController
 {
-    public const ROUTE_NAME = 'schedule.edit';
+    public const string ROUTE_NAME = 'schedule.edit';
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository

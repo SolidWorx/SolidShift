@@ -29,7 +29,7 @@ final class Route extends BaseRoute
      * @param array<string, mixed>           $options
      */
     public function __construct(
-        string | array $path = null,
+        string | array | null $path = null,
         ?string $name = null,
         array $requirements = [],
         array $options = [],
@@ -39,10 +39,10 @@ final class Route extends BaseRoute
         array | string $schemes = [],
         ?string $condition = null,
         ?int $priority = null,
-        string $locale = null,
-        string $format = null,
-        bool $utf8 = null,
-        bool $stateless = null,
+        ?string $locale = null,
+        ?string $format = null,
+        ?bool $utf8 = null,
+        ?bool $stateless = null,
         ?string $env = null,
         readonly bool $siteAware = false,
     ) {

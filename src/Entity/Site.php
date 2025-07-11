@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: Site::TABLE_NAME)]
 class Site implements Stringable
 {
-    final public const TABLE_NAME = '`sites`';
+    final public const string TABLE_NAME = '`sites`';
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]
@@ -97,7 +97,7 @@ class Site implements Stringable
     {
         $this->name = (string) $name;
 
-        $this->slug = (new AsciiSlugger())->slug($this->name)->lower()->toString();
+        $this->slug = new AsciiSlugger()->slug($this->name)->lower()->toString();
 
         return $this;
     }

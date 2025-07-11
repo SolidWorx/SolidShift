@@ -73,7 +73,7 @@ final class ShiftCalendar
         $hiddenDays = collect($this->hiddenDays)
             ->filter(static fn (bool $hidden, string $name): bool => ! $hidden)
             ->keys()
-            ->map(static fn (string $name) => WeekDay::fromName($name))
+            ->map(static fn (string $name): WeekDay => WeekDay::fromName($name))
             ->toArray();
 
         return new Calendar(
@@ -133,11 +133,7 @@ final class ShiftCalendar
     #[LiveAction]
     public function previous(): void
     {
-        if ($this->displayType->isWeekly()) {
-            $this->startDate = $this->startDate->subWeek();
-        } else {
-            $this->startDate = $this->startDate->subMonth();
-        }
+        $this->startDate = $this->displayType->isWeekly() ? $this->startDate->subWeek() : $this->startDate->subMonth();
     }
 
     #[LiveAction]

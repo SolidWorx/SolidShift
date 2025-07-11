@@ -11,6 +11,7 @@
 
 namespace App\Form;
 
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -19,11 +20,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
  */
 final class PhoneType extends AbstractType
 {
+    #[Override]
     public function getParent(): string
     {
         return TextType::class;
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'phonenumber';

@@ -14,6 +14,7 @@ namespace App\Form;
 use App\Entity\User;
 use App\Entity\UserInvite;
 use App\Enum\UserRole;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -82,6 +83,7 @@ final class UserInviteType extends AbstractType
         ]);
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'user_invite';

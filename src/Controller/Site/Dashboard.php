@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 #[Route('/dashboard', name: Dashboard::ROUTE_NAME, siteAware: true)]
 final class Dashboard extends AbstractController
 {
-    public const ROUTE_NAME = 'dashboard';
+    public const string ROUTE_NAME = 'dashboard';
 
     #[Template('site/dashboard.html.twig')]
     public function __invoke(Site $site): RedirectResponse

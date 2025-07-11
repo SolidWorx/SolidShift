@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[Route('/user/invite', name: Invite::ROUTE_NAME, siteAware: true)]
 final class Invite extends AbstractController
 {
-    public const ROUTE_NAME = 'user.invite';
+    public const string ROUTE_NAME = 'user.invite';
 
     public function __construct(
         private readonly MessageBusInterface $messageBus,

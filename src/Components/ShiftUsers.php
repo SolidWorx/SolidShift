@@ -21,6 +21,7 @@ use App\Repository\LocationRepository;
 use App\Repository\ShiftRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -86,14 +87,12 @@ final class ShiftUsers extends AbstractController
     protected function instantiateForm(): FormInterface
     {
         $locations = $this->scheduleDate?->schedule?->getLocations()->filter(
-            function (Location $location): bool {
-                return ! ($this->getShift()?->getLocation()?->getId()->equals($location->getId()) ?? false);
-            },
+            fn (Location $location): bool => ! ($this->getShift()?->getLocation()?->getId()->equals($location->getId()) ?? false),
         );
 
         $locations = array_combine(
-            $locations?->map(static fn (Location $location) => (string) $location)->toArray() ?? [],
-            $locations?->map(static fn (Location $location) => $location->getId()->toBase32())->toArray() ?? [],
+            $locations->map(static fn (Location $location): string => (string) $location)->toArray() ?? [],
+            $locations->map(static fn (Location $location): string => $location->getId()->toBase32())->toArray() ?? [],
         );
 
         asort($locations);
@@ -104,7 +103,7 @@ final class ShiftUsers extends AbstractController
                 UserAutocompleteType::class,
                 [
                     'extra_options' => [
-                        'exclude_users' => $this->getShift()?->getAssignments()->map(static fn (ShiftAssignment $assignment) => $assignment->getUser()?->getId()->toBase32())->toArray(),
+                        'exclude_users' => $this->getShift()?->getAssignments()->map(static fn (ShiftAssignment $assignment): ?string => $assignment->getUser()?->getId()->toBase32())->toArray(),
                     ],
                 ]
             )
@@ -124,7 +123,7 @@ final class ShiftUsers extends AbstractController
         $this->submitForm();
 
         if (! $this->scheduleDate instanceof ScheduleDate) {
-            throw new \LogicException('No schedule date set');
+            throw new LogicException('No schedule date set');
         }
 
         /** @var array{users: Collection<int, User>, location: string} $data */
@@ -142,7 +141,7 @@ final class ShiftUsers extends AbstractController
             ->setSchedule($this->scheduleDate->schedule)
         ;
 
-        foreach ($data['users'] ?? [] as $user) {
+        foreach ($data['users'] as $user) {
             $user->addShift(new ShiftAssignment(shift: $shift));
         }
 

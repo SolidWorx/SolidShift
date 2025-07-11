@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/user/remove/{user}', name: Remove::ROUTE_NAME, methods: ['POST', 'DELETE'], siteAware: true)]
 final class Remove extends AbstractController
 {
-    public const ROUTE_NAME = 'user.remove';
+    public const string ROUTE_NAME = 'user.remove';
 
     public function __construct(
         private readonly Security $security,

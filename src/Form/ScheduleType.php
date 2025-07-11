@@ -15,6 +15,7 @@ use App\Entity\Location;
 use App\Entity\Schedule;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use Carbon\CarbonImmutable;
+use Override;
 use Psr\Clock\ClockInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -73,6 +74,7 @@ final class ScheduleType extends AbstractType
         $resolver->setAllowedTypes('edit', 'bool');
     }
 
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'schedule';

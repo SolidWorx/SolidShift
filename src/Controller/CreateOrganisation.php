@@ -33,11 +33,11 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 #[Route(path: CreateOrganisation::ROUTE_PATH, name: CreateOrganisation::ROUTE_NAME)]
 final class CreateOrganisation extends AbstractController
 {
-    public const ROUTE_NAME = 'app_create_org';
+    public const string ROUTE_NAME = 'app_create_org';
 
-    public const ROUTE_PATH = '/org/create';
+    public const string ROUTE_PATH = '/org/create';
 
-    public const TEMPLATE_NAME = 'org/create.html.twig';
+    public const string TEMPLATE_NAME = 'org/create.html.twig';
 
     public function __construct(
         private readonly OrganisationRepository $organisationRepository

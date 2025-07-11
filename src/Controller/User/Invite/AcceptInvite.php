@@ -34,7 +34,7 @@ final class AcceptInvite extends AbstractController
 {
     use TargetPathTrait;
 
-    public const ROUTE_NAME = 'user.invite.accept';
+    public const string ROUTE_NAME = 'user.invite.accept';
 
     public function __construct(
         private readonly UserInviteRepository $userInviteRepository,
@@ -76,7 +76,7 @@ final class AcceptInvite extends AbstractController
         }
 
         // User is not logged in, so we need to create a new user
-        $user = (new User())
+        $user = new User()
             ->setUsername($userInvite->getEmail() ?? '')
             ->setPhone($userInvite->getPhone());
 
