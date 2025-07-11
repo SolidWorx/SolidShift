@@ -1,0 +1,157 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Position List{% endblock %}
+
+{% block page_header %}
+    {% if positions is not empty %}
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Positions
+                        </h2>
+                    </div>
+
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <a href="{{ url('position.create') }}" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-create-position">
+                                {{ icon('plus') }}
+                                Create new position
+                            </a>
+                            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-create-position" aria-label="Create new position">
+                                {{ icon('plus') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock page_header %}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        {% if positions is empty %}
+            <div class="empty">
+                <div class="empty-img">
+                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Position Icon">
+                </div>
+                <p class="empty-title">No positions found</p>
+                <p class="empty-subtitle text-secondary">
+                    Positions define roles that can be assigned to specific locations.
+                    <br />
+                    This could be a job title, role, or any other position within your organization.
+                    <br />
+                    Positions can optionally be associated with a specific location.
+                </p>
+                <div class="empty-action">
+                    <a href="{{ url('position.create') }}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Add your first position
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-indigo" role="alert">
+                <div class="d-flex">
+                    <div>
+                        {{ icon('alert') }}
+                    </div>
+                    <div>
+                        <div class="text-secondary">
+                            Positions define roles that can be assigned to specific locations.
+                            <br />
+                            This could be a job title, role, or any other position within your organization.
+                            <br />
+                            Positions can optionally be associated with a specific location.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Positions</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for position in positions %}
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                {{ position.name }}
+                                {% if position.location %}
+                                    <span class="badge bg-teal text-white ms-2">{{ position.location }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <a href="{{ url('position.edit', {position: position.id}) }}" class="btn btn-sm btn-action btn-ghost-light" data-bs-toggle="tooltip" title="Edit Position" data-bs-placement="top">
+                                    {{ icon('pencil') }}
+                                </a>
+
+                                <a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Position" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ position.id }}">
+                                    {{ icon('trash') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        {% embed 'ui/modal/confirm.html.twig' with {url: 'position.delete', parameters: {position: position.id}, id: position.id} %}
+                            {% block trigger %}{% endblock trigger %}
+                            {% block title %}
+                                Are you sure you want to delete the position {{ position.name }}?
+                            {% endblock %}
+                            {% block content %}
+                            {% endblock %}
+                        {% endembed %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock body %}
+
+{% block page_end %}
+    <div class="modal modal-blur fade" id="modal-create-position" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                {{ form_start(form, {'action': path('position.create')}) }}
+                <div class="modal-header">
+                    <h5 class="modal-title">New Position</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="alert alert-indigo" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    {{ icon('alert') }}
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">Create a new position by giving it a name and optionally assigning it to a location.</h4>
+                                    <div class="text-secondary">
+                                        A position represents a role or job title within your organization.<br />
+                                        Positions can be assigned to specific locations or can be location-independent.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary ms-auto">
+                        {{ icon('plus') }}
+                        Create new position
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock page_end %}
