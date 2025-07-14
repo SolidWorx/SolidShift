@@ -53,6 +53,12 @@ class Location implements Stringable
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'location')]
     private Collection $positions;
 
+    /**
+     * @var Collection<int, ShiftTemplate>
+     */
+    #[ORM\OneToMany(targetEntity: ShiftTemplate::class, mappedBy: 'location')]
+    private Collection $shiftTemplates;
+
     public function __construct(
         ?string $name = null,
         #[ORM\ManyToOne(targetEntity: self::class)]
@@ -66,7 +72,9 @@ class Location implements Stringable
         if ($site instanceof Site) {
             $this->site = $site;
         }
+
         $this->positions = new ArrayCollection();
+        $this->shiftTemplates = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -217,11 +225,37 @@ class Location implements Stringable
 
     public function removePosition(Position $position): static
     {
-        if ($this->positions->removeElement($position)) {
-            // set the owning side to null (unless already changed)
-            if ($position->getLocation() === $this) {
-                $position->setLocation(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->positions->removeElement($position) && $position->getLocation() === $this) {
+            $position->setLocation(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShiftTemplate>
+     */
+    public function getShiftTemplates(): Collection
+    {
+        return $this->shiftTemplates;
+    }
+
+    public function addShiftTemplate(ShiftTemplate $shiftTemplate): static
+    {
+        if (! $this->shiftTemplates->contains($shiftTemplate)) {
+            $this->shiftTemplates->add($shiftTemplate);
+            $shiftTemplate->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShiftTemplate(ShiftTemplate $shiftTemplate): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->shiftTemplates->removeElement($shiftTemplate) && $shiftTemplate->getLocation() === $this) {
+            $shiftTemplate->setLocation(null);
         }
 
         return $this;

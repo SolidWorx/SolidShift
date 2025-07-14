@@ -33,8 +33,13 @@ final class Security extends AbstractController
     #[Template(template: 'security/login.html.twig')]
     public function login(AuthenticationUtils $authenticationUtils): Response|array
     {
-        if ($this->getUser() instanceof User) {
-            return $this->redirectToRoute('app_create_site');
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            if ($user->getSiteAccess()->count() > 0) {
+                return $this->redirectToRoute(ChooseSite::ROUTE_NAME);
+            }
+
+            return $this->redirectToRoute(CreateSite::ROUTE_NAME);
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();

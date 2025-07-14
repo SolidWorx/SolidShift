@@ -12,8 +12,10 @@
 namespace App\Form;
 
 use App\Entity\Location;
+use App\Entity\Position;
 use App\Form\Transformer\LocationModelTransformer;
 use App\Repository\LocationRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -49,6 +51,16 @@ final class LocationType extends AbstractType
 
             $builder->get('parent')->addModelTransformer(new LocationModelTransformer($this->locationRepository));
         }
+
+        $builder->add('positions', EntityType::class, [
+            'class' => Position::class,
+            'multiple' => true,
+            'expanded' => false,
+            'required' => false,
+            'by_reference' => false,
+            'help' => 'Select positions that are available at this location. Leave blank if no specific positions are tied to this location.',
+            'autocomplete' => true,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

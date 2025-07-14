@@ -1,13 +1,15 @@
 <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            {% if action is defined and action is same as('choose') %}
-                Choose Site
-            {% else %}
-                Switch Site
-            {% endif %}
-        </h3>
-    </div>
+    {% if app.user.siteAccess|length > 1 %}
+        <div class="card-header">
+            <h3 class="card-title">
+                {% if action is defined and action is same as('choose') %}
+                    Choose Site
+                {% else %}
+                    Switch Site
+                {% endif %}
+            </h3>
+        </div>
+    {% endif %}
     <div class="list-group list-group-flush list-group-hoverable">
         {% for userSite in app.user.siteAccess|filter((s) => not s.site.id.equals(site.id)) %}
             <div class="list-group-item">
@@ -18,5 +20,13 @@
                 </div>
             </div>
         {% endfor %}
+
+        <div class="list-group-item">
+            <div class="row align-items-center">
+                <a href="{{ path('app_create_site') }}" class="text-body d-block">
+                    {{ ux_icon('tabler:circle-plus', {width: 20}) }} {{ 'Create Site'|trans }}
+                </a>
+            </div>
+        </div>
     </div>
 </div>

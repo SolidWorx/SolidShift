@@ -12,8 +12,11 @@
 namespace App\Controller;
 
 use App\Attribute\Route;
+use App\Controller\Site\Dashboard;
+use App\Entity\User;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @see \App\Tests\Controller\ChooseSiteTest
@@ -24,11 +27,28 @@ final class ChooseSite extends AbstractController
     public const string ROUTE_NAME = 'app_choose_site';
 
     /**
-     * @return array<string, mixed>
+     * @return Response|array<string, mixed>
      */
     #[Template('site/choose.html.twig')]
-    public function __invoke(): array
+    public function __invoke(): Response|array
     {
+        $user = $this->getUser();
+
+        if ($user instanceof User) {
+            $sites = $user->getSiteAccess();
+            $count = $sites->count();
+
+            if ($count === 0) {
+                return $this->redirectToRoute(CreateSite::ROUTE_NAME);
+            }
+
+            if ($count > 1) {
+                return [];
+            }
+
+            return $this->redirectToRoute(Dashboard::ROUTE_NAME, ['site' => $sites->first()->getSite()->getId()->toBase58()]);
+        }
+
         return [];
     }
 }

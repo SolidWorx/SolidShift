@@ -7,7 +7,7 @@
             <div class="d-none d-md-flex">
                 {% if site is defined and site is not empty %}
                     <div class="nav-item dropdown d-none d-md-flex me-3">
-                        {% if app.user.siteAccess|length > 1 %}
+                        {#{% if app.user.siteAccess|length > 1 %}
                             <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Switch Site">
                                 {{ icon('sitemap') }}
                                 <span class="ml-4">{{ site.name }}</span>
@@ -20,7 +20,14 @@
                                 {{ icon('sitemap') }}
                                 <span class="ml-4">{{ site.name }}</span>
                             </div>
-                        {% endif %}
+                        {% endif %}#}
+                        <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Switch Site">
+                            {{ ux_icon('tabler:sitemap', {width: 20}) }}
+                            <span class="ml-4">{{ site.name }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
+                            {% include 'site/_partial/site_list.html.twig' %}
+                        </div>
                     </div>
                 {% endif %}
             </div>
