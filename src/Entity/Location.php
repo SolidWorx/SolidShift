@@ -48,12 +48,6 @@ class Location implements Stringable
     private Collection $schedules;
 
     /**
-     * @var Collection<int, Position>
-     */
-    #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'location')]
-    private Collection $positions;
-
-    /**
      * @var Collection<int, ShiftTemplate>
      */
     #[ORM\OneToMany(targetEntity: ShiftTemplate::class, mappedBy: 'location')]
@@ -73,7 +67,6 @@ class Location implements Stringable
             $this->site = $site;
         }
 
-        $this->positions = new ArrayCollection();
         $this->shiftTemplates = new ArrayCollection();
     }
 
@@ -203,34 +196,6 @@ class Location implements Stringable
         array_unshift($names, $this->getName());
 
         return implode(' > ', array_reverse($names));
-    }
-
-    /**
-     * @return Collection<int, Position>
-     */
-    public function getPositions(): Collection
-    {
-        return $this->positions;
-    }
-
-    public function addPosition(Position $position): static
-    {
-        if (! $this->positions->contains($position)) {
-            $this->positions->add($position);
-            $position->setLocation($this);
-        }
-
-        return $this;
-    }
-
-    public function removePosition(Position $position): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->positions->removeElement($position) && $position->getLocation() === $this) {
-            $position->setLocation(null);
-        }
-
-        return $this;
     }
 
     /**

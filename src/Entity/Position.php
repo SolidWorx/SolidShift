@@ -31,19 +31,15 @@ class Position implements Stringable
     #[Assert\Length(min: 3, max: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'positions')]
-    private ?Location $location = null;
-
     /**
      * @var Collection<int, ShiftTemplate>
      */
     #[ORM\OneToMany(targetEntity: ShiftTemplate::class, mappedBy: 'position')]
     private Collection $shiftTemplates;
 
-    public function __construct(?string $name = null, ?Location $location = null)
+    public function __construct(?string $name = null)
     {
         $this->name = $name;
-        $this->location = $location;
         $this->shiftTemplates = new ArrayCollection();
     }
 
@@ -62,23 +58,6 @@ class Position implements Stringable
         $this->name = $name;
 
         return $this;
-    }
-
-    public function getLocation(): ?Location
-    {
-        return $this->location;
-    }
-
-    public function setLocation(?Location $location): static
-    {
-        $this->location = $location;
-
-        return $this;
-    }
-
-    public function __toString(): string
-    {
-        return $this->name ?? '';
     }
 
     /**
@@ -107,5 +86,10 @@ class Position implements Stringable
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name ?? '';
     }
 }

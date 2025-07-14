@@ -14,12 +14,6 @@
             {% endif %}
 
             {{ location.name }}
-            {% if location.positions|length > 0 %}
-                <span class="ms-2 badge bg-blue-lt">
-                    {{ location.positions|length }} position{% if location.positions|length > 1 %}s{% endif %}:
-                    {{ location.positions|join(', ') }}
-                </span>
-            {% endif %}
         </div>
 
         <div>
