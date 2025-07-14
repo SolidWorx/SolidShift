@@ -16,7 +16,7 @@ use App\Entity\Position;
 use App\Entity\ShiftTemplate;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
@@ -66,12 +66,12 @@ final class ShiftTemplateType extends AbstractType
             'help' => 'Optional end time for the shift',
         ]);
 
-        $builder->add('requiredMin', IntegerType::class, [
+        $builder->add('requiredMin', NumberType::class, [
             'required' => false,
             'help' => 'Minimum number of people required for this shift',
         ]);
 
-        $builder->add('requiredMax', IntegerType::class, [
+        $builder->add('requiredMax', NumberType::class, [
             'required' => false,
             'help' => 'Maximum number of people required for this shift',
         ]);

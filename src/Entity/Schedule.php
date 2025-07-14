@@ -16,8 +16,6 @@ use App\Repository\ScheduleRepository;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
@@ -58,27 +56,13 @@ class Schedule implements Stringable
     #[Assert\Valid]
     private ?RecurringOptions $recurringOptions = null;
 
-    /**
-     * @var Collection<int, Location>
-     */
-    #[ORM\ManyToMany(targetEntity: Location::class, inversedBy: 'schedules', orphanRemoval: true)]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
-    #[Assert\Valid]
-    #[Assert\NotBlank]
-    private Collection $locations;
-
     #[ORM\ManyToOne(inversedBy: 'schedules')]
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
-    /**
-     * @param Collection<int, Location>|null $locations
-     */
     public function __construct(
         string $name = '',
         ?ScheduleType $scheduleType = null,
-        ?Collection $locations = new ArrayCollection(),
         ?Site $site = null,
         ?DateTimeImmutable $startDate = null,
         ?DateTimeImmutable $endDate = null,
@@ -89,8 +73,6 @@ class Schedule implements Stringable
         if ($scheduleType instanceof ScheduleType) {
             $this->scheduleType = $scheduleType;
         }
-
-        $this->locations = $locations;
 
         if ($site instanceof Site) {
             $this->site = $site;
@@ -191,30 +173,6 @@ class Schedule implements Stringable
             $this->recurringOptions = $recurringOptions;
             $recurringOptions->setSchedule($this);
         }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Location>
-     */
-    public function getLocations(): Collection
-    {
-        return $this->locations;
-    }
-
-    public function addLocation(Location $location): static
-    {
-        if (! $this->locations->contains($location)) {
-            $this->locations->add($location);
-        }
-
-        return $this;
-    }
-
-    public function removeLocation(Location $location): static
-    {
-        $this->locations->removeElement($location);
 
         return $this;
     }

@@ -73,7 +73,6 @@
     <div {{ stimulus_controller('schedule') }}>
         {{ form_widget(form.scheduleType) }}
         {{ form_row(form.name) }}
-        {{ form_row(form.locations) }}
 
         <div {{ stimulus_target('schedule', 'startDate') }}>
             {{ form_row(form.startDate) }}

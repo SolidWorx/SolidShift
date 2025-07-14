@@ -11,13 +11,11 @@
 
 namespace App\Form;
 
-use App\Entity\Location;
 use App\Entity\Schedule;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use Carbon\CarbonImmutable;
 use Override;
 use Psr\Clock\ClockInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -51,7 +49,6 @@ final class ScheduleType extends AbstractType
                     'expanded' => true,
                 ]
             )
-            ->add('locations', EntityType::class, ['class' => Location::class, 'multiple' => true, 'autocomplete' => true])
             ->add(
                 'startDate',
                 DateType::class,

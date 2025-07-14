@@ -16,7 +16,6 @@ use App\Entity\Schedule;
 use App\Entity\Site;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use App\Form\ScheduleType;
-use App\Repository\LocationRepository;
 use App\Repository\ScheduleRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +30,6 @@ final class Create extends AbstractController
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,
-        private readonly LocationRepository $locationRepository,
     ) {
     }
 
@@ -57,7 +55,6 @@ final class Create extends AbstractController
         }
 
         return [
-            'totalLocations' => $this->locationRepository->count(['site' => $site->getId()]),
             'form' => $form->createView(),
         ];
     }

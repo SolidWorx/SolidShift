@@ -35,39 +35,17 @@
                                 </div>
                             {% endif %}#}
 
-                            {% if totalLocations is same as(0) %}
-                                <div class="alert alert-indigo" role="alert">
-                                    <div class="d-flex">
-                                        <div>
-                                            {{ icon('alert') }}
-                                        </div>
-                                        <div>
-                                            <h4 class="alert-title">{{ 'No locations'|trans }}</h4>
-                                            <div class="text-secondary">
-                                                {{ 'In order to create a schedule, you must first define a location.'|trans }}
-                                            </div>
-                                        </div>
-                                    </div>
+                            {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+                                    <button type="submit" class="btn-primary btn">
+                                        {{ 'Save'|trans }}
+                                    </button>
                                 </div>
-                                <div class="text-center">
-                                    <a href="{{ url('location.create') }}" class="btn btn-primary">
-                                        {{ icon('plus') }}
-                                        {{ 'Add location'|trans }}
-                                    </a>
-                                </div>
-                            {% else %}
-                                {{ form_start(form) }}
-                                {{ form_widget(form) }}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between">
-                                        <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
-                                        <button type="submit" class="btn-primary btn">
-                                            {{ 'Save'|trans }}
-                                        </button>
-                                    </div>
-                                </div>
-                                {{ form_end(form) }}
-                            {% endif %}
+                            </div>
+                            {{ form_end(form) }}
 
                         </div>
                     </div>
