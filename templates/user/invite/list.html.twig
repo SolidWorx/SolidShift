@@ -52,7 +52,7 @@
         {% if invites is empty %}
             <div class="empty">
                 <div class="empty-img">
-                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
+                    {{ include('components/illustration/location.html.twig', {label: 'No pending invites'}) }}
                 </div>
                 <p class="empty-title">No invites found</p>
                 <p class="empty-subtitle text-secondary">

@@ -2,7 +2,7 @@
     {% if computed.shiftDates is empty %}
         <div class="empty">
             <div class="empty-img">
-                <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
+                {{ include('components/illustration/location.html.twig', {label: 'No upcoming shifts'}) }}
             </div>
             <p class="empty-title">{{ 'No shifts found'|trans }}</p>
             <p class="empty-subtitle text-secondary">

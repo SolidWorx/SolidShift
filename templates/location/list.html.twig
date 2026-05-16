@@ -85,7 +85,7 @@
         {% if locations is empty %}
             <div class="empty">
                 <div class="empty-img">
-                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Location Icon">
+                    {{ include('components/illustration/location.html.twig', {label: 'No locations'}) }}
                 </div>
                 <p class="empty-title">No locations found</p>
                 <p class="empty-subtitle text-secondary">

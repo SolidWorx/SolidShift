@@ -35,7 +35,7 @@
         {% if shiftTemplates is empty %}
             <div class="empty">
                 <div class="empty-img">
-                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Shift Template Icon">
+                    {{ include('components/illustration/location.html.twig', {label: 'No shift templates'}) }}
                 </div>
                 <p class="empty-title">No shift templates found</p>
                 <p class="empty-subtitle text-secondary">

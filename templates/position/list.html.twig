@@ -35,7 +35,7 @@
         {% if positions is empty %}
             <div class="empty">
                 <div class="empty-img">
-                    <img src="{{ asset('asset/illustration/location.svg') }}" height="128" alt="Position Icon">
+                    {{ include('components/illustration/location.html.twig', {label: 'No positions'}) }}
                 </div>
                 <p class="empty-title">No positions found</p>
                 <p class="empty-subtitle text-secondary">
