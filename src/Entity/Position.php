@@ -16,34 +16,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
 class Position implements Stringable
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME)]
+    private Ulid $id;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank()]
     #[Assert\Length(min: 3, max: 255)]
     private ?string $name = null;
 
-    /**
-     * @var Collection<int, ShiftTemplate>
-     */
-    #[ORM\OneToMany(targetEntity: ShiftTemplate::class, mappedBy: 'position')]
-    private Collection $shiftTemplates;
-
     public function __construct(?string $name = null)
     {
+        $this->id = new Ulid();
         $this->name = $name;
-        $this->shiftTemplates = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): Ulid
     {
         return $this->id;
     }
@@ -56,34 +51,6 @@ class Position implements Stringable
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ShiftTemplate>
-     */
-    public function getShiftTemplates(): Collection
-    {
-        return $this->shiftTemplates;
-    }
-
-    public function addShiftTemplate(ShiftTemplate $shiftTemplate): static
-    {
-        if (! $this->shiftTemplates->contains($shiftTemplate)) {
-            $this->shiftTemplates->add($shiftTemplate);
-            $shiftTemplate->setPosition($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShiftTemplate(ShiftTemplate $shiftTemplate): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->shiftTemplates->removeElement($shiftTemplate) && $shiftTemplate->getPosition() === $this) {
-            $shiftTemplate->setPosition(null);
-        }
 
         return $this;
     }

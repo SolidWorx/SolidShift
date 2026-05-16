@@ -12,16 +12,20 @@
 namespace App\Form;
 
 use App\Entity\Schedule;
+use App\Entity\ShiftTemplate;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use Carbon\CarbonImmutable;
 use Override;
 use Psr\Clock\ClockInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
 
 /**
  * @extends AbstractType<Schedule>
@@ -40,7 +44,7 @@ final class ScheduleType extends AbstractType
         ] : [];
 
         $builder
-            ->add('name')
+            ->add('name', null, ['empty_data' => ''])
             ->add(
                 'scheduleType',
                 EnumType::class,
@@ -61,6 +65,15 @@ final class ScheduleType extends AbstractType
             ->add('startTime', TimeType::class)
             ->add('endTime', TimeType::class, ['required' => false, 'help' => 'Leave blank if the shift has no end time'])
             ->add('recurringOptions', RecurringOptions::class, ['required' => false])
+            ->add('shifts', LiveCollectionType::class, [
+                'button_delete_options' => [
+                    'label' => 'Remove',
+                    'attr' => [
+                        'class' => 'btn btn-danger btn-sm',
+                    ]
+                ],
+                'entry_type' => ScheduleShiftType::class,
+            ])
         ;
     }
 

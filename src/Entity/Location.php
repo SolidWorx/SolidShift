@@ -12,8 +12,6 @@
 namespace App\Entity;
 
 use App\Repository\LocationRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -41,33 +39,19 @@ class Location implements Stringable
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
-    /**
-     * @var Collection<int, Schedule>
-     */
-    #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'locations', orphanRemoval: true)]
-    private Collection $schedules;
-
-    /**
-     * @var Collection<int, ShiftTemplate>
-     */
-    #[ORM\OneToMany(targetEntity: ShiftTemplate::class, mappedBy: 'location')]
-    private Collection $shiftTemplates;
-
     public function __construct(
-        ?string $name = null,
+        ?string       $name = null,
         #[ORM\ManyToOne(targetEntity: self::class)]
         private ?self $parent = null,
-        ?Site $site = null,
-    ) {
+        ?Site         $site = null,
+    )
+    {
         $this->name = (string) $name;
-        $this->schedules = new ArrayCollection();
         $this->id = new Ulid();
 
         if ($site instanceof Site) {
             $this->site = $site;
         }
-
-        $this->shiftTemplates = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -145,38 +129,10 @@ class Location implements Stringable
 
     public function setSite(?Site $site): static
     {
-        if (! $site instanceof Site) {
+        if (!$site instanceof Site) {
             unset($this->site);
         } else {
             $this->site = $site;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Schedule>
-     */
-    public function getSchedules(): Collection
-    {
-        return $this->schedules;
-    }
-
-    public function addSchedule(Schedule $schedule): static
-    {
-        if (! $this->schedules->contains($schedule)) {
-            $this->schedules->add($schedule);
-            $schedule->setLocations($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSchedule(Schedule $schedule): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->schedules->removeElement($schedule) && $schedule->getLocations() === $this) {
-            $schedule->setLocations(null);
         }
 
         return $this;
@@ -196,33 +152,5 @@ class Location implements Stringable
         array_unshift($names, $this->getName());
 
         return implode(' > ', array_reverse($names));
-    }
-
-    /**
-     * @return Collection<int, ShiftTemplate>
-     */
-    public function getShiftTemplates(): Collection
-    {
-        return $this->shiftTemplates;
-    }
-
-    public function addShiftTemplate(ShiftTemplate $shiftTemplate): static
-    {
-        if (! $this->shiftTemplates->contains($shiftTemplate)) {
-            $this->shiftTemplates->add($shiftTemplate);
-            $shiftTemplate->setLocation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShiftTemplate(ShiftTemplate $shiftTemplate): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->shiftTemplates->removeElement($shiftTemplate) && $shiftTemplate->getLocation() === $this) {
-            $shiftTemplate->setLocation(null);
-        }
-
-        return $this;
     }
 }

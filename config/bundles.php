@@ -20,4 +20,8 @@ return [
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
     Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
     Symfony\UX\Icons\UXIconsBundle::class => ['all' => true],
+    Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
+    Knp\Bundle\MenuBundle\KnpMenuBundle::class => ['all' => true],
+    SolidWorx\Platform\UiBundle\SolidWorxPlatformUiBundle::class => ['all' => true],
+    SolidWorx\Platform\PlatformBundle\SolidWorxPlatformBundle::class => ['all' => true],
 ];

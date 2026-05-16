@@ -64,11 +64,11 @@
                                 <div class="row">
                                     <div class="col-3">
                                         <h3 class="mb-1">{{ shiftDate.schedule.name }}</h3>
-                                        {% for location in shiftDate.schedule.locations %}
+                                        {#{% for location in shiftDate.schedule.locations %}
                                             <p class="mb-1">
                                                 {{ location }}
                                             </p>
-                                        {% endfor %}
+                                        {% endfor %}#}
                                         {% if shiftDate.timeRange is not empty %}
                                             <span class="tag">
                                                 {{ shiftDate.timeRange }}

@@ -72,13 +72,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
     /**
      * @var Collection<int, UserInvite>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserInvite::class)]
+    #[ORM\OneToMany(targetEntity: UserInvite::class, mappedBy: 'user')]
     private Collection $invites;
 
     /**
-     * @var Collection<int, ShiftAssignment>
+     * @var Collection<int, Shift>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ShiftAssignment::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'user', cascade: ['persist'], orphanRemoval: true)]
     private Collection $shifts;
 
     public function __construct()
@@ -260,7 +260,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
     }
 
     /**
-     * @return Collection<int, ShiftAssignment>
+     * @return Collection<int, Shift>
      */
     public function getShifts(): Collection
     {
@@ -287,7 +287,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
         return $this;
     }
 
-    public function addShift(ShiftAssignment $shift): static
+    public function addShift(Shift $shift): static
     {
         if (! $this->shifts->contains($shift)) {
             $this->shifts->add($shift);
@@ -297,7 +297,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
         return $this;
     }
 
-    public function removeShift(ShiftAssignment $shift): static
+    public function removeShift(Shift $shift): static
     {
         if ($this->shifts->removeElement($shift)) {
             $shift->setUser(null);

@@ -32,6 +32,7 @@
     "nesbot/carbon": "^3.0",
     "phpdocumentor/reflection-docblock": "^5.3",
     "phpstan/phpdoc-parser": "^2.1",
+    "solidworx/platform": "dev-main",
     "symfony/asset": "^7.3",
     "symfony/console": "^7.3",
     "symfony/doctrine-messenger": "^7.3",
@@ -58,7 +59,6 @@
     "symfony/twig-bundle": "^7.3",
     "symfony/uid": "^7.3",
     "symfony/ux-autocomplete": "^2.27",
-    "symfony/ux-icons": "^2.27",
     "symfony/ux-live-component": "^2.14",
     "symfony/validator": "^7.3",
     "symfony/web-link": "^7.3",
@@ -146,6 +146,12 @@
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
       "assets:install %PUBLIC_DIR%": "symfony-cmd"
+    }
+  },
+  "repositories": {
+    "solidworx/platform": {
+      "type": "path",
+      "url": "/Users/pierre/projects/SolidWorx/platform"
     }
   }
 }

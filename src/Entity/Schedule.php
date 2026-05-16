@@ -16,6 +16,8 @@ use App\Repository\ScheduleRepository;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
@@ -60,6 +62,12 @@ class Schedule implements Stringable
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
+    /**
+     * @var Collection<int, ScheduleShift>
+     */
+    #[ORM\ManyToMany(targetEntity: ScheduleShift::class, inversedBy: 'schedules', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $shifts;
+
     public function __construct(
         string $name = '',
         ?ScheduleType $scheduleType = null,
@@ -100,6 +108,7 @@ class Schedule implements Stringable
 
         $this->name = $name;
         $this->id = new Ulid();
+        $this->shifts = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -112,9 +121,11 @@ class Schedule implements Stringable
         return CarbonImmutable::instance($this->startDate);
     }
 
-    public function setStartDate(DateTimeImmutable $startDate): static
+    public function setStartDate(?DateTimeImmutable $startDate): static
     {
-        $this->startDate = $startDate;
+        if ($startDate instanceof DateTimeInterface) {
+            $this->startDate = $startDate;
+        }
 
         return $this;
     }
@@ -169,7 +180,7 @@ class Schedule implements Stringable
 
     public function setRecurringOptions(?RecurringOptions $recurringOptions): static
     {
-        if ($recurringOptions instanceof RecurringOptions && $this->scheduleType->isRecurring()) {
+        if ($recurringOptions instanceof RecurringOptions && isset($this->scheduleType) && $this->scheduleType->isRecurring()) {
             $this->recurringOptions = $recurringOptions;
             $recurringOptions->setSchedule($this);
         }
@@ -224,6 +235,30 @@ class Schedule implements Stringable
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScheduleShift>
+     */
+    public function getShifts(): Collection
+    {
+        return $this->shifts;
+    }
+
+    public function addShift(ScheduleShift $shift): static
+    {
+        if (!$this->shifts->contains($shift)) {
+            $this->shifts->add($shift);
+        }
+
+        return $this;
+    }
+
+    public function removeShift(ScheduleShift $shift): static
+    {
+        $this->shifts->removeElement($shift);
 
         return $this;
     }

@@ -52,17 +52,14 @@ class Shift
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $created;
 
-    /**
-     * @var Collection<int, ShiftAssignment>
-     */
-    #[ORM\OneToMany(mappedBy: 'shift', targetEntity: ShiftAssignment::class, orphanRemoval: true)]
-    private Collection $assignments;
+    #[ORM\ManyToOne(inversedBy: 'shifts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
 
     public function __construct()
     {
         $this->id = new Ulid();
         $this->created = CarbonImmutable::now();
-        $this->assignments = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -147,30 +144,14 @@ class Shift
         return $this->created;
     }
 
-    /**
-     * @return Collection<int, ShiftAssignment>
-     */
-    public function getAssignments(): Collection
+    public function getUser(): User
     {
-        return $this->assignments;
+        return $this->user;
     }
 
-    public function addAssignment(ShiftAssignment $assignment): static
+    public function setUser(User $user): self
     {
-        if (! $this->assignments->contains($assignment)) {
-            $this->assignments->add($assignment);
-            $assignment->setShift($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAssignment(ShiftAssignment $assignment): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->assignments->removeElement($assignment) && $assignment->getShift() === $this) {
-            $assignment->setShift(null);
-        }
+        $this->user = $user;
 
         return $this;
     }

@@ -13,13 +13,11 @@ namespace App\Components;
 
 use App\Entity\Location;
 use App\Entity\Shift;
-use App\Entity\ShiftAssignment;
 use App\Entity\User;
 use App\Form\UserAutocompleteType;
 use App\Model\ScheduleDate;
 use App\Repository\LocationRepository;
 use App\Repository\ShiftRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,13 +70,13 @@ final class ShiftUsers extends AbstractController
     #[ExposeInTemplate()]
     public function getShift(): ?Shift
     {
-        return $this->shiftRepository->findOneBy([
+        return null; /*$this->shiftRepository->findOneBy([
             'schedule' => $this->scheduleDate?->schedule,
             'startDate' => $this->scheduleDate?->startDate,
             'startTime' => $this->scheduleDate?->startTime,
             'endDate' => $this->scheduleDate?->endDate,
             'endTime' => $this->scheduleDate?->endTime,
-        ]);
+        ]);*/
     }
 
     /**
@@ -86,7 +84,7 @@ final class ShiftUsers extends AbstractController
      */
     protected function instantiateForm(): FormInterface
     {
-        $locations = $this->scheduleDate?->schedule?->getLocations()->filter(
+        /*$locations = $this->scheduleDate?->schedule?->getLocations()->filter(
             fn (Location $location): bool => ! ($this->getShift()?->getLocation()?->getId()->equals($location->getId()) ?? false),
         );
 
@@ -95,7 +93,7 @@ final class ShiftUsers extends AbstractController
             $locations->map(static fn (Location $location): string => $location->getId()->toBase32())->toArray() ?? [],
         );
 
-        asort($locations);
+        asort($locations);*/
 
         return $this->createFormBuilder()
             ->add(
@@ -103,14 +101,14 @@ final class ShiftUsers extends AbstractController
                 UserAutocompleteType::class,
                 [
                     'extra_options' => [
-                        'exclude_users' => $this->getShift()?->getAssignments()->map(static fn (ShiftAssignment $assignment): ?string => $assignment->getUser()?->getId()->toBase32())->toArray(),
+                        'exclude_users' => $this->getShift()?->getUser()->getId()->toBase32(),
                     ],
                 ]
             )
-            ->add('location', ChoiceType::class, [
+            /*->add('location', ChoiceType::class, [
                 'choices' => $locations,
                 'placeholder' => 'Select a location'
-            ])
+            ])*/
             ->getForm()
         ;
     }
@@ -126,7 +124,7 @@ final class ShiftUsers extends AbstractController
             throw new LogicException('No schedule date set');
         }
 
-        /** @var array{users: Collection<int, User>, location: string} $data */
+        /** @var array{user: User, location: string} $data */
         $data = $this->getForm()->getData();
 
         $location = $this->locationRepository->find($data['location']);
@@ -138,12 +136,9 @@ final class ShiftUsers extends AbstractController
             ->setStartTime($this->scheduleDate->startTime)
             ->setEndTime($this->scheduleDate->endTime)
             ->setLocation($location)
+            ->setUser($data['user'])
             ->setSchedule($this->scheduleDate->schedule)
         ;
-
-        foreach ($data['users'] as $user) {
-            $user->addShift(new ShiftAssignment(shift: $shift));
-        }
 
         $entityManager->persist($shift);
         $entityManager->flush();
@@ -153,9 +148,9 @@ final class ShiftUsers extends AbstractController
     }
 
     #[LiveAction]
-    public function removeUser(#[LiveArg] ShiftAssignment $assignment, #[LiveArg] Shift $shift, EntityManagerInterface $entityManager): void
+    public function removeUser(#[LiveArg] Shift $shift, EntityManagerInterface $entityManager): void
     {
-        $shift->removeAssignment($assignment);
+        $entityManager->remove($shift);
         $entityManager->flush();
     }
 }

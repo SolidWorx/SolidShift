@@ -61,6 +61,9 @@
             "migrations/.gitignore"
         ]
     },
+    "knplabs/knp-menu-bundle": {
+        "version": "v3.6.0"
+    },
     "nelmio/cors-bundle": {
         "version": "2.4",
         "recipe": {
@@ -99,6 +102,22 @@
             "phpunit.xml.dist",
             "tests/bootstrap.php"
         ]
+    },
+    "scheb/2fa-bundle": {
+        "version": "7.11",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "1e6f68089146853a790b5da9946fc5974f6fcd49"
+        },
+        "files": [
+            "config/packages/scheb_2fa.yaml",
+            "config/routes/scheb_2fa.yaml"
+        ]
+    },
+    "solidworx/platform": {
+        "version": "dev-main"
     },
     "symfony/console": {
         "version": "7.3",
@@ -396,6 +415,18 @@
         "files": [
             "config/packages/web_profiler.yaml",
             "config/routes/web_profiler.yaml"
+        ]
+    },
+    "symfony/webhook": {
+        "version": "7.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.3",
+            "ref": "b70844963dc84e9a99b94ae552efe691d74b087f"
+        },
+        "files": [
+            "config/routes/webhook.yaml"
         ]
     },
     "symfony/webpack-encore-bundle": {

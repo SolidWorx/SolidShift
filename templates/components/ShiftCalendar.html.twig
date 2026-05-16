@@ -1,11 +1,11 @@
 <div{{ attributes }}>
     <div class="row mb-2">
         <div class="col px-0">
-            <a href="#" class="btn btn-icon" data-action="live#action" data-action-name="prevent|previous">
+            <a href="#" class="btn btn-icon" {{ live_action('previous:prevent') }}>
                 {{ icon('chevron-left') }}
             </a>
 
-            <a href="#" class="btn" data-action="live#action" data-action-name="prevent|today">
+            <a href="#" class="btn" {{ live_action('today:prevent') }}>
                 {{ icon('history') }}
                 Today
             </a>
@@ -27,7 +27,7 @@
                     Month View
                 </button>
             {% endif %}
-            <a href="#" class="btn btn-icon" data-action="live#action" data-action-name="prevent|next">
+            <a href="#" class="btn btn-icon" {{ live_action('next:prevent') }}>
                 {{ icon('chevron-right') }}
             </a>
         </div>
@@ -92,12 +92,12 @@
                             {% if computed.shiftDates[day|date('Y-m-d')]|default([])|length is same as(0) %}
                                 <br /><br />
                                 <br /><br />
+                                {#<br /><br />
                                 <br /><br />
                                 <br /><br />
                                 <br /><br />
                                 <br /><br />
-                                <br /><br />
-                                <br /><br />
+                                <br /><br />#}
                             {% endif %}
 
                             <div class="list-group list-group-flush">
@@ -114,7 +114,7 @@
                                                         {{ shift.schedule.name }}
                                                     </span>
 
-                                                    {% for location in shift.schedule.locations %}
+                                                    {#{% for location in shift.schedule.locations %}
                                                         {% set scheduledShift = this.shift(shift, location) %}
 
                                                         {% if scheduledShift is not empty and scheduledShift.assignments|length > 0 %}
@@ -131,7 +131,7 @@
                                                                 </span>
                                                             </div>
                                                         {% endif %}
-                                                    {% endfor %}
+                                                    {% endfor %}#}
                                                 </div>
                                             </small>
                                         </div>

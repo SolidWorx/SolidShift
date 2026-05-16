@@ -26,7 +26,6 @@
         </span>
         {{- block('form_widget_simple') -}}
     </div>
-
 {%- endblock email_widget -%}
 
 {%- block _schedule_scheduleType_widget -%}
@@ -145,3 +144,34 @@
         </button>
     </div>
 {%- endblock number_widget -%}
+
+{%- block _schedule_shifts_widget %}
+    {{ block('form_widget') }}
+    {%- if skip_add_button|default(false) is same as(false) and button_add is defined and not button_add.rendered -%}
+        {{ form_row(button_add) }}
+    {%- endif -%}
+{% endblock _schedule_shifts_widget -%}
+
+{%- block _schedule_shifts_entry_widget -%}
+    <div class="row">
+        <div class="col-lg-3">
+            {{ form_row(form.startTime) }}
+        </div>
+        <div class="col-lg-3">
+            {{ form_row(form.endTime) }}
+        </div>
+        <div class="col-lg-3">
+            {{ form_row(form.location) }}
+        </div>
+        <div class="col-lg-3">
+            {{ form_row(form.position) }}
+        </div>
+    </div>
+
+    {%- if button_delete is defined and not button_delete.rendered -%}
+        {# align button to the right #}
+        <div class="text-end">
+            {{ form_row(button_delete) }}
+        </div>
+    {%- endif -%}
+{%- endblock _schedule_shifts_entry_widget -%}

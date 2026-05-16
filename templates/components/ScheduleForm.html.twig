@@ -1,0 +1,19 @@
+<div {{ attributes }}>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <div class="mb-3">
+        <div class="d-flex justify-content-between">
+            <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+            <div>
+                <button type="submit" class="btn-primary btn">
+                    {{ 'Save'|trans }}
+                </button>
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    {#<a href="#" {{ live_action('test:prevent') }}>Test</a>
+    <a href="#" data-action="live#action" data-action-name="prevent|test">Test2</a>#}
+</div>
