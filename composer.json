@@ -21,7 +21,7 @@
     "api-platform/core": "^4.1",
     "doctrine/doctrine-bundle": "^2.11",
     "doctrine/doctrine-migrations-bundle": "^3.3",
-    "doctrine/orm": "^3.5",
+    "doctrine/orm": "^2.15",
     "giggsey/libphonenumber-for-php": "^9.0",
     "illuminate/collections": "^12.20",
     "illuminate/conditionable": "^12.20",
@@ -146,12 +146,6 @@
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
       "assets:install %PUBLIC_DIR%": "symfony-cmd"
-    }
-  },
-  "repositories": {
-    "solidworx/platform": {
-      "type": "path",
-      "url": "/Users/pierre/projects/SolidWorx/platform"
     }
   }
 }
