@@ -6,5 +6,7 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "esModuleInterop": true
-  }
+  },
+  "include": ["assets/**/*"],
+  "exclude": ["node_modules", "vendor", "public"]
 }

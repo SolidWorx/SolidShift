@@ -12,42 +12,18 @@
 namespace App\Controller;
 
 use App\Attribute\Route;
-use App\Entity\User;
-use Exception;
 use LogicException;
-use Symfony\Bridge\Twig\Attribute\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-final class Security extends AbstractController
+/**
+ * The login route ("_login_main") and its check_path are registered by
+ * SolidWorx Platform's LoginPageRouteLoader from the firewall's `form_login`
+ * config. The login template is configured in `platform.yaml` (ui.templates.login).
+ */
+final class Security
 {
-    public const string LOGIN_ROUTE_NAME = 'app_login';
+    public const string LOGIN_ROUTE_NAME = '_login_main';
 
     public const string LOGOUT_ROUTE_NAME = 'app_logout';
-
-    /**
-     * @return Response|array{last_username: string, error: Exception|null}
-     */
-    #[Route(path: '/login', name: self::LOGIN_ROUTE_NAME)]
-    #[Template(template: 'security/login.html.twig')]
-    public function login(AuthenticationUtils $authenticationUtils): Response|array
-    {
-        $user = $this->getUser();
-        if ($user instanceof User) {
-            if ($user->getSiteAccess()->count() > 0) {
-                return $this->redirectToRoute(ChooseSite::ROUTE_NAME);
-            }
-
-            return $this->redirectToRoute(CreateSite::ROUTE_NAME);
-        }
-
-        $error = $authenticationUtils->getLastAuthenticationError();
-
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return ['last_username' => $lastUsername, 'error' => $error];
-    }
 
     #[Route(path: '/logout', name: self::LOGOUT_ROUTE_NAME)]
     public function logout(): never

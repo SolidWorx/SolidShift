@@ -21,6 +21,9 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/app.js')
+    // Entry used by SolidWorx Platform UI templates
+    // (e.g. @Ui/Layout/base.html.twig used by login & 2FA pages).
+    .addEntry('_platform_ui', './vendor/solidworx/platform/assets/core.ts')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -63,7 +66,11 @@ Encore
     .enableSassLoader()
 
     // uncomment if you use TypeScript
-    .enableTypeScriptLoader()
+    // Use transpile-only mode so ts-loader doesn't type-check vendor TS
+    // files (e.g. vendor/solidworx/platform/assets/core.ts).
+    .enableTypeScriptLoader((tsConfig) => {
+        tsConfig.transpileOnly = true;
+    })
 
     // uncomment if you use React
     //.enableReactPreset()

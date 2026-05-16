@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=vendor/solidworx/platform/platform-schema.json
+platform:
+    name: 'SolidShift'
+    version: '0.1.0'
+
+    security:
+        two_factor:
+            enabled: false
+
+    doctrine:
+        types:
+            enable_utc_date: true
+
+    models:
+        user: App\Entity\User
+
+ui:
+    icon_pack: tabler
+    templates:
+        base: '@Ui/Layout/base.html.twig'
+        login: 'security/login.html.twig'

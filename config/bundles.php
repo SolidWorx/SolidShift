@@ -8,7 +8,6 @@ return [
     Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
-    Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
@@ -19,9 +18,8 @@ return [
     Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
     Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
-    Symfony\UX\Icons\UXIconsBundle::class => ['all' => true],
-    Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
-    Knp\Bundle\MenuBundle\KnpMenuBundle::class => ['all' => true],
     SolidWorx\Platform\UiBundle\SolidWorxPlatformUiBundle::class => ['all' => true],
-    SolidWorx\Platform\PlatformBundle\SolidWorxPlatformBundle::class => ['all' => true],
+    // SolidWorxPlatformBundle, SchebTwoFactorBundle (only when
+    // platform.security.two_factor.enabled), KnpMenuBundle, UXIconsBundle and
+    // TwigExtraBundle are auto-registered by the SolidWorx Platform Kernel.
 ];

@@ -995,53 +995,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     controller_paths?: list<scalar|Param|null>,
  *     controllers_json?: scalar|Param|null, // Default: "%kernel.project_dir%/assets/controllers.json"
  * }
- * @psalm-type TwigExtraConfig = array{
- *     cache?: bool|array{
- *         enabled?: bool|Param, // Default: false
- *     },
- *     html?: bool|array{
- *         enabled?: bool|Param, // Default: true
- *     },
- *     markdown?: bool|array{
- *         enabled?: bool|Param, // Default: false
- *     },
- *     intl?: bool|array{
- *         enabled?: bool|Param, // Default: false
- *     },
- *     cssinliner?: bool|array{
- *         enabled?: bool|Param, // Default: true
- *     },
- *     inky?: bool|array{
- *         enabled?: bool|Param, // Default: true
- *     },
- *     string?: bool|array{
- *         enabled?: bool|Param, // Default: false
- *     },
- *     commonmark?: array{
- *         renderer?: array{ // Array of options for rendering HTML.
- *             block_separator?: scalar|Param|null,
- *             inner_separator?: scalar|Param|null,
- *             soft_break?: scalar|Param|null,
- *         },
- *         html_input?: "strip"|"allow"|"escape"|Param, // How to handle HTML input.
- *         allow_unsafe_links?: bool|Param, // Remove risky link and image URLs by setting this to false. // Default: true
- *         max_nesting_level?: int|Param, // The maximum nesting level for blocks. // Default: 9223372036854775807
- *         max_delimiters_per_line?: int|Param, // The maximum number of strong/emphasis delimiters per line. // Default: 9223372036854775807
- *         slug_normalizer?: array{ // Array of options for configuring how URL-safe slugs are created.
- *             instance?: mixed,
- *             max_length?: int|Param, // Default: 255
- *             unique?: mixed,
- *         },
- *         commonmark?: array{ // Array of options for configuring the CommonMark core extension.
- *             enable_em?: bool|Param, // Default: true
- *             enable_strong?: bool|Param, // Default: true
- *             use_asterisk?: bool|Param, // Default: true
- *             use_underscore?: bool|Param, // Default: true
- *             unordered_list_markers?: list<scalar|Param|null>,
- *         },
- *         ...<string, mixed>
- *     },
- * }
  * @psalm-type SecurityConfig = array{
  *     access_denied_url?: scalar|Param|null, // Default: null
  *     session_fixation_strategy?: "none"|"migrate"|"invalidate"|Param, // Default: "migrate"
@@ -1143,28 +1096,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             lock_factory?: scalar|Param|null, // The service ID of the lock factory used by the login rate limiter (or null to disable locking). // Default: null
  *             cache_pool?: string|Param, // The cache pool to use for storing the limiter state // Default: "cache.rate_limiter"
  *             storage_service?: string|Param, // The service ID of a custom storage implementation, this precedes any configured "cache_pool" // Default: null
- *         },
- *         two_factor?: array{
- *             check_path?: scalar|Param|null, // Default: "/2fa_check"
- *             post_only?: bool|Param, // Default: true
- *             auth_form_path?: scalar|Param|null, // Default: "/2fa"
- *             always_use_default_target_path?: bool|Param, // Default: false
- *             default_target_path?: scalar|Param|null, // Default: "/"
- *             success_handler?: scalar|Param|null, // Default: null
- *             failure_handler?: scalar|Param|null, // Default: null
- *             authentication_required_handler?: scalar|Param|null, // Default: null
- *             auth_code_parameter_name?: scalar|Param|null, // Default: "_auth_code"
- *             trusted_parameter_name?: scalar|Param|null, // Default: "_trusted"
- *             remember_me_sets_trusted?: scalar|Param|null, // Default: false
- *             multi_factor?: bool|Param, // Default: false
- *             prepare_on_login?: bool|Param, // Default: false
- *             prepare_on_access_denied?: bool|Param, // Default: false
- *             enable_csrf?: scalar|Param|null, // Default: false
- *             csrf_parameter?: scalar|Param|null, // Default: "_csrf_token"
- *             csrf_token_id?: scalar|Param|null, // Default: "two_factor"
- *             csrf_header?: scalar|Param|null, // Default: null
- *             csrf_token_manager?: scalar|Param|null, // Default: "scheb_two_factor.csrf_token_manager"
- *             provider?: scalar|Param|null, // Default: null
  *         },
  *         x509?: array{
  *             provider?: scalar|Param|null,
@@ -1903,6 +1834,63 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     secret?: scalar|Param|null, // The secret used to compute fingerprints and checksums // Default: "%kernel.secret%"
  *     fetch_credentials?: "same-origin"|"include"|"omit"|Param, // The default fetch credentials mode for all Live Components ('same-origin', 'include', 'omit') // Default: "same-origin"
  * }
+ * @psalm-type TwigExtraConfig = array{
+ *     cache?: bool|array{
+ *         enabled?: bool|Param, // Default: false
+ *     },
+ *     html?: bool|array{
+ *         enabled?: bool|Param, // Default: true
+ *     },
+ *     markdown?: bool|array{
+ *         enabled?: bool|Param, // Default: false
+ *     },
+ *     intl?: bool|array{
+ *         enabled?: bool|Param, // Default: false
+ *     },
+ *     cssinliner?: bool|array{
+ *         enabled?: bool|Param, // Default: true
+ *     },
+ *     inky?: bool|array{
+ *         enabled?: bool|Param, // Default: true
+ *     },
+ *     string?: bool|array{
+ *         enabled?: bool|Param, // Default: false
+ *     },
+ *     commonmark?: array{
+ *         renderer?: array{ // Array of options for rendering HTML.
+ *             block_separator?: scalar|Param|null,
+ *             inner_separator?: scalar|Param|null,
+ *             soft_break?: scalar|Param|null,
+ *         },
+ *         html_input?: "strip"|"allow"|"escape"|Param, // How to handle HTML input.
+ *         allow_unsafe_links?: bool|Param, // Remove risky link and image URLs by setting this to false. // Default: true
+ *         max_nesting_level?: int|Param, // The maximum nesting level for blocks. // Default: 9223372036854775807
+ *         max_delimiters_per_line?: int|Param, // The maximum number of strong/emphasis delimiters per line. // Default: 9223372036854775807
+ *         slug_normalizer?: array{ // Array of options for configuring how URL-safe slugs are created.
+ *             instance?: mixed,
+ *             max_length?: int|Param, // Default: 255
+ *             unique?: mixed,
+ *         },
+ *         commonmark?: array{ // Array of options for configuring the CommonMark core extension.
+ *             enable_em?: bool|Param, // Default: true
+ *             enable_strong?: bool|Param, // Default: true
+ *             use_asterisk?: bool|Param, // Default: true
+ *             use_underscore?: bool|Param, // Default: true
+ *             unordered_list_markers?: list<scalar|Param|null>,
+ *         },
+ *         ...<string, mixed>
+ *     },
+ * }
+ * @psalm-type KnpMenuConfig = array{
+ *     providers?: array{
+ *         builder_alias?: bool|Param, // Default: true
+ *     },
+ *     twig?: array{
+ *         template?: scalar|Param|null, // Default: "@KnpMenu/menu.html.twig"
+ *     },
+ *     templating?: bool|Param, // Default: false
+ *     default_renderer?: scalar|Param|null, // Default: "twig"
+ * }
  * @psalm-type UxIconsConfig = array{
  *     icon_dir?: scalar|Param|null, // The local directory where icons are stored. // Default: "%kernel.project_dir%/assets/icons"
  *     default_icon_attributes?: array<string, scalar|Param|null>,
@@ -1922,64 +1910,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     ignore_not_found?: bool|Param, // Ignore error when an icon is not found. Set to 'true' to fail silently. // Default: false
  * }
- * @psalm-type SchebTwoFactorConfig = array{
- *     persister?: scalar|Param|null, // Default: "scheb_two_factor.persister.doctrine"
- *     model_manager_name?: scalar|Param|null, // Default: null
- *     security_tokens?: list<scalar|Param|null>,
- *     ip_whitelist?: list<scalar|Param|null>,
- *     ip_whitelist_provider?: scalar|Param|null, // Default: "scheb_two_factor.default_ip_whitelist_provider"
- *     two_factor_token_factory?: scalar|Param|null, // Default: "scheb_two_factor.default_token_factory"
- *     two_factor_provider_decider?: scalar|Param|null, // Default: "scheb_two_factor.default_provider_decider"
- *     two_factor_condition?: scalar|Param|null, // Default: null
- *     code_reuse_cache?: scalar|Param|null, // Default: null
- *     code_reuse_cache_duration?: int|Param, // Default: 60
- *     code_reuse_default_handler?: scalar|Param|null, // Default: null
- *     trusted_device?: bool|array{
- *         enabled?: scalar|Param|null, // Default: false
- *         manager?: scalar|Param|null, // Default: "scheb_two_factor.default_trusted_device_manager"
- *         lifetime?: int|Param, // Default: 5184000
- *         extend_lifetime?: bool|Param, // Default: false
- *         key?: scalar|Param|null, // Default: null
- *         cookie_name?: scalar|Param|null, // Default: "trusted_device"
- *         cookie_secure?: true|false|"auto"|Param, // Default: "auto"
- *         cookie_domain?: scalar|Param|null, // Default: null
- *         cookie_path?: scalar|Param|null, // Default: "/"
- *         cookie_same_site?: scalar|Param|null, // Default: "lax"
- *     },
- *     backup_codes?: bool|array{
- *         enabled?: scalar|Param|null, // Default: false
- *         manager?: scalar|Param|null, // Default: "scheb_two_factor.default_backup_code_manager"
- *     },
- *     email?: bool|array{
- *         enabled?: scalar|Param|null, // Default: false
- *         mailer?: scalar|Param|null, // Default: null
- *         code_generator?: scalar|Param|null, // Default: "scheb_two_factor.security.email.default_code_generator"
- *         form_renderer?: scalar|Param|null, // Default: null
- *         sender_email?: scalar|Param|null, // Default: null
- *         sender_name?: scalar|Param|null, // Default: null
- *         template?: scalar|Param|null, // Default: "@SchebTwoFactor/Authentication/form.html.twig"
- *         digits?: int|Param, // Default: 4
- *     },
- *     totp?: bool|array{
- *         enabled?: scalar|Param|null, // Default: false
- *         form_renderer?: scalar|Param|null, // Default: null
- *         issuer?: scalar|Param|null, // Default: null
- *         server_name?: scalar|Param|null, // Default: null
- *         leeway?: int|Param, // Default: 0
- *         parameters?: list<scalar|Param|null>,
- *         template?: scalar|Param|null, // Default: "@SchebTwoFactor/Authentication/form.html.twig"
- *     },
- * }
- * @psalm-type KnpMenuConfig = array{
- *     providers?: array{
- *         builder_alias?: bool|Param, // Default: true
- *     },
- *     twig?: array{
- *         template?: scalar|Param|null, // Default: "@KnpMenu/menu.html.twig"
- *     },
- *     templating?: bool|Param, // Default: false
- *     default_renderer?: scalar|Param|null, // Default: "twig"
- * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1989,7 +1919,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     doctrine_migrations?: DoctrineMigrationsConfig,
  *     twig?: TwigConfig,
  *     stimulus?: StimulusConfig,
- *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
  *     nelmio_cors?: NelmioCorsConfig,
@@ -1997,9 +1926,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     webpack_encore?: WebpackEncoreConfig,
  *     twig_component?: TwigComponentConfig,
  *     live_component?: LiveComponentConfig,
- *     ux_icons?: UxIconsConfig,
- *     scheb_two_factor?: SchebTwoFactorConfig,
+ *     twig_extra?: TwigExtraConfig,
  *     knp_menu?: KnpMenuConfig,
+ *     ux_icons?: UxIconsConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2011,7 +1940,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
- *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
@@ -2020,9 +1948,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         webpack_encore?: WebpackEncoreConfig,
  *         twig_component?: TwigComponentConfig,
  *         live_component?: LiveComponentConfig,
- *         ux_icons?: UxIconsConfig,
- *         scheb_two_factor?: SchebTwoFactorConfig,
- *         knp_menu?: KnpMenuConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2033,7 +1958,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         twig?: TwigConfig,
  *         stimulus?: StimulusConfig,
- *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         nelmio_cors?: NelmioCorsConfig,
@@ -2041,9 +1965,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         webpack_encore?: WebpackEncoreConfig,
  *         twig_component?: TwigComponentConfig,
  *         live_component?: LiveComponentConfig,
- *         ux_icons?: UxIconsConfig,
- *         scheb_two_factor?: SchebTwoFactorConfig,
- *         knp_menu?: KnpMenuConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2055,7 +1976,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
- *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         nelmio_cors?: NelmioCorsConfig,
@@ -2064,9 +1984,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         dama_doctrine_test?: DamaDoctrineTestConfig,
  *         twig_component?: TwigComponentConfig,
  *         live_component?: LiveComponentConfig,
- *         ux_icons?: UxIconsConfig,
- *         scheb_two_factor?: SchebTwoFactorConfig,
- *         knp_menu?: KnpMenuConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

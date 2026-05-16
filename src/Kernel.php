@@ -12,15 +12,12 @@
 namespace App;
 
 use Override;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use SolidWorx\Platform\PlatformBundle\Kernel as PlatformKernel;
 use function date_default_timezone_set;
 
-final class Kernel extends BaseKernel
+final class Kernel extends PlatformKernel
 {
     public const string APP_VERSION = '0.1.0';
-
-    use MicroKernelTrait;
 
     #[Override]
     public function boot(): void

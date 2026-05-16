@@ -1,5 +1,7 @@
-# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/6.x/configuration.html
-scheb_two_factor:
-    security_tokens:
-        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
-        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+# Two-factor auth is fully driven by SolidWorxPlatformBundle. When
+# `platform.security.two_factor.enabled` is set in `platform.yaml`, the platform
+# prepends the necessary `scheb_two_factor` configuration (TOTP, email, backup
+# codes, trusted devices, custom templates and renderers).
+#
+# Add overrides under `scheb_two_factor:` here only if the platform defaults are
+# not what you need.

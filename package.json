@@ -29,6 +29,8 @@
   "dependencies": {
     "@symfony/stimulus-bridge": "^3.2.3",
     "@tabler/core": "^1.4.0",
+    "baseline-browser-mapping": "^2.10.30",
+    "caniuse-lite": "^1.0.30001792",
     "intl-tel-input": "^18.5.3",
     "jquery": "^3.7.1",
     "tom-select": "^2.6.1"
