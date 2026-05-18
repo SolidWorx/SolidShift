@@ -1,82 +1,186 @@
-<div{{ attributes }}>
-    {% if requirements is empty %}
-        <p class="text-secondary mb-0">
-            <em>No staffing requirements on this sub-event.</em>
-        </p>
-    {% else %}
-        <div class="list-group list-group-flush">
-            {% for requirement in requirements %}
-                {% set assigned = this.assignedShifts(requirement) %}
-                {% set assignedCount = assigned|length %}
-                {% set min = requirement.requiredMin %}
-                {% set max = requirement.requiredMax %}
-                {% set target = max ?? min ?? 0 %}
-                {% set progressPct = target > 0 ? min(100, (assignedCount / target) * 100) : 0 %}
-                {% if min is not null and assignedCount < min %}
-                    {% set progressColor = 'bg-red' %}
-                {% elseif max is not null and assignedCount > max %}
-                    {% set progressColor = 'bg-warning' %}
-                {% else %}
-                    {% set progressColor = 'bg-success' %}
-                {% endif %}
-                {% set isOpen = openRequirementId == requirement.id ~ '' %}
+{% set scheduleDate = this.scheduleDate %}
+{% set overall = this.overallStatus %}
+{% set openRoles = this.openRoleCount %}
+{% set totalRoles = requirements|length %}
+{% set fullRoles = totalRoles - openRoles %}
+{% set isToday = scheduleDate.startDate.isToday %}
+{% set isPast = scheduleDate.startDate.isPast and not isToday %}
 
-                <div class="list-group-item px-0 py-2">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1 me-3">
-                            <strong>{{ requirement.role }}</strong>
-                            {% if requirement.area %}
-                                <span class="badge bg-blue-lt">{{ requirement.area }}</span>
-                            {% endif %}
-                            <small class="text-secondary d-block">
-                                {{ assignedCount }} assigned
-                                {% if min is not null or max is not null %}
-                                    (need
-                                    {% if min is not null %}min {{ min }}{% endif %}
-                                    {% if min is not null and max is not null %}, {% endif %}
-                                    {% if max is not null %}max {{ max }}{% endif %})
+{% set overallIcon = {
+    full: 'tabler:circle-check-filled',
+    under: 'tabler:alert-triangle-filled',
+    over: 'tabler:arrow-up-circle',
+    empty: 'tabler:user-plus',
+}[overall] %}
+
+{% set overallLabel = {
+    full: 'Fully staffed',
+    under: openRoles ~ ' role' ~ (openRoles == 1 ? '' : 's') ~ ' short',
+    over: 'Overstaffed',
+    empty: openRoles ~ ' role' ~ (openRoles == 1 ? '' : 's') ~ ' open',
+}[overall] %}
+
+<div{{ attributes.defaults({class: 'shift-card' ~ (isToday ? ' is-today') ~ (isPast ? ' is-past')}) }}>
+    <div class="body">
+        <div class="rail">
+            <div class="d-flex align-items-start" style="gap:12px;">
+                <span class="date-badge">
+                    <span class="dow">{{ scheduleDate.startDate|date('D') }}</span>
+                    <span class="day">{{ scheduleDate.startDate|date('d') }}</span>
+                </span>
+                <div style="min-width:0;">
+                    <div class="title">{{ scheduleDate.schedule.name }}</div>
+                    <div class="sub">{{ scheduleDate.occurrenceTemplate.name }}</div>
+                </div>
+            </div>
+
+            {% if scheduleDate.timeRange is not empty %}
+                <span class="time-pill">
+                    {{ ux_icon('tabler:clock', {width: 13, height: 13}) }}
+                    {{ scheduleDate.timeRange }}
+                </span>
+            {% endif %}
+
+            <div class="badge-summary">
+                <span class="status-pill is-{{ overall }}">
+                    {{ ux_icon(overallIcon, {width: 12, height: 12}) }}
+                    {{ overallLabel }}
+                </span>
+                {% if totalRoles > 0 %}
+                    <div class="summary-text">
+                        <span class="num">{{ fullRoles }}</span>
+                        of
+                        <span class="num">{{ totalRoles }}</span>
+                        role{{ totalRoles == 1 ? '' : 's' }} fully staffed
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="reqs">
+            {% if requirements is empty %}
+                <div class="p-3 text-secondary fst-italic">
+                    No staffing requirements on this sub-event.
+                </div>
+            {% else %}
+                {% for requirement in requirements %}
+                    {% set assigned = this.assignedShifts(requirement) %}
+                    {% set assignedCount = assigned|length %}
+                    {% set min = requirement.requiredMin %}
+                    {% set max = requirement.requiredMax %}
+                    {% set target = max ?? (min ?? 0) %}
+                    {% set status = this.statusFor(requirement) %}
+                    {% set stripe = {
+                        full: '#2FB344',
+                        under: '#D63939',
+                        over: '#F76707',
+                        empty: '#FCD34D',
+                    }[status] %}
+                    {% set rc = this.roleColor(requirement.role) %}
+                    {% set isOpen = openRequirementId == requirement.id ~ '' %}
+
+                    {% set fillLabel %}
+                        {% if min is not null and max is not null and min != max %}
+                            {{ assignedCount }} of {{ min }}–{{ max }}
+                        {% elseif min is not null %}
+                            {{ assignedCount }} of {{ min }}
+                        {% elseif max is not null %}
+                            {{ assignedCount }} of {{ max }}
+                        {% else %}
+                            {{ assignedCount }} assigned
+                        {% endif %}
+                    {% endset %}
+
+                    <div class="req-row" style="--stripe-color: {{ stripe }};">
+                        <div class="req-left">
+                            <div class="req-meta">
+                                <span class="role-chip" style="--role-color: {{ rc.color }}; --role-bg: {{ rc.bg }};">
+                                    <span class="dot"></span>
+                                    {{ requirement.role }}
+                                </span>
+                            </div>
+                            <div class="req-meta">
+                                {% if requirement.area %}
+                                    <span class="area-pill" title="{{ requirement.area }}">
+                                        {{ ux_icon('tabler:map-pin', {width: 12, height: 12}) }}
+                                        {{ requirement.area }}
+                                    </span>
                                 {% endif %}
-                            </small>
-                            {% if target > 0 %}
-                                <div class="progress progress-sm mt-1" style="max-width: 220px;">
-                                    <div class="progress-bar {{ progressColor }}" style="width: {{ progressPct }}%"></div>
-                                </div>
-                            {% endif %}
+                                {% if assignedCount > 0 %}
+                                    <span class="fill-count is-{{ status }}">{{ fillLabel|trim }}</span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <button type="button"
-                                class="btn btn-sm {{ isOpen ? 'btn-secondary' : 'btn-outline-secondary' }}"
-                                data-action="live#action:prevent"
-                                data-live-action-param="toggleRequirement"
-                                data-live-requirement-id-param="{{ requirement.id }}">
-                            {{ isOpen ? 'Close' : 'Assign' }}
-                        </button>
+
+                        <div class="req-mid">
+                            {% if assignedCount == 0 %}
+                                <span class="req-empty">
+                                    {{ ux_icon('tabler:user-plus', {width: 14, height: 14}) }}
+                                    Nobody assigned yet
+                                </span>
+                            {% else %}
+                                <span class="slot-row" aria-hidden="true">
+                                    {% for shift in assigned %}
+                                        {% set w = this.warningsForShift(shift) %}
+                                        {% set over = max is not null and loop.index > max %}
+                                        <span class="slot {{ over ? 'over' : (w ? 'warn' : 'filled') }}"></span>
+                                    {% endfor %}
+                                    {% if min is not null and assignedCount < min %}
+                                        {% for _ in 1..(min - assignedCount) %}
+                                            <span class="slot missing"></span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+
+                            <div class="req-chips">
+                                {% for shift in assigned %}
+                                    {% set warnings = this.warningsForShift(shift) %}
+                                    {% set u = shift.user %}
+                                    <span class="user-chip{{ warnings ? ' warn' }}"
+                                          {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}>
+                                        <span class="av" data-tone="{{ this.avatarTone(u) }}">{{ this.initials(u) }}</span>
+                                        <span>{{ u }}</span>
+                                        {% if warnings %}
+                                            <span class="warn-ico d-inline-flex">{{ ux_icon('tabler:alert-triangle-filled', {width: 13, height: 13}) }}</span>
+                                        {% endif %}
+                                        <a href="#"
+                                           class="x"
+                                           title="Unassign"
+                                           {{ live_action('removeUser:prevent', {shift: shift.id}) }}>×</a>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="req-action">
+                            <button type="button"
+                                    class="btn btn-sm {{ isOpen ? 'btn-secondary' : 'btn-outline-primary' }}"
+                                    {{ live_action('toggleRequirement:prevent', {requirementId: requirement.id}) }}>
+                                {% if isOpen %}
+                                    {{ ux_icon('tabler:x', {width: 14, height: 14}) }} Close
+                                {% else %}
+                                    {{ ux_icon('tabler:plus', {width: 14, height: 14}) }} Assign
+                                {% endif %}
+                            </button>
+                        </div>
                     </div>
 
-                    {% if assignedCount > 0 %}
-                        <div class="mt-2 d-flex flex-wrap gap-1">
-                            {% for shift in assigned %}
-                                {% set warnings = this.warningsForShift(shift) %}
-                                <span class="badge bg-green-lt d-inline-flex align-items-center"
-                                      {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}>
-                                    {% if warnings %}
-                                        <span class="status-dot bg-warning me-1"></span>
-                                    {% endif %}
-                                    {{ shift.user }}
-                                    <a href="#"
-                                       class="ms-1 text-reset"
-                                       data-action="live#action:prevent"
-                                       data-live-action-param="removeUser"
-                                       data-live-shift-param="{{ shift.id }}"
-                                       title="Unassign"
-                                    >&times;</a>
-                                </span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
                     {% if isOpen %}
-                        <div class="mt-3 p-3 border rounded bg-light">
-                            <div class="form-check form-switch mb-2">
+                        <div class="assign-panel">
+                            <div class="head">
+                                <div class="title">
+                                    Assign to
+                                    <span class="role-chip" style="--role-color: {{ rc.color }}; --role-bg: {{ rc.bg }};">
+                                        <span class="dot"></span>{{ requirement.role }}
+                                    </span>
+                                    <span class="text-secondary fw-normal ms-1">
+                                        · {{ fillLabel|trim }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-check form-switch mb-0">
                                 <input class="form-check-input"
                                        type="checkbox"
                                        id="include-all-{{ requirement.id }}"
@@ -93,22 +197,22 @@
                                     'data-live-action-param': 'save',
                                 }
                             }) }}
-                            {{ form_row(form.users) }}
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button"
-                                        class="btn btn-link"
-                                        data-action="live#action"
-                                        data-live-action-param="prevent|toggleRequirement"
-                                        data-live-requirement-id-param="{{ requirement.id }}">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="btn btn-primary">Assign</button>
-                            </div>
+                                {{ form_row(form.users) }}
+                                <div class="d-flex justify-content-end gap-2 mt-2">
+                                    <button type="button"
+                                            class="btn btn-link text-secondary"
+                                            {{ live_action('toggleRequirement:prevent', {requirementId: requirement.id}) }}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ ux_icon('tabler:check', {width: 14, height: 14}) }} Assign
+                                    </button>
+                                </div>
                             {{ form_end(form, {render_rest: false}) }}
                         </div>
                     {% endif %}
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 </div>

@@ -1,3 +1,4 @@
+{# @var dates Collection<int, Collection<int, App\Model\ScheduleDate>> #}
 <div{{ attributes }}>
     {% if computed.shiftDates is empty %}
         <div class="empty">
@@ -16,72 +17,37 @@
             </div>
         </div>
     {% else %}
-        <div class="container mt-3">
-            {% set currentDate = null %}
+        {# Flatten the per-day groupings into a single ordered list, then re-group by month. #}
+        {% set allDates = [] %}
+        {% for _, dayGroup in computed.shiftDates %}
+            {% for scheduleDate in dayGroup %}
+                {% set allDates = allDates|merge([scheduleDate]) %}
+            {% endfor %}
+        {% endfor %}
 
-            {% for area, dates in computed.shiftDates %}
+        {% set byMonth = {} %}
+        {% for scheduleDate in allDates %}
+            {% set monthKey = scheduleDate.startDate|date('Y-m') %}
+            {% set bucket = byMonth[monthKey]|default([]) %}
+            {% set bucket = bucket|merge([scheduleDate]) %}
+            {% set byMonth = byMonth|merge({(monthKey): bucket}) %}
+        {% endfor %}
 
-                {% if currentDate != dates|first.startDate|date('Y-m') %}
-                    <h2 class="mb-3 page-title">
-                        {{ dates|first.startDate|date('F Y') }}
-                    </h2>
-                    {% set currentDate = dates|first.startDate|date('Y-m') %}
-                {% endif %}
-
-                <div class="list-group mb-4">
-                    <div class="d-flex w-100 list-group-item align-items-stretch">
-                        <span class="timeline-date-pill">
-                            {{ area|date('D') }}
-                            <br />
-                            {{ area|date('d') }}
-                        </span>
-                        <div class="border-2 flex-grow-1 border-left border-indigo border-start ps-3 ms-3">
-                            {% for shiftDate in dates %}
-                                <div class="row g-3">
-                                    <div class="col-md-3">
-                                        <h3 class="mb-1">{{ shiftDate.schedule.name }}</h3>
-                                        <p class="mb-1 text-secondary">
-                                            {{ shiftDate.occurrenceTemplate.name }}
-                                        </p>
-                                        {% if shiftDate.timeRange is not empty %}
-                                            <span class="tag">
-                                                {{ shiftDate.timeRange }}
-                                            </span>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="col-md-9">
-                                        <twig:ShiftUsers :shiftDate="shiftDate" />
-                                    </div>
-                                </div>
-
-                                {% if not loop.last %}
-                                    <hr />
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-
+        <div class="ss-timeline">
+            {% for monthKey, monthDates in byMonth %}
+                {% set monthLabel = monthDates|first.startDate|date('F Y') %}
+                <div class="ss-monthhead">
+                    <h2>{{ monthLabel }}</h2>
+                    <span class="sub">
+                        {{ monthDates|length }} shift{{ monthDates|length == 1 ? '' : 's' }}
+                    </span>
+                    <span class="rule"></span>
                 </div>
+
+                {% for scheduleDate in monthDates %}
+                    <twig:ShiftUsers :shiftDate="scheduleDate" />
+                {% endfor %}
             {% endfor %}
         </div>
-
-        <style>
-            .timeline-date-pill {
-                width: 4rem;
-                height: 4rem;
-                font-size: 1.1rem;
-                line-height: 1.1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-                border-radius: 50%;
-                background-color: var(--tblr-bg-surface-secondary, #f1f5f9);
-                color: var(--tblr-secondary, #626976);
-                text-align: center;
-                font-weight: 500;
-            }
-        </style>
     {% endif %}
 </div>

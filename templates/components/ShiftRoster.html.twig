@@ -91,20 +91,14 @@
                                             ✓
                                             <a href="#"
                                                class="ms-1 text-reset"
-                                               data-action="live#action:prevent"
-                                               data-live-action-param="unassign"
-                                               data-live-shift-param="{{ shift.id }}"
-                                               title="Unassign">&times;</a>
+                                               title="Unassign"
+                                               {{ live_action('unassign:prevent', {shift: shift.id}) }}>&times;</a>
                                         </span>
                                     {% else %}
                                         <a href="#"
                                            class="btn btn-sm btn-ghost-secondary px-2 py-0"
-                                           data-action="live#action:prevent"
-                                           data-live-action-param="assign"
-                                           data-live-user-id-param="{{ user.id }}"
-                                           data-live-requirement-id-param="{{ column.requirement.id }}"
-                                           data-live-occurrence-id-param="{{ column.occurrence.id }}"
-                                           {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}>
+                                           {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}
+                                           {{ live_action('assign:prevent', {userId: user.id, requirementId: column.requirement.id, occurrenceId: column.occurrence.id}) }}>
                                             {% if warnings %}
                                                 <span class="text-warning">+</span>
                                             {% else %}

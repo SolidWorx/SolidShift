@@ -13,6 +13,7 @@ namespace App\Components;
 
 use App\Entity\Occurrence;
 use App\Entity\OccurrenceTemplate;
+use App\Entity\Role;
 use App\Entity\Schedule;
 use App\Entity\Shift;
 use App\Entity\ShiftRequirement;
@@ -42,6 +43,13 @@ use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 use function array_filter;
 use function array_map;
 use function array_values;
+use function count;
+use function in_array;
+use function is_int;
+use function md5;
+use function strtoupper;
+use function substr;
+use function unpack;
 
 #[AsLiveComponent]
 final class ShiftUsers extends AbstractController
@@ -173,6 +181,134 @@ final class ShiftUsers extends AbstractController
     public function getAssignedCount(ShiftRequirement $requirement): int
     {
         return $this->shiftRepository->countByOccurrenceAndRequirement($this->getOccurrence(), $requirement);
+    }
+
+    /**
+     * Per-requirement staffing status: full | under | over | empty.
+     */
+    public function statusFor(ShiftRequirement $requirement): string
+    {
+        $assigned = $this->getAssignedCount($requirement);
+        $min = $requirement->getRequiredMin();
+        $max = $requirement->getRequiredMax();
+
+        if ($assigned === 0) {
+            return 'empty';
+        }
+
+        if ($min !== null && $assigned < $min) {
+            return 'under';
+        }
+
+        if ($max !== null && $assigned > $max) {
+            return 'over';
+        }
+
+        return 'full';
+    }
+
+    /**
+     * Aggregate status across all requirements for this shift's rail badge.
+     */
+    public function getOverallStatus(): string
+    {
+        $statuses = [];
+
+        foreach ($this->getRequirements() as $requirement) {
+            $statuses[] = $this->statusFor($requirement);
+        }
+
+        if ($statuses === []) {
+            return 'empty';
+        }
+
+        $allEmpty = ! in_array('full', $statuses, true)
+            && ! in_array('under', $statuses, true)
+            && ! in_array('over', $statuses, true);
+
+        if ($allEmpty) {
+            return 'empty';
+        }
+
+        if (in_array('under', $statuses, true) || in_array('empty', $statuses, true)) {
+            return 'under';
+        }
+
+        if (in_array('over', $statuses, true)) {
+            return 'over';
+        }
+
+        return 'full';
+    }
+
+    /**
+     * Count of requirements that still need staffing (under-staffed or empty).
+     */
+    public function getOpenRoleCount(): int
+    {
+        $count = 0;
+
+        foreach ($this->getRequirements() as $requirement) {
+            $status = $this->statusFor($requirement);
+
+            if ($status === 'under' || $status === 'empty') {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * @return array{color: string, bg: string}
+     */
+    public function roleColor(Role $role): array
+    {
+        $palette = [
+            ['#C92A2A', '#FFF0F0'],
+            ['#D9480F', '#FFF4EC'],
+            ['#946200', '#FFF7E0'],
+            ['#0B7285', '#E3F4F7'],
+            ['#6741D9', '#F0EBFF'],
+            ['#2B8A3E', '#E6F4EA'],
+            ['#495057', '#EEF0F2'],
+            ['#1F4E79', '#E0EAF5'],
+        ];
+
+        $idx = $this->hashIndex($role->getId()->toBase32(), count($palette));
+
+        return ['color' => $palette[$idx][0], 'bg' => $palette[$idx][1]];
+    }
+
+    /**
+     * Stable avatar tone (a-h) for a user.
+     */
+    public function avatarTone(User $user): string
+    {
+        $tones = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+        return $tones[$this->hashIndex($user->getId()->toBase32(), count($tones))];
+    }
+
+    private function hashIndex(string $key, int $modulo): int
+    {
+        $unpacked = unpack('N', substr(md5($key), 0, 4));
+        $value = $unpacked === false ? 0 : $unpacked[1];
+
+        if (! is_int($value)) {
+            $value = 0;
+        }
+
+        return $value % $modulo;
+    }
+
+    public function initials(User $user): string
+    {
+        $first = $user->getFirstName() ?? '';
+        $last = $user->getLastName() ?? '';
+        $initials = strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
+
+        return $initials !== '' ? $initials : strtoupper(substr((string) $user, 0, 2));
     }
 
     /**
