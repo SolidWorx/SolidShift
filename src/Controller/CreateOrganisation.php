@@ -16,7 +16,7 @@ use App\Controller\Site\Dashboard;
 use App\Entity\Organisation;
 use App\Entity\Site;
 use App\Entity\UserSiteAccess;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Form\OrgType;
 use App\Repository\OrganisationRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -59,7 +59,7 @@ final class CreateOrganisation extends AbstractController
             assert($org instanceof Organisation);
             $org->addSite($site = new Site(name: 'Default'));
 
-            $site->addUserAccess(new UserSiteAccess(user: $this->getUser(), role: UserRole::ROLE_ADMIN));
+            $site->addUserAccess(new UserSiteAccess(user: $this->getUser(), role: MembershipRole::ROLE_ADMIN));
 
             $this->organisationRepository->save($org);
 

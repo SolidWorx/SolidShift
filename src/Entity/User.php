@@ -81,12 +81,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
     #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'user', cascade: ['persist'], orphanRemoval: true)]
     private Collection $shifts;
 
+    /**
+     * @var Collection<int, UserSiteRoleAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: UserSiteRoleAssignment::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $roleAssignments;
+
+    /**
+     * @var Collection<int, UserAreaManagement>
+     */
+    #[ORM\OneToMany(targetEntity: UserAreaManagement::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $managedAreas;
+
     public function __construct()
     {
         $this->id = new Ulid();
         $this->siteAccess = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->shifts = new ArrayCollection();
+        $this->roleAssignments = new ArrayCollection();
+        $this->managedAreas = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -304,6 +318,131 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Stringa
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, UserSiteRoleAssignment>
+     */
+    public function getRoleAssignments(): Collection
+    {
+        return $this->roleAssignments;
+    }
+
+    /**
+     * @return list<Role>
+     */
+    public function getRolesForSite(Site $site): array
+    {
+        $roles = [];
+
+        foreach ($this->roleAssignments as $assignment) {
+            if ($assignment->getSite() === $site) {
+                $roles[] = $assignment->getRole();
+            }
+        }
+
+        return $roles;
+    }
+
+    /**
+     * Replace the set of Roles assigned to this user for the given Site.
+     * Mutates the in-memory roleAssignments collection — Doctrine's
+     * cascade:persist + orphanRemoval handles inserts/deletes on flush.
+     *
+     * @param iterable<Role> $roles
+     */
+    public function setRolesForSite(Site $site, iterable $roles): void
+    {
+        $desired = [];
+        foreach ($roles as $role) {
+            $desired[$role->getId()->toBase32()] = $role;
+        }
+
+        foreach ($this->roleAssignments as $assignment) {
+            if ($assignment->getSite() !== $site) {
+                continue;
+            }
+
+            $key = $assignment->getRole()->getId()->toBase32();
+            if (isset($desired[$key])) {
+                unset($desired[$key]);
+            } else {
+                $this->roleAssignments->removeElement($assignment);
+            }
+        }
+
+        foreach ($desired as $role) {
+            $this->roleAssignments->add(new UserSiteRoleAssignment($this, $site, $role));
+        }
+    }
+
+    /**
+     * @return Collection<int, UserAreaManagement>
+     */
+    public function getManagedAreaAssignments(): Collection
+    {
+        return $this->managedAreas;
+    }
+
+    /**
+     * @return list<Area>
+     */
+    public function getManagedAreas(Site $site): array
+    {
+        $areas = [];
+
+        foreach ($this->managedAreas as $assignment) {
+            if ($assignment->getArea()->getSite() === $site) {
+                $areas[] = $assignment->getArea();
+            }
+        }
+
+        return $areas;
+    }
+
+    /**
+     * Replace the set of managed Areas this user has for the given Site.
+     * Same orphan-removal contract as setRolesForSite().
+     *
+     * @param iterable<Area> $areas
+     */
+    public function setManagedAreasForSite(Site $site, iterable $areas): void
+    {
+        $desired = [];
+        foreach ($areas as $area) {
+            if ($area->getSite() !== $site) {
+                continue;
+            }
+            $desired[$area->getId()->toBase32()] = $area;
+        }
+
+        foreach ($this->managedAreas as $assignment) {
+            if ($assignment->getArea()->getSite() !== $site) {
+                continue;
+            }
+
+            $key = $assignment->getArea()->getId()->toBase32();
+            if (isset($desired[$key])) {
+                unset($desired[$key]);
+            } else {
+                $this->managedAreas->removeElement($assignment);
+            }
+        }
+
+        foreach ($desired as $area) {
+            $this->managedAreas->add(new UserAreaManagement($this, $area));
+        }
+    }
+
+    public function managesArea(Area $area): bool
+    {
+        foreach ($this->managedAreas as $assignment) {
+            if ($assignment->getArea() === $area) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function __toString(): string

@@ -11,6 +11,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Role;
+use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -55,5 +57,43 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         $em->persist($user);
         $em->flush();
+    }
+
+    /**
+     * @return list<User>
+     */
+    public function findEligibleForRole(Site $site, Role $role): array
+    {
+        /** @var list<User> $users */
+        $users = $this->createQueryBuilder('u')
+            ->innerJoin('u.roleAssignments', 'ra')
+            ->andWhere('ra.site = :site')
+            ->andWhere('ra.role = :role')
+            ->setParameter('site', $site)
+            ->setParameter('role', $role)
+            ->orderBy('u.firstName', 'ASC')
+            ->addOrderBy('u.lastName', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $users;
+    }
+
+    /**
+     * @return list<User>
+     */
+    public function findForSite(Site $site): array
+    {
+        /** @var list<User> $users */
+        $users = $this->createQueryBuilder('u')
+            ->innerJoin('u.siteAccess', 'sa')
+            ->andWhere('sa.site = :site')
+            ->setParameter('site', $site)
+            ->orderBy('u.firstName', 'ASC')
+            ->addOrderBy('u.lastName', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $users;
     }
 }

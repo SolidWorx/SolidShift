@@ -27,6 +27,8 @@ final class ListShifts
 
     public const string DISPLAY_CALENDAR = 'calendar';
 
+    public const string DISPLAY_ROSTER = 'roster';
+
     #[LiveProp(writable: true, url: true)]
     private string $display = self::DISPLAY_TIMELINE;
 
@@ -67,6 +69,12 @@ final class ListShifts
     public function getDisplayCalendar(): bool
     {
         return $this->display === self::DISPLAY_CALENDAR;
+    }
+
+    #[ExposeInTemplate]
+    public function getDisplayRoster(): bool
+    {
+        return $this->display === self::DISPLAY_ROSTER;
     }
 
     /**

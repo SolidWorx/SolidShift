@@ -12,7 +12,7 @@
 namespace App\Controller\Shift;
 
 use App\Attribute\Route;
-use App\Entity\Location;
+use App\Entity\Area;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +26,7 @@ final class Upcoming extends AbstractController
     public function __invoke(Request $request): Response
     {
         $filterForm = $this->createFormBuilder()
-            ->add('location', EntityType::class, ['class' => Location::class, 'required' => false])
+            ->add('area', EntityType::class, ['class' => Area::class, 'required' => false])
             ->getForm();
 
         return $this->render(

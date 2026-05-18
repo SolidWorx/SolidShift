@@ -11,6 +11,7 @@
 
 namespace App\Schedule;
 
+use App\Entity\OccurrenceTemplate;
 use App\Entity\RecurringOptions;
 use App\Entity\Schedule;
 use App\Model\ScheduleDate;
@@ -40,7 +41,7 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
      */
     public function __construct(
         private iterable $schedules,
-        ClockInterface $clock
+        ClockInterface $clock,
     ) {
         $this->today = CarbonImmutable::instance($clock->now())->startOfDay();
     }
@@ -70,19 +71,22 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
             $schedules[] = $scheduledDate;
         }
 
-        usort($schedules, static function (ScheduleDate $schedule1, ScheduleDate $schedule2): int {
-            $date1 = $schedule1->getStartDate();
-            $date2 = $schedule2->getStartDate();
+        usort($schedules, static function (ScheduleDate $a, ScheduleDate $b): int {
+            $dateA = $a->getStartDate()->copy();
+            $dateB = $b->getStartDate()->copy();
 
-            if ($schedule1->startTime instanceof DateTimeInterface) {
-                $date1 = $date1->copy()->setTimeFromTimeString($schedule1->startTime->format('H:i:00'));
+            $startA = $a->getStartTime();
+            $startB = $b->getStartTime();
+
+            if ($startA instanceof DateTimeInterface) {
+                $dateA = $dateA->setTimeFromTimeString($startA->format('H:i:00'));
             }
 
-            if ($schedule2->startTime instanceof DateTimeInterface) {
-                $date2 = $date2->copy()->setTimeFromTimeString($schedule2->startTime->format('H:i:00'));
+            if ($startB instanceof DateTimeInterface) {
+                $dateB = $dateB->setTimeFromTimeString($startB->format('H:i:00'));
             }
 
-            return $date1 <=> $date2;
+            return $dateA <=> $dateB;
         });
 
         if ($totalDisplayDates > 0) {
@@ -97,18 +101,20 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
      */
     private function getScheduledDate(Schedule $schedule, CarbonImmutable $scheduleEnd): Generator
     {
+        $templates = $schedule->getOccurrenceTemplates();
+
+        if ($templates->isEmpty()) {
+            return;
+        }
+
         if (! $schedule->isRecurring()) {
             if ($this->today->greaterThan($schedule->getStartDate())) {
                 return;
             }
 
-            yield new ScheduleDate(
-                schedule: $schedule,
-                startDate: $schedule->getStartDate(),
-                endDate: $schedule->getEndDate(),
-                startTime: $schedule->getStartTime(),
-                endTime: $schedule->getEndTime(),
-            );
+            foreach ($templates as $template) {
+                yield $this->makeScheduleDate($schedule, $template, $schedule->getStartDate());
+            }
 
             return;
         }
@@ -117,7 +123,8 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
         $recurringOptions = $schedule->getRecurringOptions();
 
         $rangeEnd = $recurringOptions->getEndDate()?->lessThan($scheduleEnd) === true ? $recurringOptions->getEndDate() : $scheduleEnd->copy();
-        $occurrences = $recurringOptions->getEndOccurrence() ?? 0;
+        $totalOccurrences = $recurringOptions->getEndOccurrence() ?? 0;
+        $occurrences = $totalOccurrences;
 
         $startDate = $this->today->greaterThan($schedule->getStartDate()) ? $this->today : $schedule->getStartDate();
 
@@ -127,18 +134,24 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
                 continue;
             }
 
-            if ($occurrences-- <= 0 && $recurringOptions->getEndType()->isAfter()) {
+            if ($recurringOptions->getEndType()->isAfter() && $occurrences-- <= 0) {
                 continue;
             }
 
-            yield new ScheduleDate(
-                schedule: $schedule,
-                startDate: $date,
-                endDate: $schedule->getEndDate(),
-                startTime: $schedule->getStartTime(),
-                endTime: $schedule->getEndTime(),
-            );
+            foreach ($templates as $template) {
+                yield $this->makeScheduleDate($schedule, $template, $date);
+            }
         }
+    }
+
+    private function makeScheduleDate(Schedule $schedule, OccurrenceTemplate $template, CarbonImmutable $date): ScheduleDate
+    {
+        return new ScheduleDate(
+            schedule: $schedule,
+            occurrenceTemplate: $template,
+            startDate: $date,
+            endDate: $schedule->getEndDate(),
+        );
     }
 
     /**
@@ -158,6 +171,9 @@ final readonly class ScheduleList implements Countable, IteratorAggregate
         return iterator_count($this->schedules);
     }
 
+    /**
+     * @return Generator<ScheduleDate>
+     */
     public function getIterator(): Generator
     {
         return $this->getScheduledDates();

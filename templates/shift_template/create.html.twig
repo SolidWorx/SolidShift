@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html.twig' %}
 
 {%- block title -%}
-    {% if shiftTemplate is defined %}
+    {% if shiftTemplate is defined and shiftTemplate.name %}
         Edit {{ shiftTemplate.name }}
     {% else %}
         Create Shift Template
@@ -16,34 +16,24 @@
                     <div class="card-body">
                         <h3 class="card-title">{{- block('title') -}}</h3>
                         <div class="mb-3">
-                            {% if shiftTemplate is not defined %}
+                            {% if shiftTemplate is not defined or not shiftTemplate.name %}
                                 <div class="alert alert-indigo" role="alert">
                                     <div class="d-flex">
                                         <div>
                                             {{ icon('alert') }}
                                         </div>
                                         <div>
-                                            <h4 class="alert-title">Create a new shift template by giving it a name, position, and location.</h4>
+                                            <h4 class="alert-title">Create a new shift template by giving it a name, role, and area.</h4>
                                             <div class="text-secondary">
                                                 A shift template represents a recurring shift in your schedule.<br />
                                                 You can set optional start and end times for each shift template.<br />
-                                                Each shift template requires a position and location.
+                                                Each shift template requires a role and area.
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             {% endif %}
-                            {{ form_start(form) }}
-                            {{ form_widget(form) }}
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
-                                    <button type="submit" class="btn-primary btn">
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-                            {{ form_end(form) }}
+                            <twig:ShiftTemplateForm :initialFormData="shiftTemplate" :site="site" />
                         </div>
                     </div>
                 </div>

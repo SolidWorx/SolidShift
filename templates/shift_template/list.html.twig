@@ -35,15 +35,15 @@
         {% if shiftTemplates is empty %}
             <div class="empty">
                 <div class="empty-img">
-                    {{ include('components/illustration/location.html.twig', {label: 'No shift templates'}) }}
+                    {{ include('components/illustration/area.html.twig', {label: 'No shift templates'}) }}
                 </div>
                 <p class="empty-title">No shift templates found</p>
                 <p class="empty-subtitle text-secondary">
-                    Shift templates define recurring shifts that can be assigned to specific positions and locations.
+                    Shift templates define recurring shifts that can be assigned to specific roles and areas.
                     <br />
                     You can set optional start and end times for each shift template.
                     <br />
-                    Each shift template requires a position and location.
+                    Each shift template requires a role and area.
                 </p>
                 <div class="empty-action">
                     <a href="{{ url('shift_template.create') }}" class="btn btn-primary">
@@ -64,11 +64,11 @@
                     </div>
                     <div>
                         <div class="text-secondary">
-                            Shift templates define recurring shifts that can be assigned to specific positions and locations.
+                            Shift templates define recurring shifts that can be assigned to specific roles and areas.
                             <br />
                             You can set optional start and end times for each shift template.
                             <br />
-                            Each shift template requires a position and location.
+                            Each shift template requires a role and area.
                         </div>
                     </div>
                 </div>
@@ -84,12 +84,12 @@
                                 {{ shiftTemplate.name }}
                                 <div class="d-flex flex-wrap gap-1 mt-1">
                                     <span class="badge bg-teal text-white ms-2">
-                                        {{ shiftTemplate.position }}
+                                        {{ shiftTemplate.role }}
                                         {% if shiftTemplate.requiredMin > 0 or shiftTemplate.requiredMax > 0 %}
                                             ({{ shiftTemplate.requiredMin|default(1) == shiftTemplate.requiredMax|default(shiftTemplate.requiredMin|default(1)) ?  shiftTemplate.requiredMin|default(shiftTemplate.requiredMax) : (shiftTemplate.requiredMin ~ ' - ' ~ shiftTemplate.requiredMax) }})
                                         {% endif %}
                                     </span>
-                                    <span class="badge bg-blue text-white ms-2">{{ shiftTemplate.location }}</span>
+                                    <span class="badge bg-blue text-white ms-2">{{ shiftTemplate.area }}</span>
                                     {% if shiftTemplate.startTime %}
                                         <span class="badge bg-green text-white ms-2">{{ shiftTemplate.startTime|date('H:i') }}</span>
                                     {% endif %}
@@ -142,7 +142,7 @@
                                     {{ icon('alert') }}
                                 </div>
                                 <div>
-                                    <h4 class="alert-title">Create a new shift template by giving it a name, position, and location.</h4>
+                                    <h4 class="alert-title">Create a new shift template by giving it a name, role, and area.</h4>
                                     <div class="text-secondary">
                                         A shift template represents a recurring shift in your schedule.<br />
                                         You can set optional start and end times for each shift template.

@@ -50,11 +50,11 @@ class Site implements Stringable
     private Collection $userAccess;
 
     /**
-     * @var Collection<int, Location>
+     * @var Collection<int, Area>
      */
-    #[ORM\OneToMany(mappedBy: 'site', targetEntity: Location::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: Area::class, orphanRemoval: true)]
     #[ORM\OrderBy(['name' => Criteria::ASC])]
-    private Collection $locations;
+    private Collection $areas;
 
     /**
      * @var Collection<int, UserInvite>
@@ -72,13 +72,16 @@ class Site implements Stringable
     #[ORM\JoinColumn(nullable: false)]
     private Organisation $organisation;
 
+    #[ORM\Column(length: 32, unique: true, nullable: true)]
+    private ?string $selfRegistrationToken = null;
+
     public function __construct(?string $name = null)
     {
         $this->setName($name);
 
         $this->id = new Ulid();
         $this->userAccess = new ArrayCollection();
-        $this->locations = new ArrayCollection();
+        $this->areas = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->schedules = new ArrayCollection();
     }
@@ -141,28 +144,28 @@ class Site implements Stringable
     }
 
     /**
-     * @return Collection<int, Location>
+     * @return Collection<int, Area>
      */
-    public function getLocations(): Collection
+    public function getAreas(): Collection
     {
-        return $this->locations;
+        return $this->areas;
     }
 
-    public function addLocation(Location $location): static
+    public function addArea(Area $area): static
     {
-        if (! $this->locations->contains($location)) {
-            $this->locations->add($location);
-            $location->setSite($this);
+        if (! $this->areas->contains($area)) {
+            $this->areas->add($area);
+            $area->setSite($this);
         }
 
         return $this;
     }
 
-    public function removeLocation(Location $location): static
+    public function removeArea(Area $area): static
     {
         // set the owning side to null (unless already changed)
-        if ($this->locations->removeElement($location) && $location->getSite() === $this) {
-            $location->setSite(null);
+        if ($this->areas->removeElement($area) && $area->getSite() === $this) {
+            $area->setSite(null);
         }
 
         return $this;
@@ -243,6 +246,18 @@ class Site implements Stringable
         } else {
             $this->organisation = $organisation;
         }
+
+        return $this;
+    }
+
+    public function getSelfRegistrationToken(): ?string
+    {
+        return $this->selfRegistrationToken;
+    }
+
+    public function setSelfRegistrationToken(?string $token): static
+    {
+        $this->selfRegistrationToken = $token;
 
         return $this;
     }

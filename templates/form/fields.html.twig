@@ -1,3 +1,16 @@
+{%- block _role_allowedAreas_widget -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form.children -%}
+            {%- set depth = child.vars.attr['data-depth']|default(0) -%}
+            {%- if depth > 0 -%}
+                <div style="margin-left: {{ depth * 1.5 }}rem">{{ form_widget(child) }}</div>
+            {%- else -%}
+                {{ form_widget(child) }}
+            {%- endif -%}
+        {%- endfor -%}
+    </div>
+{%- endblock -%}
+
 {%- block phonenumber_widget -%}
     <div {{ stimulus_controller('telinput') }}>
         <input class="form-control" {{ stimulus_target('telinput', 'input')}} />
@@ -77,8 +90,7 @@
             {{ form_row(form.startDate) }}
         </div>
 
-        {{ form_row(form.startTime) }}
-        {{ form_row(form.endTime) }}
+        {{ form_row(form.endDate) }}
 
         <div class="d-none" {{ stimulus_target('schedule', 'recurringOptions') }}>
             <div class="hr-text">Recurring Options</div>
@@ -145,33 +157,3 @@
     </div>
 {%- endblock number_widget -%}
 
-{%- block _schedule_shifts_widget %}
-    {{ block('form_widget') }}
-    {%- if skip_add_button|default(false) is same as(false) and button_add is defined and not button_add.rendered -%}
-        {{ form_row(button_add) }}
-    {%- endif -%}
-{% endblock _schedule_shifts_widget -%}
-
-{%- block _schedule_shifts_entry_widget -%}
-    <div class="row">
-        <div class="col-lg-3">
-            {{ form_row(form.startTime) }}
-        </div>
-        <div class="col-lg-3">
-            {{ form_row(form.endTime) }}
-        </div>
-        <div class="col-lg-3">
-            {{ form_row(form.location) }}
-        </div>
-        <div class="col-lg-3">
-            {{ form_row(form.position) }}
-        </div>
-    </div>
-
-    {%- if button_delete is defined and not button_delete.rendered -%}
-        {# align button to the right #}
-        <div class="text-end">
-            {{ form_row(button_delete) }}
-        </div>
-    {%- endif -%}
-{%- endblock _schedule_shifts_entry_widget -%}

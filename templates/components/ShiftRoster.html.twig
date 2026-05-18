@@ -1,0 +1,123 @@
+<div{{ attributes }}>
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">Window:</span>
+            <select class="form-select form-select-sm w-auto" data-model="weeks">
+                <option value="1" {{ weeks == 1 ? 'selected' }}>1 week</option>
+                <option value="2" {{ weeks == 2 ? 'selected' }}>2 weeks</option>
+                <option value="4" {{ weeks == 4 ? 'selected' }}>4 weeks</option>
+                <option value="8" {{ weeks == 8 ? 'selected' }}>8 weeks</option>
+            </select>
+        </div>
+
+        <div class="form-check form-switch m-0">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="roster-include-all"
+                   {% if includeAllUsers %}checked{% endif %}
+                   data-model="includeAllUsers" />
+            <label class="form-check-label small" for="roster-include-all">
+                Include all site members
+            </label>
+        </div>
+    </div>
+
+    {% if grid.columns is empty %}
+        <p class="text-secondary mb-0"><em>No upcoming shifts in this window.</em></p>
+    {% elseif grid.rows is empty %}
+        <p class="text-secondary mb-0"><em>No eligible users for the upcoming shifts.</em></p>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-vcenter table-sm table-bordered roster-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-left bg-white" style="min-width: 180px;">User</th>
+                        {% for column in grid.columns %}
+                            {% set req = column.requirement %}
+                            {% set assignedCount = column.assigned|length %}
+                            {% set min = req.requiredMin %}
+                            {% set max = req.requiredMax %}
+                            {% set target = max ?? min ?? 0 %}
+                            {% set progressPct = target > 0 ? min(100, (assignedCount / target) * 100) : 0 %}
+                            {% if min is not null and assignedCount < min %}
+                                {% set progressColor = 'bg-red' %}
+                            {% elseif max is not null and assignedCount > max %}
+                                {% set progressColor = 'bg-warning' %}
+                            {% else %}
+                                {% set progressColor = 'bg-success' %}
+                            {% endif %}
+                            {% set reqStart = req.startTime %}
+                            {% set reqEnd = req.endTime %}
+                            <th class="text-center small" style="min-width: 140px;">
+                                <div class="text-secondary">{{ column.scheduleDate.startDate|date('D, d M') }}</div>
+                                {% if reqStart or reqEnd %}
+                                    <div class="text-secondary">
+                                        {% if reqStart %}{{ reqStart|date('H:i') }}{% endif %}{% if reqStart and reqEnd %} – {% endif %}{% if reqEnd %}{{ reqEnd|date('H:i') }}{% endif %}
+                                    </div>
+                                {% endif %}
+                                <div><strong>{{ req.role }}</strong></div>
+                                {% if req.area %}
+                                    <div><span class="badge bg-blue-lt">{{ req.area }}</span></div>
+                                {% endif %}
+                                <div class="small text-secondary">
+                                    {{ assignedCount }}{% if min is not null or max is not null %} /
+                                        {% if min is not null %}{{ min }}{% endif %}{% if min is not null and max is not null %}-{% endif %}{% if max is not null %}{{ max }}{% endif %}
+                                    {% endif %}
+                                </div>
+                                {% if target > 0 %}
+                                    <div class="progress progress-sm mt-1">
+                                        <div class="progress-bar {{ progressColor }}" style="width: {{ progressPct }}%"></div>
+                                    </div>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in grid.rows %}
+                        <tr>
+                            <td class="sticky-left bg-white"><strong>{{ user.fullName }}</strong></td>
+                            {% for index, column in grid.columns %}
+                                {% set cellKey = index ~ ':' ~ user.id %}
+                                {% set shift = grid.cells[cellKey]|default(null) %}
+                                {% set warnings = this.warningsFor(user, column.requirement, column.occurrence) %}
+                                <td class="text-center p-1">
+                                    {% if shift %}
+                                        <span class="badge bg-green-lt d-inline-flex align-items-center"
+                                              {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}>
+                                            {% if warnings %}
+                                                <span class="status-dot bg-warning me-1"></span>
+                                            {% endif %}
+                                            ✓
+                                            <a href="#"
+                                               class="ms-1 text-reset"
+                                               data-action="live#action:prevent"
+                                               data-live-action-param="unassign"
+                                               data-live-shift-param="{{ shift.id }}"
+                                               title="Unassign">&times;</a>
+                                        </span>
+                                    {% else %}
+                                        <a href="#"
+                                           class="btn btn-sm btn-ghost-secondary px-2 py-0"
+                                           data-action="live#action:prevent"
+                                           data-live-action-param="assign"
+                                           data-live-user-id-param="{{ user.id }}"
+                                           data-live-requirement-id-param="{{ column.requirement.id }}"
+                                           data-live-occurrence-id-param="{{ column.occurrence.id }}"
+                                           {% if warnings %}title="{{ warnings|join(' • ') }}"{% endif %}>
+                                            {% if warnings %}
+                                                <span class="text-warning">+</span>
+                                            {% else %}
+                                                +
+                                            {% endif %}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>

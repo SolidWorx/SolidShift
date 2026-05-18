@@ -14,35 +14,38 @@ namespace App\Controller\ShiftTemplate;
 use App\Attribute\Route;
 use App\Entity\ShiftTemplate;
 use App\Entity\Site;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Form\ShiftTemplateType;
 use App\Repository\ShiftTemplateRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/shift-template/edit/{shiftTemplate}', name: Edit::ROUTE_NAME, siteAware: true)]
-#[IsGranted(UserRole::ROLE_ADMIN->name)]
+#[IsGranted(MembershipRole::ROLE_ADMIN->name)]
 final class Edit extends AbstractController
 {
     public const string ROUTE_NAME = 'shift_template.edit';
 
     public function __construct(
-        private readonly ShiftTemplateRepository $shiftTemplateRepository
+        private readonly ShiftTemplateRepository $shiftTemplateRepository,
     ) {
     }
 
     /**
-     * @return array{form: FormView, shiftTemplate: ShiftTemplate}|Response
+     * @return array{shiftTemplate: ShiftTemplate, site: Site}|Response
      */
     #[Template(template: 'shift_template/create.html.twig')]
     public function __invoke(Request $request, Site $site, ShiftTemplate $shiftTemplate): array|Response
     {
-        $st = clone $shiftTemplate;
-        $form = $this->createForm(ShiftTemplateType::class, $shiftTemplate)->handleRequest($request);
+        $form = $this
+            ->createForm(ShiftTemplateType::class, $shiftTemplate, [
+                'site' => $site,
+                'organisation' => $site->getOrganisation(),
+            ])
+            ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->shiftTemplateRepository->save($shiftTemplate, true);
@@ -52,6 +55,6 @@ final class Edit extends AbstractController
             return $this->redirectToRoute(Lists::ROUTE_NAME, ['site' => $site->getId()->toBase58()]);
         }
 
-        return ['form' => $form->createView(), 'shiftTemplate' => $st];
+        return ['shiftTemplate' => $shiftTemplate, 'site' => $site];
     }
 }

@@ -25,6 +25,18 @@
             >
                 {{ icon('calendar') }}
             </button>
+            <button
+                class="btn btn-icon{{ displayRoster ? ' btn-primary' }}"
+                type="button"
+                data-model="display"
+                data-value="{{ constant('App\\Components\\ListShifts::DISPLAY_ROSTER') }}"
+                data-action="live#update"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Show Roster grid"
+            >
+                {{ icon('users') }}
+            </button>
 
             {% if display is same as(constant('App\\Components\\ListShifts::DISPLAY_CALENDAR')) %}
                 <div class="card-actions row">
@@ -63,9 +75,9 @@
             {% if display is same as(constant('App\\Components\\ListShifts::DISPLAY_TIMELINE')) %}
                 <twig:UpcomingShifts :site="site" />
             {% elseif display is same as(constant('App\\Components\\ListShifts::DISPLAY_CALENDAR')) %}
-                {#<twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" :site="site" />#}
-
                 <twig:ShiftCalendar :hiddenDays="hiddenDays" :weekStartsOn="weekStartsOn" :site="site" />
+            {% elseif display is same as(constant('App\\Components\\ListShifts::DISPLAY_ROSTER')) %}
+                <twig:ShiftRoster :site="site" />
             {% endif %}
         </div>
     </div>

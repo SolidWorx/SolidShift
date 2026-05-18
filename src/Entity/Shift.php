@@ -15,13 +15,19 @@ use App\Repository\ShiftRepository;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * Concrete assignment of a user to a staffing slot on a specific date.
+ *
+ * Required references:
+ *   - Occurrence    — the dated instance this shift is part of
+ *   - ShiftRequirement — the slot being filled (so we know role/area defaults)
+ *   - User          — who is working
+ */
 #[ORM\Entity(repositoryClass: ShiftRepository::class)]
 class Shift
 {
@@ -29,19 +35,21 @@ class Shift
     #[ORM\Column(type: UlidType::NAME)]
     private Ulid $id;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Schedule $schedule = null;
+    #[ORM\ManyToOne(inversedBy: 'shifts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Occurrence $occurrence;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private Location $location;
+    private ShiftRequirement $requirement;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    private DateTimeImmutable $startDate;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private Role $role;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $endDate = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Area $area = null;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $startTime = null;
@@ -56,10 +64,27 @@ class Shift
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    public function __construct()
-    {
+    public function __construct(
+        ?Occurrence $occurrence = null,
+        ?ShiftRequirement $requirement = null,
+        ?User $user = null,
+    ) {
         $this->id = new Ulid();
         $this->created = CarbonImmutable::now();
+
+        if ($occurrence instanceof Occurrence) {
+            $this->occurrence = $occurrence;
+        }
+
+        if ($requirement instanceof ShiftRequirement) {
+            $this->requirement = $requirement;
+            $this->role = $requirement->getRole();
+            $this->area = $requirement->getArea();
+        }
+
+        if ($user instanceof User) {
+            $this->user = $user;
+        }
     }
 
     public function getId(): Ulid
@@ -67,45 +92,67 @@ class Shift
         return $this->id;
     }
 
-    public function getSchedule(): ?Schedule
+    public function getOccurrence(): Occurrence
     {
-        return $this->schedule;
+        return $this->occurrence;
     }
 
-    public function setSchedule(?Schedule $schedule): static
+    public function setOccurrence(Occurrence $occurrence): static
     {
-        $this->schedule = $schedule;
+        $this->occurrence = $occurrence;
 
         return $this;
     }
 
-    public function getStartDate(): ?DateTimeImmutable
+    public function getRequirement(): ShiftRequirement
     {
-        return $this->startDate;
+        return $this->requirement;
     }
 
-    public function setStartDate(DateTimeImmutable $startDate): static
+    public function setRequirement(ShiftRequirement $requirement): static
     {
-        $this->startDate = $startDate;
+        $this->requirement = $requirement;
 
         return $this;
     }
 
-    public function getEndDate(): ?DateTimeImmutable
+    public function getRole(): Role
     {
-        return $this->endDate;
+        return $this->role;
     }
 
-    public function setEndDate(?DateTimeImmutable $endDate): static
+    public function setRole(Role $role): static
     {
-        $this->endDate = $endDate;
+        $this->role = $role;
 
         return $this;
+    }
+
+    public function getArea(): ?Area
+    {
+        return $this->area;
+    }
+
+    public function setArea(?Area $area): static
+    {
+        $this->area = $area;
+
+        return $this;
+    }
+
+    public function getDate(): DateTimeImmutable
+    {
+        return $this->occurrence->getDate();
+    }
+
+    public function getSchedule(): Schedule
+    {
+        return $this->occurrence->getSchedule();
     }
 
     public function getStartTime(): ?DateTimeInterface
     {
-        return $this->startTime;
+        return $this->startTime ?? $this->requirement->getStartTime();
     }
 
     public function setStartTime(?DateTimeImmutable $startTime): static
@@ -117,24 +164,12 @@ class Shift
 
     public function getEndTime(): ?DateTimeInterface
     {
-        return $this->endTime;
+        return $this->endTime ?? $this->requirement->getEndTime();
     }
 
     public function setEndTime(?DateTimeImmutable $endTime): static
     {
         $this->endTime = $endTime;
-
-        return $this;
-    }
-
-    public function getLocation(): ?Location
-    {
-        return $this->location;
-    }
-
-    public function setLocation(Location $location): static
-    {
-        $this->location = $location;
 
         return $this;
     }

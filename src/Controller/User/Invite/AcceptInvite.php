@@ -96,12 +96,14 @@ final class AcceptInvite extends AbstractController
 
     private function addSiteToUser(User $user, UserInvite $userInvite): Response
     {
-        $user->addSite(new UserSiteAccess(site: $userInvite->getSite(), role: $userInvite->getRole()));
+        $site = $userInvite->getSite();
+        $user->addSite(new UserSiteAccess(site: $site, role: $userInvite->getRole()));
+        $user->setRolesForSite($site, [...$userInvite->getPreAssignedRoles()]);
 
         $this->userRepository->save($user);
-        $this->addFlash('success', sprintf('You have been added to %s.', $userInvite->getSite()->getName()));
+        $this->addFlash('success', sprintf('You have been added to %s.', $site->getName()));
         $this->userInviteRepository->delete($userInvite);
 
-        return $this->redirectToRoute(Dashboard::ROUTE_NAME, ['site' => $userInvite->getSite()->getSlug()]);
+        return $this->redirectToRoute(Dashboard::ROUTE_NAME, ['site' => $site->getSlug()]);
     }
 }

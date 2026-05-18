@@ -51,11 +51,11 @@
             {% if schedules is empty %}
                 <div class="empty">
                     <div class="empty-img">
-                        {{ include('components/illustration/location.html.twig', {label: 'No schedules'}) }}
+                        {{ include('components/illustration/area.html.twig', {label: 'No schedules'}) }}
                     </div>
                     <p class="empty-title">No schedules found</p>
                     <p class="empty-subtitle text-secondary">
-                        Schedules are used to assign people to locations and times. <br />
+                        Schedules are used to assign people to areas and times. <br />
                         A schedule can be a one-time event or a recurring event.<br />
                     </p>
                     <div class="empty-action">
@@ -75,16 +75,17 @@
                             <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <div class="col text-truncate">
-                                        {{ schedule.name }}
-                                            {#{% for location in schedule.locations %}
-                                        <div class="d-block text-secondary text-truncate mt-n1">
-                                            {{ icon('building') }}
-                                                {{ location }}
-                                                <br />
-                                        </div>
-                                        {% endfor %}#}
-                                        <small>
-                                            {{ schedule }}
+                                        <div class="fw-medium">{{ schedule.name }}</div>
+                                        <small class="text-secondary d-block">{{ schedule }}</small>
+                                        <small class="text-secondary">
+                                            {% set templateCount = schedule.occurrenceTemplates|length %}
+                                            {{ templateCount }} sub-event{{ templateCount == 1 ? '' : 's' }}
+                                            {% if templateCount > 0 %}
+                                                &middot;
+                                                {% for tpl in schedule.occurrenceTemplates %}
+                                                    {{ tpl.name }}{% if not loop.last %}, {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
                                         </small>
                                     </div>
                                 </div>
@@ -94,7 +95,7 @@
                                         {{ icon('pencil') }}
                                     </a>
 
-                                    {#<a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Location" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ schedule.id }}">
+                                    {#<a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Area" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ schedule.id }}">
                                     {{ icon('trash') }}
                                 </a>#}
                                 </div>

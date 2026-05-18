@@ -1,0 +1,45 @@
+// Modal-style overlay used by the `overlay` Stimulus controller. Lives
+// inside its parent form so contained inputs participate in submission.
+
+.overlay-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1080; // above Bootstrap modal-backdrop (1050) just in case
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+}
+
+.overlay-panel[hidden] {
+    display: none;
+}
+
+.overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.overlay-content {
+    position: relative;
+    background: var(--tblr-bg-surface, #fff);
+    border-radius: 0.5rem;
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 640px;
+    margin-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 8rem);
+}
+
+.overlay-content .card-body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+body.overlay-open {
+    overflow: hidden;
+}

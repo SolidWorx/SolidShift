@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html.twig' %}
+
+{%- block title -%}
+    {% if role is defined %}
+        Edit {{ role.name }}
+    {% else %}
+        Create Role
+    {% endif %}
+{%- endblock title -%}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <div class="row row-cards">
+            <div class="col-6 offset-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">{{- block('title') -}}</h3>
+                        <div class="mb-3">
+                            {% if role is not defined %}
+                                <div class="alert alert-indigo" role="alert">
+                                    <div class="d-flex">
+                                        <div>
+                                            {{ icon('alert') }}
+                                        </div>
+                                        <div>
+                                            <h4 class="alert-title">Create a new role by giving it a name and optionally restricting it to one or more areas.</h4>
+                                            <div class="text-secondary">
+                                                A role represents a job title (e.g. Bartender, Usher) that can be assigned to users.<br />
+                                                Restrict it to specific areas, or leave the area list empty to allow it anywhere.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+                                    <button type="submit" class="btn-primary btn">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

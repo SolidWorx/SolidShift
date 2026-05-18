@@ -40,19 +40,11 @@ class Schedule implements Stringable
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotBlank()]
-    // #[Assert\GreaterThan('today')]
     private DateTimeImmutable $startDate;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     #[Assert\GreaterThan(propertyPath: 'startDate')]
     private ?DateTimeImmutable $endDate = null;
-
-    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $startTime = null;
-
-    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
-    //#[Assert\GreaterThan(propertyPath: 'startTime')]
-    private ?DateTimeImmutable $endTime = null;
 
     #[ORM\OneToOne(mappedBy: 'schedule', cascade: ['persist', 'remove'])]
     #[Assert\Valid]
@@ -63,10 +55,15 @@ class Schedule implements Stringable
     private Site $site;
 
     /**
-     * @var Collection<int, ScheduleShift>
+     * Time blocks within each occurrence of this Schedule (e.g. "Morning
+     * Service" 09:00–11:00). A Schedule needs at least one to appear in the
+     * calendar; form-level validation enforces this on submit.
+     *
+     * @var Collection<int, OccurrenceTemplate>
      */
-    #[ORM\ManyToMany(targetEntity: ScheduleShift::class, inversedBy: 'schedules', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $shifts;
+    #[ORM\OneToMany(mappedBy: 'schedule', targetEntity: OccurrenceTemplate::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Assert\Valid]
+    private Collection $occurrenceTemplates;
 
     public function __construct(
         string $name = '',
@@ -74,8 +71,6 @@ class Schedule implements Stringable
         ?Site $site = null,
         ?DateTimeImmutable $startDate = null,
         ?DateTimeImmutable $endDate = null,
-        ?DateTimeImmutable $startTime = null,
-        ?DateTimeImmutable $endTime = null,
         ?RecurringOptions $recurringOptions = null,
     ) {
         if ($scheduleType instanceof ScheduleType) {
@@ -94,21 +89,13 @@ class Schedule implements Stringable
             $this->endDate = $endDate;
         }
 
-        if ($startTime instanceof DateTimeInterface) {
-            $this->startTime = $startTime;
-        }
-
-        if ($endTime instanceof DateTimeInterface) {
-            $this->endTime = $endTime;
-        }
-
         if ($recurringOptions instanceof RecurringOptions) {
             $this->recurringOptions = $recurringOptions;
         }
 
         $this->name = $name;
         $this->id = new Ulid();
-        $this->shifts = new ArrayCollection();
+        $this->occurrenceTemplates = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -137,33 +124,7 @@ class Schedule implements Stringable
 
     public function setEndDate(?DateTimeImmutable $endDate): static
     {
-        if ($endDate instanceof DateTimeInterface) {
-            $this->endDate = $endDate;
-        }
-
-        return $this;
-    }
-
-    public function getStartTime(): ?CarbonImmutable
-    {
-        return $this->startTime instanceof DateTimeInterface ? CarbonImmutable::instance($this->startTime) : null;
-    }
-
-    public function setStartTime(?DateTimeImmutable $startTime): static
-    {
-        $this->startTime = $startTime;
-
-        return $this;
-    }
-
-    public function getEndTime(): ?CarbonImmutable
-    {
-        return $this->endTime instanceof DateTimeInterface ? CarbonImmutable::instance($this->endTime) : null;
-    }
-
-    public function setEndTime(?DateTimeImmutable $endTime): static
-    {
-        $this->endTime = $endTime;
+        $this->endDate = $endDate;
 
         return $this;
     }
@@ -220,11 +181,11 @@ class Schedule implements Stringable
 
         $day = $this->startDate->format('d F Y');
 
-        if ($this->endTime instanceof DateTimeInterface) {
-            return sprintf('%d %s to %s', $day, $this->startTime?->format('H:i'), $this->endTime->format('H:i'));
+        if ($this->endDate instanceof DateTimeInterface) {
+            return sprintf('%s to %s', $day, $this->endDate->format('d F Y'));
         }
 
-        return sprintf('%s at %s', $day, $this->startTime?->format('H:i'));
+        return $day;
     }
 
     public function getName(): ?string
@@ -240,25 +201,26 @@ class Schedule implements Stringable
     }
 
     /**
-     * @return Collection<int, ScheduleShift>
+     * @return Collection<int, OccurrenceTemplate>
      */
-    public function getShifts(): Collection
+    public function getOccurrenceTemplates(): Collection
     {
-        return $this->shifts;
+        return $this->occurrenceTemplates;
     }
 
-    public function addShift(ScheduleShift $shift): static
+    public function addOccurrenceTemplate(OccurrenceTemplate $occurrenceTemplate): static
     {
-        if (!$this->shifts->contains($shift)) {
-            $this->shifts->add($shift);
+        if (! $this->occurrenceTemplates->contains($occurrenceTemplate)) {
+            $this->occurrenceTemplates->add($occurrenceTemplate);
+            $occurrenceTemplate->setSchedule($this);
         }
 
         return $this;
     }
 
-    public function removeShift(ScheduleShift $shift): static
+    public function removeOccurrenceTemplate(OccurrenceTemplate $occurrenceTemplate): static
     {
-        $this->shifts->removeElement($shift);
+        $this->occurrenceTemplates->removeElement($occurrenceTemplate);
 
         return $this;
     }

@@ -11,9 +11,11 @@
 
 namespace App\Entity;
 
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Repository\UserInviteRepository;
 use App\Validator\PhoneNumber;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -51,13 +53,20 @@ class UserInvite
     #[PhoneNumber()]
     private ?string $phone = null;
 
-    #[ORM\Column(type: Types::STRING, length: 25, enumType: UserRole::class)]
-    private UserRole $role;
+    #[ORM\Column(type: Types::STRING, length: 25, enumType: MembershipRole::class)]
+    private MembershipRole $role;
+
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'user_invite_pre_assigned_role')]
+    private Collection $preAssignedRoles;
 
     public function __construct(
         ?User $user = null,
         ?Site $site = null,
-        UserRole $role = UserRole::ROLE_USER,
+        MembershipRole $role = MembershipRole::ROLE_USER,
         ?string $email = null,
         ?string $phone = null,
     ) {
@@ -71,6 +80,31 @@ class UserInvite
         }
 
         $this->id = new Ulid();
+        $this->preAssignedRoles = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getPreAssignedRoles(): Collection
+    {
+        return $this->preAssignedRoles;
+    }
+
+    public function addPreAssignedRole(Role $role): static
+    {
+        if (! $this->preAssignedRoles->contains($role)) {
+            $this->preAssignedRoles->add($role);
+        }
+
+        return $this;
+    }
+
+    public function removePreAssignedRole(Role $role): static
+    {
+        $this->preAssignedRoles->removeElement($role);
+
+        return $this;
     }
 
     public function getId(): Ulid
@@ -142,12 +176,12 @@ class UserInvite
         return $this;
     }
 
-    public function getRole(): UserRole
+    public function getRole(): MembershipRole
     {
         return $this->role;
     }
 
-    public function setRole(UserRole $role): void
+    public function setRole(MembershipRole $role): void
     {
         $this->role = $role;
     }

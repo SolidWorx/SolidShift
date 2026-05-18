@@ -11,20 +11,19 @@
 
 namespace App\Form;
 
+use App\Entity\Organisation;
 use App\Entity\Schedule;
-use App\Entity\ShiftTemplate;
+use App\Entity\Site;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use Carbon\CarbonImmutable;
 use Override;
 use Psr\Clock\ClockInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
 
 /**
@@ -33,7 +32,7 @@ use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
 final class ScheduleType extends AbstractType
 {
     public function __construct(
-        private readonly ClockInterface $clock
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -57,24 +56,44 @@ final class ScheduleType extends AbstractType
                 'startDate',
                 DateType::class,
                 [
-                    'label' => 'Shift Date',
+                    'label' => 'Start Date',
                     'attr' => $minStartDate,
                     'input' => 'datetime_immutable',
                 ]
             )
-            ->add('startTime', TimeType::class)
-            ->add('endTime', TimeType::class, ['required' => false, 'help' => 'Leave blank if the shift has no end time'])
+            ->add(
+                'endDate',
+                DateType::class,
+                [
+                    'label' => 'End Date',
+                    'required' => false,
+                    'input' => 'datetime_immutable',
+                    'help' => 'Leave blank for an open-ended schedule',
+                ]
+            )
             ->add('recurringOptions', RecurringOptions::class, ['required' => false])
-            ->add('shifts', LiveCollectionType::class, [
-                'button_delete_options' => [
-                    'label' => 'Remove',
-                    'attr' => [
-                        'class' => 'btn btn-danger btn-sm',
-                    ]
+            ->add('occurrenceTemplates', LiveCollectionType::class, [
+                'label' => 'Sub-events',
+                'help' => 'Each schedule has at least one sub-event (e.g. "Morning Service"). Add staffing requirements under each.',
+                'entry_type' => OccurrenceTemplateType::class,
+                'entry_options' => [
+                    'label' => false,
+                    'site' => $options['site'],
+                    'organisation' => $options['organisation'],
                 ],
-                'entry_type' => ScheduleShiftType::class,
-            ])
-        ;
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'constraints' => [new Assert\Count(min: 1, minMessage: 'Add at least one sub-event')],
+                'button_add_options' => [
+                    'label' => 'Add sub-event',
+                    'attr' => ['class' => 'btn btn-sm btn-secondary'],
+                ],
+                'button_delete_options' => [
+                    'label' => 'Remove sub-event',
+                    'attr' => ['class' => 'btn btn-sm btn-outline-danger'],
+                ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -82,6 +101,9 @@ final class ScheduleType extends AbstractType
         $resolver->setDefault('data_class', Schedule::class);
         $resolver->setDefault('edit', false);
         $resolver->setAllowedTypes('edit', 'bool');
+        $resolver->setRequired(['site', 'organisation']);
+        $resolver->setAllowedTypes('site', Site::class);
+        $resolver->setAllowedTypes('organisation', Organisation::class);
     }
 
     #[Override]

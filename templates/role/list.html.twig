@@ -1,0 +1,156 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Role List{% endblock %}
+
+{% block page_header %}
+    {% if roles is not empty %}
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Roles
+                        </h2>
+                    </div>
+
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <a href="{{ url('role.create') }}" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-create-role">
+                                {{ icon('plus') }}
+                                Create new role
+                            </a>
+                            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-create-role" aria-label="Create new role">
+                                {{ icon('plus') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock page_header %}
+
+{% block body %}
+    <div class="container-xl d-flex flex-column justify-content-center">
+        {% if roles is empty %}
+            <div class="empty">
+                <div class="empty-img">
+                    {{ include('components/illustration/area.html.twig', {label: 'No roles'}) }}
+                </div>
+                <p class="empty-title">No roles found</p>
+                <p class="empty-subtitle text-secondary">
+                    Roles define roles that can be assigned to users.
+                    <br />
+                    This could be a job title, role, or any other role within your organization.
+                </p>
+                <div class="empty-action">
+                    <a href="{{ url('role.create') }}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Add your first role
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-indigo" role="alert">
+                <div class="d-flex">
+                    <div>
+                        {{ icon('alert') }}
+                    </div>
+                    <div>
+                        <div class="text-secondary">
+                            Roles define roles that can be assigned to users.
+                            <br />
+                            This could be a job title, role, or any other role within your organization.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Roles</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for role in roles %}
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <span class="fw-medium">{{ role.name }}</span>
+                                {% if role.allowedAreas|length > 0 %}
+                                    {% for area in role.allowedAreas %}
+                                        <span class="badge bg-blue-lt">{{ area.name }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="badge bg-secondary-lt">Any area</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <a href="{{ url('role.edit', {role: role.id}) }}" class="btn btn-sm btn-action btn-ghost-light" data-bs-toggle="tooltip" title="Edit Role" data-bs-placement="top">
+                                    {{ icon('pencil') }}
+                                </a>
+
+                                <a href="#" class="btn btn-sm btn-action btn-ghost-light" title="Delete Role" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ role.id }}">
+                                    {{ icon('trash') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        {% embed 'ui/modal/confirm.html.twig' with {url: 'role.delete', parameters: {role: role.id}, id: role.id} %}
+                            {% block trigger %}{% endblock trigger %}
+                            {% block title %}
+                                Are you sure you want to delete the role {{ role.name }}?
+                            {% endblock %}
+                            {% block content %}
+                            {% endblock %}
+                        {% endembed %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock body %}
+
+{% block page_end %}
+    <div class="modal modal-blur fade" id="modal-create-role" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                {{ form_start(form, {'action': path('role.create')}) }}
+                <div class="modal-header">
+                    <h5 class="modal-title">New Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="alert alert-indigo" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    {{ icon('alert') }}
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">Create a new role by giving it a name.</h4>
+                                    <div class="text-secondary">
+                                        A role represents a role or job title within your organization.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary ms-auto">
+                        {{ icon('plus') }}
+                        Create new role
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock page_end %}

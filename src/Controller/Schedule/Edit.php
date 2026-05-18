@@ -28,17 +28,23 @@ final class Edit extends AbstractController
     public const string ROUTE_NAME = 'schedule.edit';
 
     public function __construct(
-        private readonly ScheduleRepository $scheduleRepository
+        private readonly ScheduleRepository $scheduleRepository,
     ) {
     }
 
     /**
-     * @return array{form: FormView}|Response
+     * @return array{form: FormView, schedule: Schedule, edit: bool}|Response
      */
     #[Template('schedule/create.html.twig')]
     public function __invoke(Request $request, Site $site, Schedule $schedule): array|Response
     {
-        $form = $this->createForm(ScheduleType::class, $schedule, ['edit' => true])->handleRequest($request);
+        $form = $this
+            ->createForm(ScheduleType::class, $schedule, [
+                'edit' => true,
+                'site' => $site,
+                'organisation' => $site->getOrganisation(),
+            ])
+            ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->scheduleRepository->save($schedule);
@@ -50,6 +56,8 @@ final class Edit extends AbstractController
 
         return [
             'form' => $form->createView(),
+            'schedule' => $schedule,
+            'edit' => true,
         ];
     }
 }

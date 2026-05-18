@@ -15,7 +15,7 @@ use App\Attribute\Route;
 use App\Controller\Site\Dashboard;
 use App\Entity\Site;
 use App\Entity\UserSiteAccess;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -57,7 +57,7 @@ final class CreateSite extends AbstractController
             $site = $form->getData();
             assert($site instanceof Site);
 
-            $site->addUserAccess(new UserSiteAccess(user: $this->getUser(), role: UserRole::ROLE_ADMIN));
+            $site->addUserAccess(new UserSiteAccess(user: $this->getUser(), role: MembershipRole::ROLE_ADMIN));
 
             $this->siteRepository->save($site);
 

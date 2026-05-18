@@ -13,8 +13,6 @@ namespace App\Entity;
 
 use App\Repository\ShiftTemplateRepository;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
@@ -37,13 +35,16 @@ class ShiftTemplate implements Stringable
 
     #[ORM\ManyToOne(inversedBy: 'shiftTemplates')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull(message: 'Position is required')]
-    private ?Position $position = null;
+    private Organisation $organisation;
 
-    #[ORM\ManyToOne(inversedBy: 'shiftTemplates')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull(message: 'Location is required')]
-    private ?Location $location = null;
+    #[Assert\NotNull(message: 'Role is required')]
+    private ?Role $role = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Area $area = null;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $startTime = null;
@@ -61,16 +62,13 @@ class ShiftTemplate implements Stringable
     #[Assert\Positive]
     private ?int $requiredMax = null;
 
-    /**
-     * @var Collection<int, Schedule>
-     */
-    #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'shiftTemplates')]
-    private Collection $schedules;
-
-    public function __construct()
+    public function __construct(?Organisation $organisation = null)
     {
         $this->id = new Ulid();
-        $this->schedules = new ArrayCollection();
+
+        if ($organisation instanceof Organisation) {
+            $this->organisation = $organisation;
+        }
     }
 
     public function getId(): Ulid
@@ -102,26 +100,38 @@ class ShiftTemplate implements Stringable
         return $this;
     }
 
-    public function getPosition(): ?Position
+    public function getOrganisation(): Organisation
     {
-        return $this->position;
+        return $this->organisation;
     }
 
-    public function setPosition(?Position $position): static
+    public function setOrganisation(Organisation $organisation): static
     {
-        $this->position = $position;
+        $this->organisation = $organisation;
 
         return $this;
     }
 
-    public function getLocation(): ?Location
+    public function getRole(): ?Role
     {
-        return $this->location;
+        return $this->role;
     }
 
-    public function setLocation(?Location $location): static
+    public function setRole(?Role $role): static
     {
-        $this->location = $location;
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getArea(): ?Area
+    {
+        return $this->area;
+    }
+
+    public function setArea(?Area $area): static
+    {
+        $this->area = $area;
 
         return $this;
     }
@@ -177,32 +187,5 @@ class ShiftTemplate implements Stringable
     public function __toString(): string
     {
         return $this->name ?? '';
-    }
-
-    /**
-     * @return Collection<int, Schedule>
-     */
-    public function getSchedules(): Collection
-    {
-        return $this->schedules;
-    }
-
-    public function addSchedule(Schedule $schedule): static
-    {
-        if (!$this->schedules->contains($schedule)) {
-            $this->schedules->add($schedule);
-            $schedule->addShiftTemplate($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSchedule(Schedule $schedule): static
-    {
-        if ($this->schedules->removeElement($schedule)) {
-            $schedule->removeShiftTemplate($this);
-        }
-
-        return $this;
     }
 }

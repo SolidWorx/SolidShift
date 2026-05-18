@@ -35,10 +35,24 @@ class Organisation implements Stringable
     #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: Site::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $sites;
 
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: Role::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $roles;
+
+    /**
+     * @var Collection<int, ShiftTemplate>
+     */
+    #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: ShiftTemplate::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $shiftTemplates;
+
     public function __construct()
     {
         $this->id = new Ulid();
         $this->sites = new ArrayCollection();
+        $this->roles = new ArrayCollection();
+        $this->shiftTemplates = new ArrayCollection();
     }
 
     public function getId(): Ulid
@@ -82,6 +96,56 @@ class Organisation implements Stringable
         if ($this->sites->removeElement($site) && $site->getOrganisation() === $this) {
             $site->setOrganisation(null);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function addRole(Role $role): static
+    {
+        if (! $this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->setOrganisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): static
+    {
+        $this->roles->removeElement($role);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShiftTemplate>
+     */
+    public function getShiftTemplates(): Collection
+    {
+        return $this->shiftTemplates;
+    }
+
+    public function addShiftTemplate(ShiftTemplate $shiftTemplate): static
+    {
+        if (! $this->shiftTemplates->contains($shiftTemplate)) {
+            $this->shiftTemplates->add($shiftTemplate);
+            $shiftTemplate->setOrganisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShiftTemplate(ShiftTemplate $shiftTemplate): static
+    {
+        $this->shiftTemplates->removeElement($shiftTemplate);
 
         return $this;
     }

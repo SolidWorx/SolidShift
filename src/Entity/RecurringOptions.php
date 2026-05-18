@@ -211,22 +211,10 @@ class RecurringOptions implements Stringable
 
     public function __toString(): string
     {
-        $time = '';
-
-        if ($this->schedule->getStartTime() instanceof DateTimeInterface) {
-            $time = sprintf('at %s', $this->schedule->getStartTime()->format('H:i'));
-
-            if ($this->schedule->getEndTime() instanceof DateTimeInterface) {
-                $time .= sprintf(' to %s', $this->schedule->getEndTime()->format('H:i'));
-            }
-        } elseif ($this->schedule->getEndTime() instanceof DateTimeInterface) {
-            $time = sprintf('until %s', $this->schedule->getEndTime()->format('H:i'));
-        }
-
         if ($this->type->isWeekly()) {
-            $string = sprintf('Every %s %s', Arr::join(array_map(static fn (WeekDay $day) => $day->name, $this->getDays()), ', ', ' and '), $time);
+            $string = sprintf('Every %s', Arr::join(array_map(static fn (WeekDay $day) => $day->name, $this->getDays()), ', ', ' and '));
         } else {
-            $string = sprintf('Every day %s', $time);
+            $string = 'Every day';
         }
 
         if ($this->endType->isOn()) {

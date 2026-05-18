@@ -13,7 +13,7 @@ namespace App\Security\Voter;
 
 use App\Entity\Site;
 use App\Entity\User;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use function Symfony\Component\String\u;
 
 /**
- * @extends Voter<string, UserRole>
+ * @extends Voter<string, MembershipRole>
  */
 final class UserSiteAccessVoter extends Voter
 {
@@ -32,7 +32,7 @@ final class UserSiteAccessVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (! $this->getUserRole($attribute) instanceof UserRole) {
+        if (! $this->getUserRole($attribute) instanceof MembershipRole) {
             return false;
         }
 
@@ -51,7 +51,7 @@ final class UserSiteAccessVoter extends Voter
         }
 
         $userRole = $this->getUserRole($attribute);
-        assert($userRole instanceof UserRole);
+        assert($userRole instanceof MembershipRole);
 
         foreach ($user->getSiteAccess() as $access) {
             if ($access->getSite() !== $subject) {
@@ -68,9 +68,9 @@ final class UserSiteAccessVoter extends Voter
         return false;
     }
 
-    private function getUserRole(string $attribute): ?UserRole
+    private function getUserRole(string $attribute): ?MembershipRole
     {
-        return UserRole::tryFrom(
+        return MembershipRole::tryFrom(
             u($attribute)
                 ->replace('ROLE_', '')
                 ->lower()

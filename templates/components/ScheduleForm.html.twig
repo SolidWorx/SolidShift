@@ -1,19 +1,139 @@
 <div {{ attributes }}>
     {{ form_start(form) }}
-    {{ form_widget(form) }}
 
-    <div class="mb-3">
-        <div class="d-flex justify-content-between">
-            <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
-            <div>
-                <button type="submit" class="btn-primary btn">
-                    {{ 'Save'|trans }}
-                </button>
-            </div>
+    {# Prevent schedule_widget from rendering occurrenceTemplates — we render
+       them ourselves below as overlay-driven sub-event cards. The schedule_widget
+       block still owns name / scheduleType / dates / recurringOptions (it wires
+       up the Stimulus controller that toggles recurring-options visibility). #}
+    {% do form.occurrenceTemplates.setRendered() %}
+
+    {# ---------- Schedule basics ---------- #}
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Schedule</h3>
+        </div>
+        <div class="card-body">
+            {{ form_widget(form) }}
         </div>
     </div>
-    {{ form_end(form) }}
 
-    {#<a href="#" {{ live_action('test:prevent') }}>Test</a>
-    <a href="#" data-action="live#action" data-action-name="prevent|test">Test2</a>#}
+    {# ---------- Sub-events ---------- #}
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="card-title mb-0">Sub-events</h3>
+                <small class="text-secondary">Each sub-event is one distinct slot (e.g. "Morning Service"). Click a sub-event to edit its staffing.</small>
+            </div>
+            {{ form_widget(form.occurrenceTemplates.vars.button_add, {label: '+ Add sub-event', attr: {class: 'btn btn-primary'}}) }}
+        </div>
+        <div class="card-body">
+            {% if form.occurrenceTemplates|length == 0 %}
+                <p class="text-secondary mb-0">No sub-events yet — click "Add sub-event" to add the first one.</p>
+            {% else %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for occurrenceTemplate in form.occurrenceTemplates %}
+                        {% set tplName = occurrenceTemplate.name.vars.value %}
+                        {% set tplStart = occurrenceTemplate.startTime.vars.value %}
+                        {% set tplEnd = occurrenceTemplate.endTime.vars.value %}
+                        {% set requirementsCount = occurrenceTemplate.requirements|length %}
+                        {% set isNew = (tplName is null or tplName == '') %}
+
+                        <div data-controller="overlay" data-overlay-open-on-connect-value="{{ isNew ? 'true' : 'false' }}" class="d-inline-block">
+                            <button type="button" class="btn btn-outline-primary" data-action="overlay#open">
+                                <span class="fw-medium">
+                                    {{ tplName|default('New sub-event') }}
+                                </span>
+                                {% if tplStart %}
+                                    <span class="text-secondary ms-1">{{ tplStart|date('H:i') }}{% if tplEnd %}–{{ tplEnd|date('H:i') }}{% endif %}</span>
+                                {% endif %}
+                                {% if requirementsCount > 0 %}
+                                    <span class="badge bg-blue-lt ms-1">{{ requirementsCount }} requirement{{ requirementsCount == 1 ? '' : 's' }}</span>
+                                {% endif %}
+                            </button>
+
+                            <div data-overlay-target="panel" class="overlay-panel" hidden>
+                                <div class="overlay-backdrop" data-action="click->overlay#close"></div>
+                                <div class="overlay-content card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ tplName ?: 'New sub-event' }}</h5>
+                                        <button type="button" class="btn-close" aria-label="Close" data-action="overlay#close"></button>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form_row(occurrenceTemplate.name) }}
+                                        <div class="row">
+                                            <div class="col">{{ form_row(occurrenceTemplate.startTime) }}</div>
+                                            <div class="col">{{ form_row(occurrenceTemplate.endTime) }}</div>
+                                        </div>
+
+                                        <hr class="my-3" />
+
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <h6 class="mb-0">Staffing requirements</h6>
+                                                <small class="text-secondary">Who do you need? Pick role + area + how many.</small>
+                                            </div>
+                                            {{ form_widget(occurrenceTemplate.requirements.vars.button_add, {label: '+ Add requirement', attr: {class: 'btn btn-sm btn-secondary'}}) }}
+                                        </div>
+
+                                        {% if occurrenceTemplate.requirements|length == 0 %}
+                                            <p class="text-secondary small mb-0">No requirements yet — add one to staff this sub-event.</p>
+                                        {% endif %}
+
+                                        {% for requirement in occurrenceTemplate.requirements %}
+                                            <div class="border rounded p-3 mb-2 position-relative">
+                                                <div data-controller="reveal" class="mb-2">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-link p-0"
+                                                            data-action="reveal#open"
+                                                            data-reveal-target="trigger">
+                                                        📋 Load from shift template
+                                                    </button>
+                                                    <div data-reveal-target="panel" hidden>
+                                                        {{ form_row(requirement.template) }}
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">{{ form_row(requirement.role) }}</div>
+                                                    <div class="col-md-6">{{ form_row(requirement.area) }}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">{{ form_row(requirement.startTime) }}</div>
+                                                    <div class="col-md-6">{{ form_row(requirement.endTime) }}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">{{ form_row(requirement.requiredMin) }}</div>
+                                                    <div class="col-md-6">{{ form_row(requirement.requiredMax) }}</div>
+                                                </div>
+                                                {% if requirement.vars.button_delete is defined %}
+                                                    <div class="text-end">
+                                                        {{ form_widget(requirement.vars.button_delete, {label: 'Remove requirement', attr: {class: 'btn btn-sm btn-outline-danger'}}) }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        {% if occurrenceTemplate.vars.button_delete is defined %}
+                                            {{ form_widget(occurrenceTemplate.vars.button_delete, {label: 'Remove sub-event', attr: {class: 'btn btn-outline-danger'}}) }}
+                                        {% else %}
+                                            <span></span>
+                                        {% endif %}
+                                        <button type="button" class="btn btn-primary" data-action="overlay#close">Done</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3 d-flex justify-content-between">
+        <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+        <button type="submit" class="btn btn-primary">{{ 'Save'|trans }}</button>
+    </div>
+
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
 </div>

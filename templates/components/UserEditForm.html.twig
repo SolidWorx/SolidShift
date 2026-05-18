@@ -1,0 +1,19 @@
+<div {{ attributes }}>
+    {{ form_start(form) }}
+    {{ form_row(form.firstName) }}
+    {{ form_row(form.lastName) }}
+    {{ form_row(form.phone) }}
+    {{ form_row(form.membershipRole) }}
+    {{ form_row(form.jobRoles) }}
+    {% if form.managedAreas is defined %}
+        {{ form_row(form.managedAreas) }}
+    {% endif %}
+
+    <div class="d-flex justify-content-between mt-3">
+        <a href="{{ path('user.list', {site: site.slug}) }}" class="btn btn-link">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+</div>

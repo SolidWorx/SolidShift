@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 use function array_map;
+use function is_string;
 
 /**
  * @extends AbstractType<User>
@@ -49,6 +50,27 @@ class UserAutocompleteType extends AbstractType
                                 $excludeUsers,
                             )
                         );
+                }
+
+                $siteId = $options['extra_options']['eligible_site_id'] ?? null;
+                $roleIds = $options['extra_options']['eligible_role_ids'] ?? [];
+
+                if (is_string($siteId) && $siteId !== '' && $roleIds !== []) {
+                    $qb->innerJoin('u.roleAssignments', 'ra')
+                        ->andWhere('ra.site = :eligibleSite')
+                        ->andWhere('ra.role IN (:eligibleRoles)')
+                        ->setParameter('eligibleSite', Ulid::fromBase32($siteId)->toBinary())
+                        ->setParameter(
+                            'eligibleRoles',
+                            array_map(
+                                static fn (string $id): string => Ulid::fromBase32($id)->toBinary(),
+                                $roleIds,
+                            )
+                        );
+                } elseif (is_string($siteId) && $siteId !== '') {
+                    $qb->innerJoin('u.siteAccess', 'sa')
+                        ->andWhere('sa.site = :eligibleSite')
+                        ->setParameter('eligibleSite', Ulid::fromBase32($siteId)->toBinary());
                 }
 
                 return $qb;

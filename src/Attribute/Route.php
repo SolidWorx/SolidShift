@@ -44,7 +44,7 @@ final class Route extends BaseRoute
         ?bool $utf8 = null,
         ?bool $stateless = null,
         ?string $env = null,
-        readonly bool $siteAware = false,
+        public readonly bool $siteAware = false,
     ) {
         if (! is_array($path)) {
             $path = ($siteAware ? '/s/{site}/' : '/') . ltrim((string) $path, '/');

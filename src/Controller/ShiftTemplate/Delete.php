@@ -13,14 +13,14 @@ namespace App\Controller\ShiftTemplate;
 
 use App\Attribute\Route;
 use App\Entity\ShiftTemplate;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Repository\ShiftTemplateRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/shift-template/delete/{shiftTemplate}', name: Delete::ROUTE_NAME, methods: ['DELETE', 'POST'], siteAware: true)]
-#[IsGranted(UserRole::ROLE_ADMIN->name)]
+#[IsGranted(MembershipRole::ROLE_ADMIN->name)]
 final class Delete extends AbstractController
 {
     public const string ROUTE_NAME = 'shift_template.delete';

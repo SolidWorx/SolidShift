@@ -1,0 +1,21 @@
+<div {{ attributes }}>
+    {{ form_start(form) }}
+    {{ form_row(form.name) }}
+    {{ form_row(form.description) }}
+    {{ form_row(form.role) }}
+    {{ form_row(form.area) }}
+    {{ form_row(form.startTime) }}
+    {{ form_row(form.endTime) }}
+    {{ form_row(form.requiredMin) }}
+    {{ form_row(form.requiredMax) }}
+
+    <div class="mb-3">
+        <div class="d-flex justify-content-between">
+            <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
+            <button type="submit" class="btn-primary btn">{{ 'Save'|trans }}</button>
+        </div>
+    </div>
+
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+</div>

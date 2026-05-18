@@ -41,7 +41,7 @@ final class Invite extends AbstractController
     {
         $userInvite = new UserInvite(site: $site);
 
-        $form = $this->createForm(UserInviteType::class, $userInvite)->handleRequest($request);
+        $form = $this->createForm(UserInviteType::class, $userInvite, ['site' => $site])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->messageBus->dispatch($userInvite);

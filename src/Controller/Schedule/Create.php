@@ -16,10 +16,7 @@ use App\Entity\Schedule;
 use App\Entity\Site;
 use App\Enum\ScheduleType as ScheduleTypeEnum;
 use App\Form\ScheduleType;
-use App\Repository\LocationRepository;
-use App\Repository\PositionRepository;
 use App\Repository\ScheduleRepository;
-use App\Repository\ShiftTemplateRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormView;
@@ -33,14 +30,11 @@ final class Create extends AbstractController
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,
-        private readonly ShiftTemplateRepository $shiftTemplateRepository,
-        private readonly PositionRepository $positionRepository,
-        private readonly LocationRepository $locationRepository,
     ) {
     }
 
     /**
-     * @return array{form: FormView, shiftTemplates: array, positions: array, locations: array}|Response
+     * @return array{form: FormView, schedule: Schedule, edit: bool}|Response
      */
     #[Template('schedule/create.html.twig')]
     public function __invoke(Request $request, Site $site): array|Response
@@ -50,7 +44,13 @@ final class Create extends AbstractController
             site: $site,
         );
 
-        $form = $this->createForm(ScheduleType::class, $schedule, ['edit' => false])->handleRequest($request);
+        $form = $this
+            ->createForm(ScheduleType::class, $schedule, [
+                'edit' => false,
+                'site' => $site,
+                'organisation' => $site->getOrganisation(),
+            ])
+            ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->scheduleRepository->save($schedule);
@@ -62,9 +62,8 @@ final class Create extends AbstractController
 
         return [
             'form' => $form->createView(),
-            'shiftTemplates' => $this->shiftTemplateRepository->findAll(),
-            'positions' => $this->positionRepository->findAll(),
-            'locations' => $this->locationRepository->findAll(),
+            'schedule' => $schedule,
+            'edit' => false,
         ];
     }
 }

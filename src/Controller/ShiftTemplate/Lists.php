@@ -14,7 +14,7 @@ namespace App\Controller\ShiftTemplate;
 use App\Attribute\Route;
 use App\Entity\ShiftTemplate;
 use App\Entity\Site;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Form\ShiftTemplateType;
 use App\Repository\ShiftTemplateRepository;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -23,7 +23,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/shift-templates', name: Lists::ROUTE_NAME, siteAware: true)]
-#[IsGranted(UserRole::ROLE_ADMIN->name)]
+#[IsGranted(MembershipRole::ROLE_ADMIN->name)]
 final class Lists extends AbstractController
 {
     public const string ROUTE_NAME = 'shift_template.list';
@@ -40,8 +40,11 @@ final class Lists extends AbstractController
     public function __invoke(Site $site): array
     {
         return [
-            'form' => $this->createForm(ShiftTemplateType::class)->createView(),
-            'shiftTemplates' => $this->shiftTemplateRepository->findAll()
+            'form' => $this->createForm(ShiftTemplateType::class, null, [
+                'site' => $site,
+                'organisation' => $site->getOrganisation(),
+            ])->createView(),
+            'shiftTemplates' => $this->shiftTemplateRepository->findForSite($site),
         ];
     }
 }

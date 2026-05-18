@@ -11,7 +11,7 @@
 
 namespace App\Entity;
 
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Repository\UserSiteAccessRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -36,16 +36,16 @@ class UserSiteAccess
     #[ORM\JoinColumn(nullable: false)]
     private Site $site;
 
-    #[ORM\Column(length: 15, enumType: UserRole::class)]
-    private UserRole $role;
+    #[ORM\Column(length: 15, enumType: MembershipRole::class)]
+    private MembershipRole $role;
 
-    public function __construct(?UserInterface $user = null, ?Site $site = null, ?UserRole $role = null)
+    public function __construct(?UserInterface $user = null, ?Site $site = null, ?MembershipRole $role = null)
     {
         if ($user instanceof User) {
             $this->setUser($user);
         }
 
-        if ($role instanceof UserRole) {
+        if ($role instanceof MembershipRole) {
             $this->setRole($role);
         }
 
@@ -93,12 +93,12 @@ class UserSiteAccess
         return $this;
     }
 
-    public function getRole(): UserRole
+    public function getRole(): MembershipRole
     {
         return $this->role;
     }
 
-    public function setRole(UserRole $role): static
+    public function setRole(MembershipRole $role): static
     {
         $this->role = $role;
 

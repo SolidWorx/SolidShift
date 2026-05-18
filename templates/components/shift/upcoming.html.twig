@@ -2,7 +2,7 @@
     {% if computed.shiftDates is empty %}
         <div class="empty">
             <div class="empty-img">
-                {{ include('components/illustration/location.html.twig', {label: 'No upcoming shifts'}) }}
+                {{ include('components/illustration/area.html.twig', {label: 'No upcoming shifts'}) }}
             </div>
             <p class="empty-title">{{ 'No shifts found'|trans }}</p>
             <p class="empty-subtitle text-secondary">
@@ -17,29 +17,9 @@
         </div>
     {% else %}
         <div class="container mt-3">
-
-            {# <div class="row g-2 align-items-center mb-4">
-                <div class="col">
-                    <h2 class="page-title">
-                        Event Timeline
-                    </h2>
-                </div>
-            #}{# <div class="col-auto ms-auto d-print-none">
-                            <div class="btn-list">
-                                <a href="{{ url('schedule.create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                                    {{ icon('plus') }}
-                                    Add Shift
-                                </a>
-                                <a href="{{ url('schedule.create') }}" class="btn btn-primary d-sm-none btn-icon" aria-label="Create new Schedule">
-                                    {{ icon('plus') }}
-                                </a>
-                            </div>
-                        </div> #}{#
-            </div> #}
-
             {% set currentDate = null %}
 
-            {% for location, dates in computed.shiftDates %}
+            {% for area, dates in computed.shiftDates %}
 
                 {% if currentDate != dates|first.startDate|date('Y-m') %}
                     <h2 class="mb-3 page-title">
@@ -49,26 +29,20 @@
                 {% endif %}
 
                 <div class="list-group mb-4">
-                    <div class="d-flex w-100 justify-content-between align-items-center list-group-item">
-                        <span class="badge badge-light rounded-pill">
-                            {# {{ location|date('d') }}
+                    <div class="d-flex w-100 list-group-item align-items-stretch">
+                        <span class="timeline-date-pill">
+                            {{ area|date('D') }}
                             <br />
-                            {{ location|date('M') }} #}
-
-                            {{ location|date('D') }}
-                            <br />
-                            {{ location|date('d') }}
+                            {{ area|date('d') }}
                         </span>
                         <div class="border-2 flex-grow-1 border-left border-indigo border-start ps-3 ms-3">
                             {% for shiftDate in dates %}
-                                <div class="row">
-                                    <div class="col-3">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
                                         <h3 class="mb-1">{{ shiftDate.schedule.name }}</h3>
-                                        {#{% for location in shiftDate.schedule.locations %}
-                                            <p class="mb-1">
-                                                {{ location }}
-                                            </p>
-                                        {% endfor %}#}
+                                        <p class="mb-1 text-secondary">
+                                            {{ shiftDate.occurrenceTemplate.name }}
+                                        </p>
                                         {% if shiftDate.timeRange is not empty %}
                                             <span class="tag">
                                                 {{ shiftDate.timeRange }}
@@ -76,7 +50,7 @@
                                         {% endif %}
                                     </div>
 
-                                    <div class="col">
+                                    <div class="col-md-9">
                                         <twig:ShiftUsers :shiftDate="shiftDate" />
                                     </div>
                                 </div>
@@ -91,34 +65,22 @@
                 </div>
             {% endfor %}
         </div>
-        {# <div class="card">
-             <div class="card-header">
-                 <button class="btn btn-icon" type="button" data-action="live#action" data-action-name="fooBar">
-                    {{ icon('calendar') }}
-                 </button>
-                 {% if this.display is same as('calendar') %}
-                     DISPLAY THE CALENDAR!!!!
-                 {% endif %}
-        #}{# {{ form_start(form) }}
-                    {{ form_widget(this.filters.location, {'attr': {'data-model': 'query'}}) }}
-                    {{ form_row(form.location, {'attr': {'data-model': 'query'}}) }}
-                {{ form_end(form) }} #}{#
-    </div>
-    <div class="card-body">
-
-    </div>
-</div> #}
 
         <style>
-            .list-group-item .badge {
-                width: 5rem;
-                height: 5rem;
-                font-size: 1.5rem;
+            .timeline-date-pill {
+                width: 4rem;
+                height: 4rem;
+                font-size: 1.1rem;
+                line-height: 1.1;
                 display: flex;
                 align-items: center;
-                flex-shrink: 0;
                 justify-content: center;
+                flex-shrink: 0;
                 border-radius: 50%;
+                background-color: var(--tblr-bg-surface-secondary, #f1f5f9);
+                color: var(--tblr-secondary, #626976);
+                text-align: center;
+                font-weight: 500;
             }
         </style>
     {% endif %}

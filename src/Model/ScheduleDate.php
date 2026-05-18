@@ -11,58 +11,90 @@
 
 namespace App\Model;
 
+use App\Entity\OccurrenceTemplate;
 use App\Entity\Schedule;
 use Carbon\CarbonImmutable;
+use DateTimeImmutable;
 use DateTimeInterface;
-use LogicException;
 use Stringable;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Uid\Ulid;
 use function hash;
 
+/**
+ * A materialised (date, OccurrenceTemplate) pair belonging to a Schedule.
+ *
+ * Each rendered calendar/list entry corresponds to one ScheduleDate. The time
+ * block (start/end) is derived from the OccurrenceTemplate, not the Schedule.
+ */
 final class ScheduleDate implements Stringable
 {
     private string $hash = '';
 
     public function __construct(
-        public ?Schedule $schedule = null,
-        public ?CarbonImmutable $startDate = null,
+        public Schedule $schedule,
+        public OccurrenceTemplate $occurrenceTemplate,
+        public CarbonImmutable $startDate,
         public ?CarbonImmutable $endDate = null,
-        public ?CarbonImmutable $startTime = null,
-        public ?CarbonImmutable $endTime = null,
     ) {
+    }
+
+    public function getOccurrenceTemplate(): OccurrenceTemplate
+    {
+        return $this->occurrenceTemplate;
+    }
+
+    #[Ignore]
+    public function getStartTime(): ?DateTimeImmutable
+    {
+        return $this->occurrenceTemplate->getStartTime();
+    }
+
+    #[Ignore]
+    public function getEndTime(): ?DateTimeImmutable
+    {
+        return $this->occurrenceTemplate->getEndTime();
     }
 
     public function timeRange(): string
     {
         $parts = [];
 
-        if ($this->startTime instanceof DateTimeInterface) {
-            $parts[] = $this->startTime->format('H:i A');
+        $start = $this->getStartTime();
+
+        if ($start instanceof DateTimeInterface) {
+            $parts[] = $start->format('H:i');
         }
 
-        if ($this->endTime instanceof DateTimeInterface) {
-            $parts[] = $this->endTime->format('H:i A');
+        $end = $this->getEndTime();
+
+        if ($end instanceof DateTimeInterface) {
+            $parts[] = $end->format('H:i');
         }
 
         return implode(' - ', $parts);
+    }
+
+    public function getDate(): DateTimeImmutable
+    {
+        // Strip the time portion so it lines up with Occurrence.date (DATE column).
+        return $this->startDate->startOfDay()->toDateTimeImmutable();
     }
 
     public function __toString(): string
     {
         $string = $this->getStartDate()->format('d F Y');
 
-        if ($this->startTime instanceof DateTimeInterface) {
-            $string .= ' ' . $this->startTime->format('H:i');
+        $start = $this->getStartTime();
+
+        if ($start instanceof DateTimeInterface) {
+            $string .= ' ' . $start->format('H:i');
         }
 
-        if ($this->endDate instanceof DateTimeInterface) {
-            $string .= ' - ' . $this->endDate->format('d F Y');
+        $end = $this->getEndTime();
 
-            if ($this->endTime instanceof DateTimeInterface) {
-                $string .= ' ' . $this->endTime->format('H:i');
-            }
-        } elseif ($this->endTime instanceof DateTimeInterface) {
-            $string .= ' - ' . $this->endTime->format('H:i');
+        if ($end instanceof DateTimeInterface) {
+            $string .= ' - ' . $end->format('H:i');
         }
 
         return $string;
@@ -74,7 +106,9 @@ final class ScheduleDate implements Stringable
             return $this->hash;
         }
 
-        return $this->hash = Ulid::fromBinary(hash('md5', $this->schedule?->getId() . $this, true));
+        $key = $this->schedule->getId() . '|' . $this->occurrenceTemplate->getId() . '|' . $this->startDate->format('Y-m-d');
+
+        return $this->hash = Ulid::fromBinary(hash('md5', $key, true));
     }
 
     public function setHash(string $hash): self
@@ -86,19 +120,11 @@ final class ScheduleDate implements Stringable
 
     public function getStartDate(): CarbonImmutable
     {
-        if (! $this->startDate instanceof CarbonImmutable) {
-            throw new LogicException('Start date is not set');
-        }
-
         return $this->startDate;
     }
 
     public function getSchedule(): Schedule
     {
-        if (! $this->schedule instanceof Schedule) {
-            throw new LogicException('Schedule is not set');
-        }
-
         return $this->schedule;
     }
 }

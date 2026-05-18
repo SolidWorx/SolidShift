@@ -17,7 +17,7 @@ use App\Doctrine\Filter\SiteFilter;
 use App\Doctrine\Listener\UserPasswordListener;
 use App\Entity\Site;
 use App\Entity\User;
-use App\Enum\UserRole;
+use App\Enum\MembershipRole;
 use App\Repository\SiteRepository;
 use App\Repository\UserRepository;
 use App\Router\Router;
@@ -185,7 +185,7 @@ final class CreateSiteTest extends KernelTestCase
 
             foreach ($dbSite->getUserAccess() as $userAccess) {
                 self::assertSame($this->user, $userAccess->getUser());
-                self::assertSame(UserRole::ROLE_ADMIN, $userAccess->getRole());
+                self::assertSame(MembershipRole::ROLE_ADMIN, $userAccess->getRole());
             }
         }
     }

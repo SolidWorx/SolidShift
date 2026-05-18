@@ -18,13 +18,6 @@
                             {{ icon('plus') }}
                             Invite new user
                         </a>
-                        <a href="#" class="btn btn-cyan d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#site-invite-link" aria-label="Get Invite Link">
-                            {{ icon('link') }}
-                            Get Invite Link
-                        </a>
-                        <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-create-location" aria-label="Invite new user">
-                            {{ icon('plus') }}
-                        </a>
                     </div>
                 </div>
             </div>
@@ -43,6 +36,36 @@
             </li>
         </ul>
 
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title">Self-registration link</h3>
+                <p class="text-secondary mb-3">
+                    Share this URL so anyone can register themselves as a member of {{ site.name }}.
+                    Rotate it to invalidate any leaked copies.
+                </p>
+
+                {% if site.selfRegistrationToken %}
+                    {% set joinUrl = url('site.self_register', {token: site.selfRegistrationToken}) %}
+                    <div class="clipboard-container mb-3" data-controller="clipboard">
+                        <pre data-clipboard-target="source">{{ joinUrl }}</pre>
+                        <a class="copy-btn" href="#" data-action="clipboard#copy">{{ icon('link') }}</a>
+                    </div>
+
+                    <form method="post" action="{{ path('user.self_registration_link', {action: 'rotate'}) }}" class="d-inline">
+                        <button type="submit" class="btn btn-secondary">Rotate</button>
+                    </form>
+                    <form method="post" action="{{ path('user.self_registration_link', {action: 'disable'}) }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger">Disable</button>
+                    </form>
+                {% else %}
+                    <p class="text-secondary mb-3"><em>Self-registration is disabled.</em></p>
+                    <form method="post" action="{{ path('user.self_registration_link', {action: 'rotate'}) }}">
+                        <button type="submit" class="btn btn-primary">{{ icon('link') }} Generate link</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="card">
             <div class="table-responsive">
                 <table class="table table-vcenter card-table">
@@ -50,7 +73,8 @@
                     <tr>
                         <th>Name</th>
                         <th>Phone</th>
-                        <th>Role</th>
+                        <th>Membership</th>
+                        <th>Job roles</th>
                         <th class="w-1"></th>
                     </tr>
                     </thead>
@@ -84,17 +108,27 @@
                                 {{ userAccess.role.value|title }}
                             </td>
                             <td>
-                                {% if userAccess.user is not same as(app.user) %}
-                                    {% embed 'ui/modal/confirm.html.twig' with {url: 'user.remove', parameters: {user: userAccess.user.id}} %}
-                                        {% block title %}
-                                            Are you sure you want to delete the user {{ userAccess.user.fullName }}?
-                                        {% endblock %}
+                                {% for role in userAccess.user.getRolesForSite(site) %}
+                                    <span class="badge bg-blue-lt">{{ role.name }}</span>
+                                {% else %}
+                                    <span class="text-secondary"><em>None</em></span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <a href="{{ path('user.edit', {user: userAccess.user.id}) }}" class="btn btn-sm">Manage</a>
+                                    {% if userAccess.user is not same as(app.user) %}
+                                        {% embed 'ui/modal/confirm.html.twig' with {url: 'user.remove', parameters: {user: userAccess.user.id}} %}
+                                            {% block title %}
+                                                Are you sure you want to delete the user {{ userAccess.user.fullName }}?
+                                            {% endblock %}
 
-                                        {% block content %}
-                                            Deleting the user will remove all their access from {{ site.name }}.
-                                        {% endblock content %}
-                                    {% endembed %}
-                                {% endif %}
+                                            {% block content %}
+                                                Deleting the user will remove all their access from {{ site.name }}.
+                                            {% endblock content %}
+                                        {% endembed %}
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -105,30 +139,3 @@
     </div>
 {% endblock body %}
 
-{% block page_end %}
-    <div class="modal modal-blur fade" id="site-invite-link" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ site.name }} Invite link</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Send the below link to any user that you want to invite to {{ site.name }}.<br />
-
-                    {#<pre>{{ url('site.join', {site: site.id}) }}</pre>#}
-
-                    <div class="clipboard-container" data-controller="clipboard">
-                        <pre data-clipboard-target="source">{{ url('site.join', {site: site.id}) }}</pre>
-                        <a class="copy-btn" href="#" data-action="clipboard#copy">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-copy" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h3m9 -9v-5a2 2 0 0 0 -2 -2h-2" /><path d="M13 17v-1a1 1 0 0 1 1 -1h1m3 0h1a1 1 0 0 1 1 1v1m0 3v1a1 1 0 0 1 -1 1h-1m-3 0h-1a1 1 0 0 1 -1 -1v-1" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /></svg>
-                        </a>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock page_end %}

@@ -14,12 +14,9 @@ namespace App\Components;
 use App\Calendar\Calendar;
 use App\Calendar\Config;
 use App\Calendar\Enum\DisplayType;
-use App\Entity\Location;
-use App\Entity\Shift;
 use App\Entity\Site;
 use App\Model\ScheduleDate;
 use App\Repository\ScheduleRepository;
-use App\Repository\ShiftRepository;
 use Carbon\CarbonImmutable;
 use Carbon\WeekDay;
 use DateInvalidTimeZoneException;
@@ -59,7 +56,6 @@ final class ShiftCalendar
 
     public function __construct(
         private readonly ScheduleRepository $scheduleRepository,
-        private readonly ShiftRepository $shiftRepository,
         private readonly ClockInterface $clock,
     ) {
         $this->startDate = CarbonImmutable::instance($this->clock->now())
@@ -102,20 +98,8 @@ final class ShiftCalendar
         };
 
         return collect($schedules)
-            ->groupBy(static fn (ScheduleDate $date, int $index): string => $date->startDate?->format('Y-m-d') ?? '')
+            ->groupBy(static fn (ScheduleDate $date): string => $date->startDate->format('Y-m-d'))
             ->toArray();
-    }
-
-    public function getShift(ScheduleDate $scheduleDate, Location $location): ?Shift
-    {
-        return $this->shiftRepository->findOneBy([
-            'schedule' => $scheduleDate->schedule,
-            'startDate' => $scheduleDate->startDate,
-            'startTime' => $scheduleDate->startTime,
-            'location' => $location,
-            'endDate' => $scheduleDate->endDate,
-            'endTime' => $scheduleDate->endTime,
-        ]);
     }
 
     #[LiveAction]

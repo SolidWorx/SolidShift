@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html.twig' %}
 
 {%- block title -%}
-    {% if schedule is defined %}
+    {% if edit %}
         {{ 'Edit Schedule'|trans }}
     {% else %}
         {{ 'Create Schedule'|trans }}
@@ -11,134 +11,16 @@
 {% block body %}
     <div class="container-xl d-flex flex-column justify-content-center">
         <div class="row row-cards">
-            <div class="col-6 offset-3">
+            <div class="col-8 offset-2">
                 <div class="card">
                     <div class="card-body">
                         <h3 class="card-title">{{- block('title') -}}</h3>
                         <div class="mb-3">
-
-                            {#{% if location is not defined %}
-                                <div class="alert alert-indigo" role="alert">
-                                    <div class="d-flex">
-                                        <div>
-                                            {{ icon('alert') }}
-                                        </div>
-                                        <div>
-                                            <h4 class="alert-title">Create a new location by giving it a unique name.</h4>
-                                            <div class="text-secondary">
-                                                A location is any place where a person can be scheduled to be on duty.<br />
-                                                This could be a physical location, like an office or an area in the building, <br />
-                                                or it can be a team or department within the organization.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}#}
-
-                            <twig:ScheduleForm />
-
-                            {#{{ form_start(form) }}
-                            {{ form_widget(form) }}
-
-                            <div id="selectedTemplatesContainer" class="mb-3 d-none">
-                                <h5>{{ 'Selected Shift Templates'|trans }}</h5>
-                                <div id="selectedTemplates" class="list-group">
-                                    <!-- Selected templates will be displayed here -->
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <a href="javascript: history.back()" class="btn btn-link">Cancel</a>
-                                    <div>
-                                        <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#addShiftsModal">
-                                            {{ 'Add Shifts'|trans }}
-                                        </button>
-                                        <button type="submit" class="btn-primary btn">
-                                            {{ 'Save'|trans }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            {{ form_end(form) }}#}
-
+                            <twig:ScheduleForm :initialFormData="schedule" :site="site" :edit="edit" />
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Shifts Modal -->
-    <div class="modal fade" id="addShiftsModal" tabindex="-1" aria-labelledby="addShiftsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addShiftsModalLabel">{{ 'Add Shifts from Template'|trans }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="shiftTemplateSelect" class="form-label">{{ 'Select Shift Template'|trans }}</label>
-                        <select id="shiftTemplateSelect" class="form-select">
-                            <option value="">{{ 'Choose a template'|trans }}</option>
-                            {% for template in shiftTemplates %}
-                                <option value="{{ template.id }}"
-                                    data-position="{{ template.position.id }}"
-                                    data-location="{{ template.location.id }}"
-                                    data-start-time="{{ template.startTime ? template.startTime|date('H:i') : '' }}"
-                                    data-end-time="{{ template.endTime ? template.endTime|date('H:i') : '' }}"
-                                    data-required-min="{{ template.requiredMin }}"
-                                    data-required-max="{{ template.requiredMax }}">
-                                    {{ template.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div id="shiftTemplateDetails" class="d-none">
-                        <h6>{{ 'Template Details'|trans }}</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="templatePosition" class="form-label">{{ 'Position'|trans }}</label>
-                                <select id="templatePosition" class="form-select">
-                                    {% for position in positions %}
-                                        <option value="{{ position.id }}">{{ position.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="templateLocation" class="form-label">{{ 'Location'|trans }}</label>
-                                <select id="templateLocation" class="form-select">
-                                    {% for location in locations %}
-                                        <option value="{{ location.id }}">{{ location.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="templateStartTime" class="form-label">{{ 'Start Time'|trans }}</label>
-                                <input type="time" id="templateStartTime" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="templateEndTime" class="form-label">{{ 'End Time'|trans }}</label>
-                                <input type="time" id="templateEndTime" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="templateRequiredMin" class="form-label">{{ 'Min Required'|trans }}</label>
-                                <input type="number" id="templateRequiredMin" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="templateRequiredMax" class="form-label">{{ 'Max Required'|trans }}</label>
-                                <input type="number" id="templateRequiredMax" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans }}</button>
-                    <button type="button" class="btn btn-primary" id="addShiftFromTemplate">{{ 'Add Shift'|trans }}</button>
                 </div>
             </div>
         </div>
     </div>
 {% endblock body %}
-
