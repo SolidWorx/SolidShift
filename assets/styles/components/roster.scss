@@ -1,0 +1,404 @@
+// Roster matrix — adapted from the design bundle (SolidShift Roster.html).
+// Scoped under .ss-roster so it doesn't leak.
+
+.ss-roster {
+    --status-under: #D63939;
+    --status-full: #2FB344;
+    --status-over: #F76707;
+
+    color: #1A1A1A;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    .roster-controls {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+
+        .ctrl {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .lbl {
+                font-size: 11.5px;
+                font-weight: 700;
+                color: #94A3B8;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+            }
+        }
+
+        .form-select {
+            background-color: #fff;
+            border-color: #D6DEE6;
+            font-size: 13px;
+            height: 32px;
+            padding: 0 32px 0 12px;
+            background-position: right 10px center;
+            background-size: 14px 12px;
+            width: auto;
+            min-width: 110px;
+        }
+
+        .form-check-label {
+            font-size: 13px;
+            color: #475569;
+        }
+    }
+
+    .roster-card {
+        background: #fff;
+        border: 1px solid #D6DEE6;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .roster-scroll {
+        flex: 1;
+        overflow: auto;
+    }
+
+    .roster-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 1080px;
+        table-layout: fixed;
+
+        th.user-head {
+            background: #FAFBFC;
+            border-bottom: 1px solid #D6DEE6;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 4;
+        }
+
+        th.shift-head {
+            background: #fff;
+            border-bottom: 1px solid #D6DEE6;
+            border-left: 1px solid #F1F5F9;
+            padding: 8px 10px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            vertical-align: top;
+
+            .meta {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
+            }
+
+            .when {
+                font-size: 10px;
+                font-weight: 700;
+                color: #94A3B8;
+                letter-spacing: .06em;
+                text-transform: uppercase;
+            }
+
+            .time {
+                font-size: 10.5px;
+                color: #64748B;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .area {
+                padding: 1px 6px;
+                border-radius: 4px;
+                background: #F1F5F9;
+                color: #475569;
+                font-size: 9.5px;
+                font-weight: 600;
+                max-width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .fill {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                width: 100%;
+                margin-top: 2px;
+
+                .count {
+                    font-size: 11px;
+                    font-weight: 700;
+                    font-variant-numeric: tabular-nums;
+                }
+
+                .bar {
+                    flex: 1;
+                    height: 3px;
+                    border-radius: 2px;
+                    background: #E2E8F0;
+                    overflow: hidden;
+
+                    > div {
+                        height: 100%;
+                    }
+                }
+            }
+
+            &.today {
+                background: #EFF8FF;
+            }
+        }
+
+        td {
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+        }
+
+        td.user-cell {
+            padding: 10px 16px;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        td.cell {
+            border-left: 1px solid #F1F5F9;
+            padding: 6px;
+            text-align: center;
+        }
+
+        td.cell.filled {
+            background: #F0FDF4;
+        }
+
+        td.cell.warn {
+            background: #FFFBEB;
+        }
+
+        tbody tr:nth-child(odd) td.user-cell {
+            background: #fff;
+        }
+
+        tbody tr:nth-child(even) td.user-cell {
+            background: #FAFBFC;
+        }
+
+        tbody tr:hover td.user-cell {
+            background: #EFF8FF;
+        }
+
+        tbody tr:hover td.cell:not(.filled):not(.warn) {
+            background: #F8FAFC;
+        }
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .av {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            flex: 0 0 auto;
+        }
+
+        .nm {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .roles {
+            display: flex;
+            gap: 3px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+
+        .role-mini {
+            font-size: 9.5px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+    }
+
+    .av[data-tone="a"] { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); color: #1E40AF; }
+    .av[data-tone="b"] { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); color: #9D174D; }
+    .av[data-tone="c"] { background: linear-gradient(135deg, #DCFCE7, #BBF7D0); color: #166534; }
+    .av[data-tone="d"] { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; }
+    .av[data-tone="e"] { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); color: #3730A3; }
+    .av[data-tone="f"] { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: #991B1B; }
+    .av[data-tone="g"] { background: linear-gradient(135deg, #CCFBF1, #99F6E4); color: #115E59; }
+    .av[data-tone="h"] { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); color: #5B21B6; }
+
+    .cell-assigned {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #fff;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+
+        svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        &.ok {
+            border: 1px solid #86EFAC;
+            color: #166534;
+        }
+
+        &.warn {
+            border: 1px solid #FCD34D;
+            color: #B45309;
+        }
+
+        .x {
+            color: #94A3B8;
+            font-size: 13px;
+            padding-left: 1px;
+            line-height: 1;
+            text-decoration: none;
+
+            &:hover {
+                color: #C92A2A;
+            }
+        }
+    }
+
+    .cell-add {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1.5px dashed #CBD5E1;
+        background: #fff;
+        color: #94A3B8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: border-color .12s, color .12s, background .12s;
+        padding: 0;
+
+        svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        &:hover {
+            border-color: #1492E6;
+            color: #1492E6;
+            background: #EFF8FF;
+        }
+
+        &.ineligible,
+        &.ineligible:hover {
+            border: none;
+            background: transparent;
+            color: #E2E8F0;
+            cursor: default;
+        }
+    }
+
+    .role-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 5px;
+        white-space: nowrap;
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+    }
+
+    .roster-footer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 10px 16px;
+        border-top: 1px solid #D6DEE6;
+        background: #FAFBFC;
+        font-size: 12px;
+        color: #64748B;
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            strong {
+                color: #1A1A1A;
+                font-variant-numeric: tabular-nums;
+                font-weight: 700;
+            }
+        }
+
+        .legend-sw {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            border: 1px solid;
+        }
+
+        .legend-filled {
+            background: #F0FDF4;
+            border-color: #86EFAC;
+        }
+
+        .legend-warn {
+            background: #FFFBEB;
+            border-color: #FCD34D;
+        }
+
+        .legend-dashed {
+            background: #fff;
+            border-color: #CBD5E1;
+            border-style: dashed;
+        }
+    }
+
+    // Density modifiers (apply on parent: .ss-roster.density-compact)
+    &.density-compact {
+        .roster-table td.user-cell { padding: 6px 14px; }
+        .roster-table td.cell { padding: 3px 5px; }
+        .user-info .av { width: 26px; height: 26px; font-size: 10px; }
+    }
+
+    &.density-comfortable {
+        .roster-table td.user-cell { padding: 14px 18px; }
+        .roster-table td.cell { padding: 9px 6px; }
+    }
+}

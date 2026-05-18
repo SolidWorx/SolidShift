@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Components;
 
 use App\Entity\Occurrence;
+use App\Entity\Role;
 use App\Entity\Shift;
 use App\Entity\ShiftRequirement;
 use App\Entity\Site;
@@ -35,6 +36,12 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 use function array_values;
+use function count;
+use function is_int;
+use function md5;
+use function strtoupper;
+use function substr;
+use function unpack;
 
 /**
  * Users × Requirements grid. Each row is an eligible user, each column is a
@@ -211,5 +218,85 @@ final class ShiftRoster
     public function getTodayLabel(): string
     {
         return CarbonImmutable::now()->format('D, d M Y');
+    }
+
+    /**
+     * Per-requirement staffing status: full | under | over | empty.
+     *
+     * @param list<Shift> $assigned
+     */
+    public function statusFor(ShiftRequirement $requirement, array $assigned): string
+    {
+        $count = count($assigned);
+        $min = $requirement->getRequiredMin();
+        $max = $requirement->getRequiredMax();
+
+        if ($count === 0) {
+            return 'empty';
+        }
+
+        if ($min !== null && $count < $min) {
+            return 'under';
+        }
+
+        if ($max !== null && $count > $max) {
+            return 'over';
+        }
+
+        return 'full';
+    }
+
+    /**
+     * @return array{color: string, bg: string}
+     */
+    public function roleColor(Role $role): array
+    {
+        $palette = [
+            ['#C92A2A', '#FFF0F0'],
+            ['#D9480F', '#FFF4EC'],
+            ['#946200', '#FFF7E0'],
+            ['#0B7285', '#E3F4F7'],
+            ['#6741D9', '#F0EBFF'],
+            ['#2B8A3E', '#E6F4EA'],
+            ['#495057', '#EEF0F2'],
+            ['#1F4E79', '#E0EAF5'],
+        ];
+
+        $idx = $this->hashIndex($role->getId()->toBase32(), count($palette));
+
+        return ['color' => $palette[$idx][0], 'bg' => $palette[$idx][1]];
+    }
+
+    public function avatarTone(User $user): string
+    {
+        $tones = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+        return $tones[$this->hashIndex($user->getId()->toBase32(), count($tones))];
+    }
+
+    public function initials(User $user): string
+    {
+        $first = $user->getFirstName() ?? '';
+        $last = $user->getLastName() ?? '';
+        $initials = strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
+
+        return $initials !== '' ? $initials : strtoupper(substr((string) $user, 0, 2));
+    }
+
+    public function isToday(CarbonImmutable $date): bool
+    {
+        return $date->isSameDay(CarbonImmutable::now());
+    }
+
+    private function hashIndex(string $key, int $modulo): int
+    {
+        $unpacked = unpack('N', substr(md5($key), 0, 4));
+        $value = $unpacked === false ? 0 : $unpacked[1];
+
+        if (! is_int($value)) {
+            $value = 0;
+        }
+
+        return $value % $modulo;
     }
 }
