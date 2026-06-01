@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "setup": ["composer install"],
+    "setup": ["composer install", "bun install", "bun run build"],
     "run": [
       { "label": "Unit Tests", "command": "vendor/bin/phpunit" },
       { "label": "Static Analysis", "command": "vendor/bin/phpstan" },
