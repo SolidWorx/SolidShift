@@ -75,7 +75,7 @@
     "ergebnis/composer-normalize": "^2.41",
     "ergebnis/phpunit-slow-test-detector": "^2.7",
     "phpstan/extension-installer": "^1.3",
-    "phpstan/phpstan": "^2.0",
+    "phpstan/phpstan": "^2.2",
     "phpstan/phpstan-deprecation-rules": "^2.0",
     "phpstan/phpstan-doctrine": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
